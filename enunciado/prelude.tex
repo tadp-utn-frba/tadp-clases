@@ -1,0 +1,262 @@
+%%!TEX encoding = UTF-8 Unicode 
+\usepackage[utf8]{inputenc}
+\usepackage{amstext}
+\usepackage{ifthen}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{xspace}
+\usepackage{color}
+\usepackage{fancyvrb}
+\usepackage{version}
+\usepackage{theorem}
+\usepackage{listings}
+
+\usepackage[spanish]{babel}
+
+\textwidth 17.5cm
+\textheight 26cm
+\oddsidemargin -1cm
+%\evensidemargin -.3cm
+\topmargin -1cm
+\headheight 0cm
+\headsep 0cm
+
+%\textwidth 16cm
+%\textheight 25cm
+%\oddsidemargin -.64cm
+%\evensidemargin -.64cm
+%\topmargin -1.5cm
+%\headheight 0cm
+%\headsep 0cm
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\lstset{ %
+  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,	                % adds a frame around the code
+  tabsize=2,	                % sets default tabsize to 2 spaces
+  captionpos=true,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=true,        % sets if automatic breaks should only happen at whitespace
+  escapeinside={\%*}{*)/},         % if you want to add a comment within your code
+  aboveskip=3mm,
+  belowskip=3mm,
+  columns=flexible,
+  basicstyle=\small\ttfamily,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\bfseries,
+  commentstyle=\color{gray},
+  stringstyle=\color{gray},
+}
+
+\lstdefinelanguage{smalltalk}{
+  morekeywords={self,super},
+  otherkeywords={:=,^,\[,\],>>,\(,\),\;},
+  sensitive=true,
+  morecomment=[n]{"},
+  morestring=[b]'
+}
+
+\lstloadlanguages{Ruby}
+\lstset{%
+  basicstyle=\ttfamily\color{black},
+  commentstyle = \ttfamily\color{red},
+  keywordstyle=\ttfamily\color{blue},
+  stringstyle=\color{orange}
+}
+
+\renewcommand{\thepage}{}
+\newcommand{\ignore}[1]{}
+\newcommand{\mat}[1]{\ensuremath{#1}}
+
+\newenvironment{display}
+   {\begin{list}{}{\setlength{\topsep}{0cm}
+                   \setlength{\leftmargin}{0cm}
+                  }}{\end{list}}
+
+\newcommand{\textfol}[1]{\ensuremath{\textsf{#1}}}
+\newcommand{\textcode}[1]{{\normalfont{\texttt{#1}}}}
+\newcommand{\propername}[1]{\textsc{#1}}
+
+%\renewcommand{\labelenumi}{\textbf{\alph{enumi})}}
+\renewcommand{\labelenumii}{\textbf{\alph{enumii})}}
+
+\newcommand{\pred}[2]{\ensuremath{\text{\textbf{#1}}(#2)}}
+\newcommand{\predName}[1]{\ensuremath{\text{\textbf{#1}}}}
+\newcommand{\var}[1]{\ensuremath{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\paratodo}[2]{\ensuremath{(\forall{#1})#2}}
+\newcommand{\existe}[2]{\ensuremath{(\exists{#1})#2}}
+\newcommand{\implicasp}{\ensuremath{\Rightarrow}}
+\newcommand{\ysp}{\ensuremath{\,\wedge\,}}
+\newcommand{\osp}{\ensuremath{\,\vee\,}}
+\newcommand{\nosp}{\ensuremath{\neg}}
+\newcommand{\implica}{\ensuremath{\Rightarrow}}
+\newcommand{\y}{\ensuremath{\,\wedge\,}}
+\renewcommand{\o}{\ensuremath{\,\vee\,}}
+\newcommand{\no}{\ensuremath{\neg}}
+
+\newcommand{\agujero}[1]{\ensuremath{<}\textit{#1}\ensuremath{>}}
+\newcommand{\vble}[1]{\ensuremath{#1}}
+\newcommand{\mkP}[2]{\ensuremath{p_{{#1#2}}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Manejo de versiones (final o interna)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\final}[1]{\ifthenelse{\equal{\version}{interna}}{}{#1}}
+\newcommand{\nofinal}[1]{\ifthenelse{\equal{\version}{interna}}{#1}{}}
+
+\newcommand{\consolu}[1]{\ifthenelse{\equal{\version}{con soluciones}}{#1}{}}
+\newcommand{\sinsolu}[1]{\ifthenelse{\equal{\version}{con soluciones}}{}{#1}}
+
+\newboolean{final}
+\final{\setboolean{final}{true}}
+\nofinal{\setboolean{final}{false}}
+
+\newcommand{\internal}[1]{ 
+ \nofinal{\begin{flushleft} \textcolor{blue}{\upshape #1} \end{flushleft}}
+}
+
+\newcommand{\comentario}[1]{\textbf{\internal{#1}}}
+\newcommand{\objetivo}[1]{\internal{\textbf{Objetivo:} #1}}
+
+\sinsolu{\excludeversion{solucion}}
+\consolu{
+	\newcommand{\solucionTitle}{{\normalfont\textbf{\textcolor{blue}{Solución posible:}}}}
+	\DefineVerbatimEnvironment{solucion}{Verbatim}
+		{fontshape=n,tabsize=0,fontsize=\small,xleftmargin=16pt,formatcom=\solucionTitle\color{blue}}
+}
+
+\DefineVerbatimEnvironment{ejemplo}{Verbatim}{fontshape=n,tabsize=0,fontsize=\small,xleftmargin=16pt,}
+
+
+\newcommand{\formalidadesPrimerEnunciado}{
+  \section{Objetivos y forma de entrega}
+  
+  \subsection{Objetivos generales}
+    El trabajo práctico debe realizarse en grupos de 5 personas. El trabajo práctico tiene como objetivo garantizar 
+    que durante el transcurso de la materia todos los estudiantes pasen por la experiencia de:
+
+    \begin{itemize}
+      
+      \item participar en un diseño complejo,
+      \item bajar a código sus ideas de diseño en una computadora y verificar su funcionamiento mediante la utilización 
+      de test cases.
+      \item participar de una experiencia de trabajo grupal basada en herramientas de colaboración de tipo industrial, en
+      particular compartiendo el código mediante un repositorio de fuentes compartido.
+    \end{itemize}
+
+    Para garantizar esto habrá tareas individuales y grupales. La entrega global deberá ser una sola para todo el 
+    grupo, pero identificando en donde se solicite las responsabilidades que tomó cada uno. De esta forma se logra 
+    un ambiente de trabajo similar al profesional, en el que cada uno tiene sus responsabilidad individuales sobre un
+    proyecto compartido y el éxito del proyecto depende del trabajo conjunto.
+
+    La evaluación del tp tendrá dos calificaciones, una grupal y otra individual. En caso de que alguno de los 
+    integrantes del grupo no demuestre haberse comprometido con el trabajo grupal se le realizará un coloquio en el
+    que deberá defender la solución propuesta por él y por el grupo.
+
+    En la primera etapa del tp tendrán preponderancia las tareas grupales, con asignaciones individuales muy
+    pequeñas, mientras que en la segunda parte esto se invertirá, para tener una mayoría de responsabilidades repartidas
+    en asignaciones individuales.
+
+    \subsection{Interacción con el tutor}
+      Cada grupo tendrá asignado un tutor que los guiará no sólo para ir encontrando la mejor solución posible sino
+      también en cuanto al proceso de trabajo, \textbf{ambos aspectos son igualmente importantes para la materia} y
+      serán tenidos en cuenta para decidir la aprobación o no del trabajo práctico.
+
+      Consideramos muy importante interactuar frecuentemente con el tutor y no esperar a la fecha de entrega para
+      realizar las consultas. \textbf{No se aceptarán entregas fuera de término}, ya que esto es contrario a las necesidades
+      del aprendizaje, las fechas no están puestas por capricho sino para ayudarlos a asimilar los conocimientos de la
+      mejor manera posible. Si un grupo o un integrante no puede asistir al día de la entrega deberá responsabilizarse
+      de coordinar una alternativa con el tutor, \textbf{en forma previa a la fecha límite}.
+
+    \subsection{Forma de entrega}
+      Para realizar el TP y almacenar tanto el código fuente como los documentos se deberá crear un área de trabajo
+      compartida basada en un repositorio con capacidad de versionado, por ejemplo se pueden utilizar los repositorios
+      \emph{svn} provistos en \texttt{www.xp-dev.com}.
+
+      En cada entrega se deberá contar con el código en el aula para poder validarla. Quienes tengan la posibilidad de
+      traerla en su propia notebook podrán hacerlo, en caso contrario deberán coordinar con el tutor para que él pueda
+      tener el código en su propia notebook o el mecanismo alternativo que decidan en conjunto con el tutor. En caso
+      que no contar con el código para evaluarlo en el momento de la entrega, la misma se considerará \emph{desaprobada}.
+      
+      La entrega constará del código fuente que resuelva los requerimientos y la documentación en papel correspondiente que
+      explique las decisiones de diseño tomadas para llegar a dicha solución. Lo interesante de esta documentación no es una
+      explicación del código (eso se puede ver allí) sino las alternativas que consideraron y los motivos por los cuales eligieron
+      la solución que se implementó.
+
+
+  \section{Requerimientos del Sistema}
+
+}
+
+
+
+\newcommand{\formalidadesSegundoEnunciado}{
+ \section{Objetivos y forma de entrega}
+ 
+   En esta siguiente parte del trabajo práctico se presentan 5 nuevos requerimientos, que se agregan a lo ya realizado
+   para la anterior parte. Estos nuevos requerimientos deberán repartirse entre los integrantes del grupo, uno para
+   cada uno. En los casos en los que el grupo tenga menos de 5 integrantes se podrá dejar afuera algún requerimiento,
+   previo acuerdo con el tutor del grupo.
+
+   Cabe recordar que no por esto la entrega deja de ser grupal. La entrega del TP debe ser una sola, pero
+   identificando las responsabilidades asumidas por cada uno. Esto tiene dos objetivos: el primero es acercarse a la
+   forma de colaboración que uno tendría en un proyecto laboral; el segundo es garantizar que todos trabajen, pero
+   sin perder la posibilidad de interactuar con los compañeros.
+
+   De esta forma cada uno deberá proponer el diseño que soluciona la tarea que le fue asignada, pero al mismo
+   tiempo deberá consensuar con los demás integrantes del grupo las modificaciones que quiere hacer sobre el diseño
+   base.
+    \smallskip
+
+    Para la entrega, deberán traer la documentación impresa actualizada que explica las decisiones de diseño que llevaron
+    a la solución actual, así como todo el código terminado. Lo importante del documento impreso es que explique cuales
+    fueron las decisiones de diseño que se tomaron para llegar a la solución. La implementación debe incluir todos los tests cases que sean necesarios que sean necesarios y que muestren el uso del sistema.
+
+    En todos los casos nos planteamos como objetivo resolver las correcciones del TP en el día para ello deberán
+    coordinar con el tutor algún mecanismo para tener a mano el código y poder verlo en conjunto.
+
+
+  \section{Nuevos requerimientos}
+ 
+}
+
+\newcommand{\formalidadesTercerEnunciado}{
+ \section{Objetivos y forma de entrega}
+ 
+  El objetivo de esta entrega es construir un DSL utilizando el lenguaje Groovy para permitir la creación de reuniones según lo
+  especificado en la siguiente sección. Es un requerimiento básico que el DSL generado interactúe con la solución desarrollada en Java
+  en las entregas anteriores.
+  Es importante también tratar de lograr que el DSL creado sea lo más expresivo posible considerando al menos los elementos del
+  lenguaje vistos en clase.
+  \smallskip
+  
+  Nos planteamos como objetivo resolver las correcciones del TP en el día para ello deberán coordinar con el tutor algún mecanismo
+  para tener a mano el código y poder verlo en conjunto.
+
+
+  \section{Nuevos requerimientos}
+ 
+}
+
+\title{Técnicas Avanzadas de Programación -- UTN -- FRBA\vspace{.2\baselineskip}
+       \\ \cuatrimestre\
+       \\ Ejercicio Integrador \
+       \\ \nofinal{\large \medskip Versión \version\\}
+       \bigskip
+      }
+\date{}
+\newcommand{\newest}[1]{#1} %\textbf{Cursadas$\geq$2000:} #1 }
+\newcommand{\oldest}[1]{}%{#1}
+
+\newcommand{\flecha}{->}
+\newcommand{\newconcept}[1]{\emph{#1}}
+
+\DefineShortVerb{\|}
+
+\author{}
+	
