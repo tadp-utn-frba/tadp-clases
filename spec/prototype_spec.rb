@@ -58,7 +58,7 @@ describe 'Testear los distintos puntos del prototype' do
                                         self.energia -= delta
                                       })
 
-    @otro_guerrero = @guerrero.clone #clone es un metodo que ya viene definido en Ruby
+    @otro_guerrero = @guerrero.clone_object #clone es un metodo que ya viene definido en Ruby
 
     espadachin = PrototypedObject.new
 
@@ -70,7 +70,7 @@ describe 'Testear los distintos puntos del prototype' do
     espadachin.set_property(:potencial_defensivo, 10)
     espadachin.set_property(:potencial_ofensivo, 20)
 
-    espadachin.energia = 100
+    espadachin.energia= 100
 
     #deberia llamar a super, pero eso lo resolvemos mas adelante
     espadachin.set_method(:potencial_ofensivo, proc {
