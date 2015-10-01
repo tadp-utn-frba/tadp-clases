@@ -30,7 +30,7 @@ class AtaqueTest {
     val g1 = new Guerrero
     val m = new Muralla
     
-    //g1.atacaA(m)
+    g1.atacaA(m)
     
     assertEquals(998, m.energia)
   }
