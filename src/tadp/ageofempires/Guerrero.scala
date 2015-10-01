@@ -1,8 +1,7 @@
 package tadp.ageofempires
 
-class Guerrero {
+class Guerrero(val potencialOfensivo:Int = 20) {
   var energia = 100
-  val potencialOfensivo = 20
   val potencialDefensivo = 10
 
   def atacaA(otroGuerrero: Guerrero) = {
@@ -12,6 +11,6 @@ class Guerrero {
   }
 
   def recibeDanio(danio: Int) = {
-    this.energia-= danio
+    this.energia = (this.energia - danio).max(0)
   }
 }

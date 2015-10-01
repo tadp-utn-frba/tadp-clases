@@ -11,8 +11,34 @@ class AtaqueTest {
     val g2 = new Guerrero
     
     g1.atacaA(g2)
-    
+        
     assertEquals(90, g2.energia)
   }
   
+  @Test
+  def unGuerreroConMuchoPotencialOfensivoAtacaAOtroGuerrero() {
+    val g1 = new Guerrero(200)
+    val g2 = new Guerrero
+    
+    g1.atacaA(g2)
+        
+    assertEquals(0, g2.energia)
+  }
+  
+  @Test
+  def unGuerreroAtacaAUnaMuralla() {
+    val g1 = new Guerrero
+    val m = new Muralla
+    
+    //g1.atacaA(m)
+    
+    assertEquals(998, m.energia)
+  }
+  
 }
+
+
+
+
+
+
