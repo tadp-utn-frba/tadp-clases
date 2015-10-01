@@ -1,8 +1,8 @@
 package tadp.ageofempires
 
-class Muralla {
+class Muralla extends Defensor {
+  this.energia = 1000
   val potencialDefensivo = 0
-  var energia = 1000
   
   def recibeDanio(danio:Int) = {
     this.energia = (this.energia - danio / 10).max(0)
