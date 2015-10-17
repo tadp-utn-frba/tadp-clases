@@ -1,4 +1,4 @@
-tadp2014c1-scala-objetofuncional-microprocesador
+tadp2015c2-scala-objetofuncional-microprocesador
 ================================================
 
 Este proyecto esta separado en varios proyectos pequeños de microporcesador en el que se iŕan introduciendo nuevos conceptos del paradigma funcional sobre el de objetos.
