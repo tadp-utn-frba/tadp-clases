@@ -2,17 +2,51 @@ package ar.edu.tadp.pokemon
 
 object GimnasioPokemon {
 
-  trait TipoPokemon
-  case object Pelea extends TipoPokemon
+  abstract class TipoPokemon(val debilidades:List[TipoPokemon] = List()) {
+    def esDebilContra(tipo: TipoPokemon) = 
+      debilidades.contains(tipo)
+  }
+  case object Pelea extends TipoPokemon(List(Volador))
   case object Agua extends TipoPokemon
   case object Fantasma extends TipoPokemon
-  case object Fuego extends TipoPokemon
+  case object Fuego extends TipoPokemon(List(Agua))
+  case object Roca extends TipoPokemon(List(Agua))
+  case object Tierra extends TipoPokemon(List(Agua))
   case object Volador extends TipoPokemon
 
   case class Tipos(tipoPrimario: TipoPokemon,
                    tipoSecundario: Option[TipoPokemon] = None) {
     def es(tipo: TipoPokemon) = asList.contains(tipo)
     def asList = List(tipoPrimario) ++ tipoSecundario
+    def esDebilContra(tipo: TipoPokemon) = {
+      asList.exists { x => x.esDebilContra(tipo) }
+    }
+  }
+
+  trait EstadoPokemon {
+    def realizarActividad(pokemon: Pokemon, actividad: Actividad) = {
+      actividad(pokemon)
+    }
+  }
+
+  case object KO extends EstadoPokemon {
+    override def realizarActividad(pokemon: Pokemon, actividad: Actividad) = {
+      throw new RuntimeException("No puede porque está Knock Out, lo vas a matar")
+    }
+  }
+  
+  case object Paralizado extends EstadoPokemon
+  case object Bueno extends EstadoPokemon
+  
+  case class Dormido(turnos: Int = 3) extends EstadoPokemon {
+    require(turnos > 0, "turnos no puede ser negativo")
+    override def realizarActividad(pokemon: Pokemon, actividad: Actividad) = {
+      if(turnos == 1) {
+        pokemon.cambiarEstado(Bueno)
+      } else {
+        pokemon.cambiarEstado(Dormido(turnos - 1))
+      }
+    }
   }
 
   case class Pokemon(
@@ -21,6 +55,7 @@ object GimnasioPokemon {
       velocidad: Int,
       energia: Int,
       especie: Especie,
+      estado: EstadoPokemon = Bueno,
       experiencia: Int = 1) {
 
     require(experiencia >= 0, "La experiencia no puede ser menor a 0")
@@ -34,6 +69,9 @@ object GimnasioPokemon {
     def ganarVelocidad(cuanta: Int) = {
       copy(velocidad = velocidad + cuanta)
     }
+    
+    def cambiarEstado(estadoNuevo: EstadoPokemon) =
+      copy(estado = estadoNuevo)
 
     val tipos = especie.tipos
 
@@ -45,9 +83,12 @@ object GimnasioPokemon {
     }
 
     lazy val otroNivel = {
+      //experiencia para llegar al nivel actual
+      //nivel actual
       def nivelR(experienciaParaNivel: Int,
                  nivel: Int): Int = {
-        val experienciaParaProximoNivel = 2 * experienciaParaNivel + especie.resistenciaEvolutiva
+        val experienciaParaProximoNivel =
+          2 * experienciaParaNivel + especie.resistenciaEvolutiva
         if (experienciaParaProximoNivel > experiencia) {
           nivel
         } else {
@@ -55,6 +96,10 @@ object GimnasioPokemon {
         }
       }
       nivelR(0, 1)
+    }
+
+    def realizarActividad(actividad: Actividad) = {
+      estado.realizarActividad(this, actividad)
     }
 
   }
@@ -74,28 +119,40 @@ object GimnasioPokemon {
     }
   }
 
-  type Actividad = Pokemon => Pokemon
+  type Actividad = Function1[Pokemon, Pokemon]
 
-  val descansar = (pokemon:Pokemon) => {
-    pokemon.copy(
+  val descansar = (pokemon: Pokemon) => {
+    val pokemonDescansado = pokemon.copy(
       energia = pokemon.energiaMaxima)
+      
+    if (pokemonDescansado.estado == Bueno && 
+        pokemon.energia < pokemon.energiaMaxima * 0.5){
+        pokemonDescansado.cambiarEstado(Dormido())
+    }
+    else {
+      pokemonDescansado
+    }
   }
 
-  def levantarPesas(peso: Int): Actividad =
-    (pokemon) => {
-      (pokemon.tipos, pokemon.fuerza) match {
-        case (tipos, _) if tipos.es(Fantasma) =>
+  case class LevantarPesas(peso: Int) extends Actividad {
+    def apply(pokemon: Pokemon) = {
+      (pokemon.tipos, pokemon.fuerza, pokemon.estado) match {
+        case (tipos, _, _) if tipos.es(Fantasma) =>
           throw new RuntimeException("No puede levantar pesas porque es etéreo")
-        case (_, fuerza) if peso > 10 * fuerza =>
+        case (tipos, _, Paralizado) => pokemon.cambiarEstado(KO)  
+        case (_, fuerza, _) if peso > 10 * fuerza =>
           pokemon.perderEnergia(10)
-        case (tipos, _) if tipos.es(Pelea) =>
+          pokemon.cambiarEstado(Paralizado)
+        case (tipos, _, _) if tipos.es(Pelea) =>
           pokemon.ganarExperiencia(2 * peso)
         case _ => pokemon.ganarExperiencia(peso)
       }
     }
+  }
+    
 
-  def nadar(minutos: Int): Actividad =
-    (pokemon) => {
+  case class Nadar(minutos: Int) extends Actividad {
+    def apply(pokemon:Pokemon) = {
       val pokemonEntrenado = pokemon
         .ganarExperiencia(200 * minutos)
         .perderEnergia(minutos)
@@ -103,8 +160,14 @@ object GimnasioPokemon {
       pokemonEntrenado.tipos match {
         case tipos if tipos.es(Agua) => pokemonEntrenado
           .ganarVelocidad(minutos / 60)
+        case tipos if tipos.esDebilContra(Agua) => 
+          pokemon.cambiarEstado(KO)  
         case _ => pokemonEntrenado
       }
     }
-
+  }
 }
+
+
+
+

@@ -13,14 +13,14 @@ class ActividadSuite extends FlatSpec with Matchers {
     val charizard: Pokemon = Pokemon(
       200, 40, 40, 100, especieCharizard)
 
-    assert(descansar(charizard).energia === 200)
+    assert(charizard.realizarActividad(descansar).energia === 200)
   }
 
   "Un hitmonlee" should "levantar pesas y tener 3 de experiencia" in {
     val hitmonlee = Pokemon(
       200, 40, 40, 100, especieHitmonlee)
 
-    assert(levantarPesas(1)(hitmonlee).experiencia === 3)
+    assert(LevantarPesas(1)(hitmonlee).experiencia === 3)
   }
 }
 
