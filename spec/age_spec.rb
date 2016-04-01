@@ -52,17 +52,17 @@ describe 'age of empires tests' do
   end
 
 #   ######################
-
-  it 'Atacante descansado pega doble' do
-    atila = Guerrero.new #(potencial_ofensivo = 20, energia = 100, potencial_defensivo = 10)
-    conan = Guerrero.new
-
-    atila.descansar
-    atila.atacar conan
-
-    # 100 - (20 * 2 - 10)
-    expect(conan.energia).to eq(70)
-  end
+#
+#   it 'Atacante descansado pega doble' do
+#     atila = Guerrero.new #(potencial_ofensivo = 20, energia = 100, potencial_defensivo = 10)
+#     conan = Guerrero.new
+#
+#     atila.descansar
+#     atila.atacar conan
+#
+#     # 100 - (20 * 2 - 10)
+#     expect(conan.energia).to eq(70)
+#   end
 #
 #   it 'Atacante descansado ataca doble solo una vez por descanso' do
 #     atila = Guerrero.new
