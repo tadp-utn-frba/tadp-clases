@@ -7,20 +7,12 @@ module Atacante
       danio = self.potencial_ofensivo - un_defensor.potencial_defensivo
       un_defensor.sufri_danio(danio)
     end
-    @multiplicador = 1
-  end
-
-  def descansar
-    @multiplicador = 2
   end
 
   def potencial_ofensivo
-    @potencial_ofensivo * self.multiplicador
+    @potencial_ofensivo
   end
 
-  def multiplicador
-    @multiplicador || 1
-  end
 end
 
 module Defensor
@@ -29,14 +21,6 @@ module Defensor
 
   def sufri_danio(danio)
     self.energia= self.energia - danio
-  end
-
-  def descansar
-    self.energia += 10
-  end
-
-  def esta_descansado?
-    40 < self.energia
   end
 
 end
