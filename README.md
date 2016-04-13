@@ -1,19 +1,35 @@
 Clase 2 TADP 2C2016
 
 # Continuación ejercicio age of empires
-Sobre el ejercicio de la clase anterior agregamos la posibilidad de que los atacantes y defensores puedan "descansar". [Seguimos este enunciado](https://docs.google.com/document/d/1keATItFXpIC70UeZCZ4wXUKFGIuCF5Uqk_-DWne-hOQ/edit#).
+Sobre el ejercicio de la clase anterior agregamos la posibilidad de que los atacantes y defensores puedan "descansar" y los siguientes requerimientos.
 
-Arranquemos por la implementación en Defensor, cuando un defensor descansa, suma 10 de energía.
+El descanso de la guerra
+
+Todas las unidades pueden descansar. Cuando un atacante descansa, tiene el efecto de duplicar su potencial ofensivo en su próximo ataque.
+Cuando un defensor descansa, suma siempre 10 de energía.
+
+
+Banzai!
+
+La característica del kamikaze es que se comporta como un atacante y un defensor, y su potencial ofensivo es 250, pero luego de atacar, su energía queda en 0.
+Como la unidad va a morir luego de atacar, puede descansar como atacante, pero no debe descansar como defensor.
+
+
+Atacando de la mano
+
+Queremos que los guerreros formen parte de un pelotón. Cuando un guerrero es atacado, el pelotón puede tomar alguna acción. Ciertos pelotones se retiran cuando alguna de sus unidades es lastimada. Otros pelotones hacen que el guerrero descanse cuando recibe un daño y no está descansado. Un guerrero está descansado cuando su energía es mayor a 40.
+
+## **Implementación**
+
+Arranquemos por el Defensor, cuando un defensor descansa, suma 10 de energía.
 
 ```ruby
-    module Defensor
-    def esta_cansado?
-        self.energia < 40
-    end
+module Defensor
 
     def descansar
         self.energia += 10
     end
+
 end
 ```
 
@@ -22,25 +38,20 @@ Por otro lado, cuando le decimos "descansar" al atacante, este ataca con el dobl
 ```ruby
 module Atacante
 
-
   def atacar(un_defensor)
     if self.potencial_ofensivo > un_defensor.potencial_defensivo
       danio = self.potencial_ofensivo - un_defensor.potencial_defensivo
       un_defensor.sufri_danio(danio)
     end
-    @multiplicador = 1
+    self.descansado = false
   end
 
   def potencial_ofensivo
-    @potencial_ofensivo * self.multiplicador
+    self.descansado ? @potencial_ofensivo * 2 : @potencial_ofensivo
   end
 
   def descansar
-    @multiplicador = 2
-  end
-
-  def multiplicador
-    @multiplicador = @multiplicador || 1
+    self.descansado = true
   end
 
 end
@@ -80,16 +91,17 @@ class Kamikaze
   include Defensor
   include Atacante
 
-  def initialize
-    @potencial_ofensivo = 250
-    @energia = 100
-    @potencial_defensivo = 10
+  def initialize(energia=100, potencial_defensivo=10)     
+    self.potencial_ofensivo = 250 
+    self.energia = energia     
+    self.potencial_defensivo = potencial_defensivo   
   end
 
   def atacar(un_defensor)
     super(un_defensor)
-    @energia = 0
+    self.energia = 0
   end
+  
 end
 ```
 
@@ -105,18 +117,19 @@ class Peloton
   attr_accessor :guerreros
 
   def initialize(integrantes)
-     self.guerreros = []
-     integrantes.each {|integrante| self.agregar_guerrero integrante}
+     self.integrantes = integrantes
+     self.integrantes.each { |integrante|integrante.peloton = self} 
   end
 
-  def agregar_guerrero(guerrero)
-    self.guerreros << guerrero
-    guerrero.peloton = self
+  def descansar     
+    cansados = self.integrantes.select { |integrante| 
+      integrante.cansado     
+    }     
+    cansados.each { |integrante| 
+      integrante.descansar 
+    }  
   end
 
-  def descansar
-    guerreros.select {|guerrero| guerrero.esta_cansado? }.each { |guerrero| guerrero.descansar }
-  end
 end
 ```
 
@@ -129,8 +142,12 @@ class Guerrero
 
   def sufri_danio(danio)
     super(danio)
-    self.peloton.lastimado
+    self.lastimado if cansado 
   end
+  
+  def cansado     
+    self.energia <= 40
+  end 
 
 end
 ```
@@ -139,13 +156,14 @@ Ahora, lo que vamos a hacer es modelar las estrategias que sigue el Pelotón, do
 
 ```ruby
 class Peloton
-  attr_accessor :guerreros, :retirado, :estrategia
+  attr_accessor :integrantes, :retirado, :estrategia
 
-  def initialize integrantes, estrategia
-    self.guerreros = []
-    integrantes.each {|integrante| self.agregar_guerrero integrante}
-    self.retirado = false
+  def initialize(integrantes, estrategia) 
+    self.integrantes = integrantes
     self.estrategia = estrategia
+    self.integrantes.each { |integrante| 
+      integrante.peloton = self
+    }
   end
 
   def lastimado
@@ -180,25 +198,30 @@ Para definir estos métodos de clase vamos a esperar que nos pasen bloques y en 
 
 ```ruby
 class Peloton
-  attr_accessor :guerreros, :retirado, :accion_a_tomar
+  attr_accessor :integrantes, :retirado, :estrategia
 
-  def self.cobarde integrantes
-    self.new( integrantes ) { |peloton| peloton.retirate }
+  def self.cobarde(integrantes) 
+    self.new(integrantes) {|peloton| 
+      peloton.retirate
+    }
   end
 
-  def self.descansador integrantes
-    self.new( integrantes) { |peloton| peloton.descansar }
+  def self.descansador(integrantes)
+    self.new( integrantes) { |peloton| 
+      peloton.descansar 
+    }
   end
 
-  def initialize(integrantes, &accion_a_tomar)
-    self.guerreros = []
-    integrantes.each {|integrante| self.agregar_guerrero integrante}
-    self.retirado = false
-    self.accion_a_tomar = accion_a_tomar
+  def initialize(integrantes, &estrategia)
+    self.integrantes = integrantes
+    self.estrategia = estrategia
+    self.integrantes.each { |integrante| 
+      integrante.peloton = self
+    }
   end
 
   def lastimado(defensor)
-    self.accion_a_tomar.call(self)
+    self.estrategia.call(self)
   end
 
 end
@@ -243,7 +266,3 @@ p.call # 7
 
 a   # 7
 ```
-
-Código de la clase:
-
-[https://github.com/uqbar-paco/tadp-2015c2-age-of-empires](https://github.com/uqbar-paco/tadp-2015c2-age-of-empires)
