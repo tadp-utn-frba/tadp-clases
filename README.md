@@ -1,7 +1,6 @@
 Clase 3 TADP 2C2016
 
 # METAPROGRAMACION
-
 Es el proceso o la práctica por la cual escribimos programas que generan, manipulan o utilizan otros programas.
 
 ###### Ejemplos
@@ -9,23 +8,22 @@ Es el proceso o la práctica por la cual escribimos programas que generan, manip
 * Un formateador de código es un programa que manipula otro programa.
 * Una herramienta como javadoc utiliza nuestro programa para generar su documentación.
 
-###### Para qué se usa la metaprogramación ? 
-
+###### Para qué se usa la metaprogramación?
 En general la metaprogramación se utiliza más fuertemente en el desarrollo de frameworks.
+
 Simplemente porque un framework va a resolver cierta problemática de una aplicación, pero no va a estar diseñador para ninguna en particular. Es decir, la idea de framework es que se va a poder aplicar y utilizar en diferentes dominios desconocidos para el creador del framework.
+
 Entonces estos frameworks van a manipular objetos, sin conocerlos de antemano.
 
 Ejemplos:
-* ORM's como hibernate:Que van a encargarse de persistir las instancias de nuestras clases sin siquiera conocerlas de antemano.
-* Frameworks de UI: Que deberán saber mostras cualquier objeto.
-Frameworks de Testing, como JUnit suelen usar metaprogramación para analizar la clase de Test y encontrar los tests que se deben correr.
-Otras herramientas:
-* javadoc:Es una herramienta como el compilador de java, que lee el código fuente y genera documentación html.
-* code coverage: Herramientas que miden cuánto de nuestro código es realmente ejecutado al correr los tests, y cuales lineas no.
-analizadores de código: Que evalúan nuestro código y genera métrics o miden violaciones a reglas definidas. Como el estilo de código, complejidad ciclomática, etc. Por ejemplo para java existe sonar que junto a maven automatizan y concrentran varias otras herramientas.
+* ORM's (como hibernate): Que van a encargarse de persistir las instancias de nuestras clases sin siquiera conocerlas de antemano.
+* Frameworks de UI: Que deberán saber mostras / bindear cualquier objeto.
+* Frameworks de Testing (como JUnit): suelen usar metaprogramación para analizar la clase de Test y encontrar los tests que se deben correr.
+* javadoc: Es una herramienta como el compilador de java, que lee el código fuente y genera documentación html.
+* Code Coverage: Herramientas que miden cuánto de nuestro código es realmente ejecutado al correr los tests, y cuales lineas no.
+* Analizadores de código: Que evalúan nuestro código y genera métrics o miden violaciones a reglas definidas. Como el estilo de código, complejidad ciclomática, etc.
 
 # Modelos y metamodelos
-
 Así como todo programa construye un modelo para describir su dominio. El domino de un metaprograma es otro programa denominado programa objeto o base y tendrá un modelo que describe a ese programa, al que llamamos metamodelo.
 
 En el siguiente ejemplo, nuestro dominio contiene diferentes tipos de animales, entre ellos perros y humanos.
