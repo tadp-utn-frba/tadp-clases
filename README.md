@@ -38,16 +38,14 @@ Entonces el metamodelo deberá tener clases que permitan describir esos concepto
 
 Así como el programa manipula las instancias de las clases Perro o Animal, el metaprograma manipula las instancias de las clases que conforman el metamodelo (Class, Method, Field, o las que fueran).
 
-TODO:Poner la imagen
-
-##### Reflection
-Reflection:Es un caso particular de metaprogramación, donde "metaprogramamos" en el mismo lenguaje en que están escritos (o vamos a escribir) los programas. Es decir, todo desde el mismo lenguaje.
+### Reflection
+Es un caso particular de metaprogramación, donde "metaprogramamos" en el mismo lenguaje en que están escritos (o vamos a escribir) los programas. Es decir, todo desde el mismo lenguaje.
 
 #### Tipos de reflection
 Para esto, generalmente, es necesario contar con facilidades o herramientas específicas, digamos "soporte" del lenguaje. Entonces reflection, además, abarca los siguientes items que vamos a mencionar en esta lista:
-* Introspection:Se refiere a la capacidad de un sistema, de analizarse a sí mismo. Algo así como la introspección humana, pero en términos de programa. Para eso, el lenguaje debe proveer ciertas herramientas, que le permitan al mismo programa, "ver" o "reflejar" cada uno de sus componentes.
-* Self-Modification:Es la capacidad de un programa de modificarse a sí mismo. Nuevamente esto requiere cierto soporte del lenguaje. Y las limitaciones van a depender de este soporte.
-* Intercession:Es la capacidad de modificar la semántica del modelo que estamos manipulando,desde el mismo lenguaje.
+* **Introspection**:Se refiere a la capacidad de un sistema, de analizarse a sí mismo. Algo así como la introspección humana, pero en términos de programa. Para eso, el lenguaje debe proveer ciertas herramientas, que le permitan al mismo programa, "ver" o "reflejar" cada uno de sus componentes.
+* **Self-Modification**:Es la capacidad de un programa de modificarse a sí mismo. Nuevamente esto requiere cierto soporte del lenguaje. Y las limitaciones van a depender de este soporte.
+* **Intercession**:Es la capacidad de modificar la semántica del modelo que estamos manipulando,desde el mismo lenguaje.
 
 # Practica
 
@@ -158,17 +156,18 @@ Guerrero.new.saluda  #=> "Hola"
  
  Aca podemos hacer referencia a dos practicas de programacion
  Duck Typing y Monkey patching
- Duck Typing
- Debido a que ruby es un lenguaje no tipado, las clases en si, si bien nos sirven para modelar abstracciones, generalmente hacemos referencia a un tipo de dato por el comportamiento que tiene.
-...if it walks like a duck and talks like a duck, it’s a duck, right? 
+ 
+Duck Typing
+
+Debido a que ruby es un lenguaje no tipado, las clases en si, si bien nos sirven para modelar abstracciones, generalmente hacemos referencia a un tipo de dato por el comportamiento que tiene.
+>...if it walks like a duck and talks like a duck, it’s a duck, right? 
+
 Si tenemos un objeto que cuando hace ruido hace "cuak" y camina como un pato, probablemente lo sea, y deberia poder continuar usando este objeto como si fuera uno.
 
 Monkey Patching
-...if it walks like a duck and talks like a duck, it’s a duck, right? So if this duck is not giving you the noise that you want, you’ve got to just punch that duck until it returns what you expect.
+>...if it walks like a duck and talks like a duck, it’s a duck, right? So if this duck is not giving you the noise that you want, you’ve got to just punch that duck until it returns what you expect.
 
 Hace referencia a la posibilidad de practicamente modificar un tipo a gusto y plachiere para que responda a nuestras necesidades y realizar otro tipo de operaciones como si fuera otro.
-
-TODO: Poner imagen de las clases
 
 Tambien podemos empezar a hacer algunas cosas mas locas, como agregarle comportamiento a un objeto en especial.
 ```ruby
@@ -178,7 +177,7 @@ atila.define_singleton_method(:saluda) {
 atila.saluda  #=> "Hola soy Atila"
 ```
 
-METAMODELO
+## METAMODELO
 
 Empezamos a dibujar el modelo de clases.
 Vamos a jugar un poco más con el metamodelo, ya sabemos que existe el mensaje class que lo entienden todos los objetos, si queremos saber la superclase de una clase tenemos el mensaje superclass. Podríamos pensar en base a eso quiénes le proveen comportamiento a cada uno de nuestros objetos.
@@ -268,4 +267,4 @@ Dibujar la singleton class de Guerrero (donde definí “gritar”)
 Espadachin.gritar  #=>haaaa
 ```
 
-TODO poner el diagrama de clases
+!![](https://github.com/uqbar-paco/tadp-ruby-age-of-empires-meta/blob/master/Metamodelo_de_Ruby.jpg)
