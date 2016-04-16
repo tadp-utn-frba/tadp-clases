@@ -353,7 +353,7 @@ end
 
 Ademas de todo lo visto de bloques, puede ser muy util guardar un bloque como un objeto (un proc) y ya vimos que lo único que hay que hacer es agregar la palabra proc antes del mismo. Esto permite que podamos guardarlo en una variable y que le podamos hacer
 @a_block.call(...args...)
-Ahora, suponiendo que queremos revertir esto y convertir el objeto que era un bloque, en un bloque de nuevo, lo único que tenemos que hacer es agregar un &, por ejemplo: &a_block, ya no es un objeto, sino un bloque, pero hay que entender que lo podemos hacer mientras un metodo lo vaya a recibir como argumento. 
+Ahora, suponiendo que queremos revertir esto y convertir el objeto que era un bloque, en un bloque de nuevo, lo único que tenemos que hacer es agregar un &, por ejemplo: &@a_block, ya no es un objeto, sino un bloque, pero hay que entender que lo podemos hacer mientras un metodo lo vaya a recibir como argumento. 
 Un método puede recibir solo un bloque, pero varios argumentos. Quiere decir que yo puedo definir al metodo un_metodo(a,b, …), pero para poder mandarle un bloque necesito agregar el & al momento de definirlo.
 
 Por ejemplo, 
@@ -364,7 +364,7 @@ Por ejemplo,
 => :un_metodo
 ```
 
-Es un metodo que va a recibir dos argumentos y un bloque. Si yo tuviese un proc @a_proc, para pasarselo efectivamente deberia hacer &a_proc.
+Es un metodo que va a recibir dos argumentos y un bloque. Si yo tuviese un proc @a_proc, para pasarselo efectivamente deberia hacer &@a_proc.
 Probamos lo que pasa:
 ```
 [2] pry(main)> @a_proc = proc do "hello!" end
@@ -383,8 +383,8 @@ hello!
 
 #### o también
 
-[6] pry(main)> un_metodo(0,0) do puts "soy un bloque" end
-soy un bloque
+[6] pry(main)> un_metodo(0,0) do puts "hello!" end
+hello!
 => nil
 ```
 
