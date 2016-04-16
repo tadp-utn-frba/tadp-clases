@@ -97,15 +97,15 @@ metodo.bind(Hijo.new).call  #=> 'correr como padre'
 Como vemos los Unbound methods se escapan al metodo lookup.
 Tambien podemos pregunarle a los metodos cosas.
 ```ruby
-metodo = atila.method(:potencial_ofensivo)  #=> #<Method: Guerrero(Atacante)#potencial_ofensivo>
-metodo.arity  #=> 0
-metodo.parameters #=> []
-metodo.owner  #=> Atacante Donde esta definido
+metodo = atila.method(:atacar) #=> #<Method: Guerrero(Atacante)#atacar>
+metodo.arity  #=> 1
+metodo.parameters #=> [[:req, :un_defensor]]
+metodo.owner  #=> Atacante (donde esta definido)
 ```
 
 Asi como ya estuvimos jugando con las clases, objetos y metodos, tambien podemos jugar con las variables.
 ```ruby
-atila.instance_variables  #=> [:@potencial_ofensivo, :@energia, :@potencial_defensivo]
+atila.instance_variables #=> [:@potencial_ofensivo, :@energia, :@potencial_defensivo]
 atila.instance_variable_get(:@energia)  #=> 100
 atila.instance_variable_set(:@energia, 50) #=> 50
 atila.instance_variable_get(:@energia)  #=> 50
@@ -142,27 +142,27 @@ Guerrero.send(:define_method, :saluda) {
 Guerrero.new.saluda  #=> "Hola"
  ```
  
- Aca podemos hacer referencia a dos practicas de programacion
- Duck Typing y Monkey patching
+Aca podemos hacer referencia a dos practicas de programacion
+Duck Typing y Monkey patching
  
-Duck Typing
-
-Debido a que ruby es un lenguaje no tipado, las clases en si, si bien nos sirven para modelar abstracciones, generalmente hacemos referencia a un tipo de dato por el comportamiento que tiene.
+#### Duck Typing
+Debido a que ruby es un lenguaje dinamicamente tipado, hacemos referencia a un tipo de dato por el comportamiento que tiene.
 >...if it walks like a duck and talks like a duck, it’s a duck, right? 
 
 Si tenemos un objeto que cuando hace ruido hace "cuak" y camina como un pato, probablemente lo sea, y deberia poder continuar usando este objeto como si fuera uno.
 
-Monkey Patching
+#### Monkey Patching
 >...if it walks like a duck and talks like a duck, it’s a duck, right? So if this duck is not giving you the noise that you want, you’ve got to just punch that duck until it returns what you expect.
 
-Hace referencia a la posibilidad de practicamente modificar un tipo a gusto y plachiere para que responda a nuestras necesidades y realizar otro tipo de operaciones como si fuera otro.
+Hace referencia a la posibilidad de practicamente modificar un tipo a gusto y piacere para que responda a nuestras necesidades y realizar otro tipo de operaciones como si fuera otro.
 
-Tambien podemos empezar a hacer algunas cosas mas locas, como agregarle comportamiento a un objeto en especial.
+Tambien podemos empezar a hacer algunas cosas mas locas, como agregarle comportamiento a un unico objeto
 ```ruby
 atila.define_singleton_method(:saluda) {
   'Hola soy Atila'
 }
 atila.saluda  #=> "Hola soy Atila"
+Guerrero.new.saludo # NoMethodError
 ```
 
 ## METAMODELO
@@ -175,7 +175,7 @@ zorro = Espadachin.new(Espada.new(123))
 ```
 Tenemos al zorro que es instancia de Espadachin, que hereda de Guerrero. Si le pedimos los métodos al zorro vemos que incluye a los instance_methods de Espadachin y deGuerrero, así como todos los que se definen para las instancias de Object.
 
-Autoclases-EigenClass
+### Autoclases-EigenClass
 Pero nosotros no le agregamos comportamiento sólo a las instancias, también teníamos un par de métodos de clase que habíamos definido para Peloton, como por ejemplo cobarde.
 ```ruby
 Peloton.cobarde([])
