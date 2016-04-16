@@ -44,22 +44,20 @@ Podemos comenzar con un poco de introspection y preguntarle a un objeto desde su
 
 ```ruby
 atila = Guerrero.new
-atila.class  #=>Guerrero
-atila.class.superclass  #=>Object
+atila.class  #=> Guerrero
+atila.class.superclass  #=> Object
 
-#methods(booleano)-->true - default (los metodos heredados)
-#                 -->false          (los metodos de la instancia propios)
-atila.methods  #=> [:potencial_defensivo, :sufri_danio, :descansar, :energia, :energia=,.....] 
-atila.methods(false)  #=> []
+atila.methods  #=> [:potencial_defensivo, :sufri_danio, :descansar, :energia, :energia=,...] 
 Guerrero.instance_methods #=> Idem a atila.methods
+Guerrero.instance_methods(false) #=> [:descansar_atacante, :descansar_defensor,...] (solo los de la clase guerrero)
 ```
 Tambien podemos empezar a interactuar con los objetos de otra manera, como mandarle mensajes de otra manera.
 
 ```ruby
 atila.send(:potencial_ofensivo)  #=> 20
-atila.send(:descansar)  #=> 20
+atila.send(:descansar)  #=> 110
 
-#con send no existen los metodos privados, la seguridad es una sensacion
+# con send no existen los metodos privados, la seguridad es una sensacion
 class A
     private
     def metodo_privado
@@ -70,16 +68,15 @@ objeto = A.new
 objeto.metodo_privado #=> NoMethodError: private method `metodo_privado' called for #<A:direccion en memoria del objeto>
 objeto.send(:metodo_privado)  #=> "cosa privada, no te metas"
 ```
-Diferir que metodo llamar en runtime se llama Dynamic Dispatch
-Tambien podemos obtener un metodo y diferir su ejecucion
+
+Tambien podemos obtener un metodo e invocarlo
 
 ```ruby
-atila.method(:potencial_ofensivo) =>  #<Method:Guerrero(Atacante)#potencial_ofensivo>
-metodo =  atila.method(:potencial_ofensivo)  => #<Method: Guerrero(Atacante)#potencial_ofensivo>
+metodo = atila.method(:potencial_ofensivo)  #=> #<Method: Guerrero(Atacante)#potencial_ofensivo>
 metodo.call  #=> 20
 ```
 
-Algo interesante que podemos hacer es pedirle un metodo de instancia a una clase. A este metodo se lo llama UnBound method, ya que no esta asociado a ningun objeto. Podemos asociarlo a un objeto siempre y cuando este dentro de la jerarquia de clases.
+Algo interesante que podemos hacer es pedirle un metodo de instancia a una clase. A este metodo se lo llama UnBound method, ya que no esta asociado a ninguna instancia de esa clase. Podemos asociarlo a un objeto siempre y cuando este dentro de la jerarquia de clases.
 
 ```ruby
 class Padre
