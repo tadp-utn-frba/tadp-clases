@@ -173,7 +173,7 @@ Vamos a jugar un poco más con el metamodelo, ya sabemos que existe el mensaje c
 ```ruby
 zorro = Espadachin.new(Espada.new(123))
 ```
-Tenemos al zorro que es instancia de Espadachin, que hereda de Guerrero. Si le pedimos los métodos al zorro vemos que incluye a los instance_methods de Espadachin y deGuerrero, así como todos los que se definen para las instancias de Object.
+Tenemos al zorro que es instancia de Espadachin, que hereda de Guerrero. Si le pedimos los métodos al zorro vemos que incluye a los instance_methods de Espadachin y de Guerrero, así como todos los que se definen para las instancias de Object.
 
 ### Autoclases-EigenClass
 Pero nosotros no le agregamos comportamiento sólo a las instancias, también teníamos un par de métodos de clase que habíamos definido para Peloton, como por ejemplo cobarde.
@@ -222,10 +222,11 @@ atila.edad  #=> 5
 Guerrero.new.edad  #=> NoMethodError
 ```
 
-Vemos que no aparecen los mixins que tiene la clase Guerrero. Por más que haya linearización de por medio, no aparecen los Mixins en la jerarquía de herencia usando superclass, pero podemos consultarlos con el mensaje ancestors.
+Vemos que no aparecen los mixins que tiene la clase Guerrero si vamos preguntando las super clases. El mensaje superclass no mustra los mixins (porque no son clases), para poder ver la linearización tenemos que pedir quienes proveen comportamiento con el mensaje ancestors.
 ```ruby
 Guerrero.ancestors  #=> [Guerrero, Defensor, Observable, Atacante, Object, Kernel, BasicObject]
 ```
+
 Nota: Las ultimas veriones de ruby incluyen a la singleton class de Guerrero, las anteriores a 2.1.0 NO incluyen a las singleton classes:
 ```ruby
 Guerrero.new.singleton_class.ancestors
@@ -255,4 +256,4 @@ Dibujar la singleton class de Guerrero (donde definí “gritar”)
 Espadachin.gritar  #=>haaaa
 ```
 
-!![](https://github.com/uqbar-paco/tadp-ruby-age-of-empires-meta/blob/master/Metamodelo_de_Ruby.jpg)
+![](https://github.com/uqbar-paco/tadp-ruby-age-of-empires-meta/blob/master/Metamodelo_de_Ruby.jpg)
