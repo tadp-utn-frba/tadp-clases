@@ -38,6 +38,7 @@ El programa describe las características de los elementos del dominio utilizand
 Un metaprograma usará el metamodelo que describe al programa base. Así como en el dominio hay guerreros, los elementos del "metadominio" (= programa base) serán los construcciones del lenguaje, por ejemplo, clases, atributos, métodos.
 
 # Practica
+Vamos a usar el código de la clase anterior como ejemplo https://github.com/uqbar-paco/tadp-ruby-age-of-empires
 
 Podemos comenzar con un poco de introspection y preguntarle a un objeto desde su clase hasta que metodos tiene.
 
