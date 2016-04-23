@@ -266,3 +266,136 @@ p.call # 7
 
 a   # 7
 ```
+
+## **Anexo**
+
+**MIXINS**
+
+Si lo que queremos es incluir comportamiento de n modules, pero no nos importa utilizar un método que comparten (en este caso descansar), podemos incluir a los modules de cualquier forma, y no va a influir en lo que hagamos después. Por el contrario, si lo que queremos es utilizar algun método que aparece en más de un module, tenemos que resolver los conflictos que se presenten.
+
+**MIXINS: Resolución de conflictos**
+
+
+En este ejemplo, vemos que un Atacante no descansa de la misma forma que un Defensor, por lo cual podemos tomar varios caminos
+
+1. Si lo que queremos es incluir comportamiento de ambos, pero ademas nos interesa que descanse como uno o como el otro, entonces el que nos interesa es el que deberia estar incluido mas abajo, porque al ser su superclase más inmediata es del primero que toma el método cuando no lo encuentra en Guerrero. Esto conlleva a un grave problema de todas formas, ya que si ambos (aunque no es muy común) tuviesen n cantidad de métodos que se llaman igual pero por algun motivo hacen cosas diferentes, ya no seríamos libres de elegir cuál toma prioridad por sobre el otro.
+2. **Alias methods**: Nos sirven para poder renombrar estos métodos compartidos con otro nombre y así poder utilizarlos, tanto si queremos separar su comportamiento como si queremos juntarlos. En el ejemplo, vemos que les cambia el nombre a ambos metodos para justamente poder usar a los dos. Ahora sí, una vez que ya tengo estos métodos separados puedo entonces si quiero definir un nuevo método descansar, que ejecute a ambos. 
+3. Tambien habíamos visto en clase una alternativa usando **super**, ya que cuando incluimos a un module por debajo del otro quedan como si fuesen superclases una de la otra (recordar que si hago ancestors de la clase que incluye a los modules, aparecen los modules y sus ancestors tambien), y entonces el module que se encuentre mas arriba va a ser la superclase mas lejana. 
+En el caso de descansar, podríamos haber definido solo el alias method para Atacante, y que cuando definimos el nuevo descansar ejecute super y luego a descansar_atacante.
+
+Hay que notar que si nosotros hubiésemos incluido más modules, podríamos hacer super (si todos tienen descansar en común) del último que incluimos, porque es la superclase inmediata, y del resto, definir alias methods.
+
+```ruby
+[38] pry(main)> Guerrero.ancestors
+=> [Guerrero, Defensor, Atacante, Object, PP::ObjectMixin, Kernel, BasicObject]
+### Aca vemos que su primer Superclase es Defensor.
+
+
+class Guerrero
+    include Atacante
+    alias_method :descansar_atacante, :descansar
+    include Defensor
+    def descansar
+         self.descansar_atacante  super
+    end  
+end  
+
+[39] pry(main)> un_guerrero = Guerrero.new
+=> #<Guerrero2:0x0000000258f668>
+[40] pry(main)> un_guerrero.descansar
+soy atacante
+soy defensor
+```
+**Lazy Initialization**
+
+Podemos usar ```||=``` para inicializar una variable, pero hay que tomar algunas consideraciones con eso. Hay que tener en cuenta que Ruby tiene algunos valores que considera que son false o que son true. Por ejemplo, a nil lo considera false, y otros valores como numeros, letras, etc, los considera true.
+Supongamos que quiero inicializar```@a```:
+
+```ruby
+def inicializar
+ @a ||= @b
+end
+```
+``` ruby
+### a. Si @variable es true o se considera true, toma el valor de  @a, sin importar el valor de @b
+[15] pry(main)> @a = 3
+=> 3
+[16] pry(main)> @b = false
+=> false
+[17] pry(main)> @a ||= @b
+=> 3
+[18] pry(main)> @b = 4
+=> 4
+[19] pry(main)> @a ||= @b
+=> 3
+
+### b. Si @a es false o se considera false, toma el valor de @b
+
+ pry(main)> @a = nil
+=> nil
+[2] pry(main)> @b = 3
+=> 3
+## Aca vemos que al hacer || devuelve el que considera true, o sea @b
+[3] pry(main)> @a || @b    
+=> 3
+[4] pry(main)> @a   ## @a sigue siendo nil
+=> nil
+[5] pry(main)> @a ||= @b    ##Lazy initialization
+=> 3
+[6] pry(main)> @a
+=> 3
+
+### c. Si ambos son false o se consideran false, siempre toma el segundo valor.
+
+[12] pry(main)> @a = nil
+=> nil
+[13] pry(main)> @b = false
+=> false
+[14] pry(main)> @a ||= @b
+=> false
+```
+
+## **Sobre bloques como objetos**
+
+Ademas de todo lo visto de bloques, puede ser muy útil guardar un bloque como un objeto (un proc) y ya vimos que lo único que hay que hacer es agregar la palabra proc antes del mismo. Esto permite que podamos guardarlo en una variable y que le podamos hacer:
+```ruby
+@a_block.call(...args...)
+```
+Ahora, suponiendo que queremos revertir esto y convertir el objeto que era un bloque, en un bloque de nuevo, lo único que tenemos que hacer es agregar un ```&```, por ejemplo: ```&@a_block```, ya no es un objeto, sino un bloque, pero hay que entender que lo podemos hacer mientras un metodo lo vaya a recibir como argumento. 
+Un método puede recibir solo un bloque, pero varios argumentos. Por ejemplo:
+
+```ruby
+[1] pry(main)> def un_metodo(a,b,&a_block)
+### Para poder mandarle un bloque hay que agregar &
+[1] pry(main)*   a_block.call
+[1] pry(main)* end  
+=> :un_metodo
+```
+
+Es un método que va a recibir dos argumentos y un bloque. Si yo tuviese un proc ```@a_proc```, para pasárselo efectivamente debería hacer ```&@a_proc```.
+Probamos lo que pasa:
+
+```ruby
+[2] pry(main)> @a_proc = proc do "hello!" end
+=> #<Proc:0x0000000205c600@(pry):101>
+
+### Miren lo que pasa si al metodo le paso un proc:
+[3] pry(main)> un_metodo 0, 0, @a_proc
+ArgumentError: wrong number of arguments (given 3, expected 2)
+from (pry):79:in `un_metodo'
+```
+
+```ruby
+### En cambio, si le paso un bloque:
+
+[5] pry(main)> un_metodo 0,0,&@a_proc
+hello!
+=> nil
+
+### o también
+
+[6] pry(main)> un_metodo(0,0) do puts "hello!" end
+hello!
+=> nil
+```
+
