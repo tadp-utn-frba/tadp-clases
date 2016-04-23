@@ -1,0 +1,256 @@
+\usepackage[utf8]{inputenc}
+\usepackage{amstext}
+\usepackage{ifthen}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{xspace}
+\usepackage{color}
+\usepackage{fancyvrb}
+\usepackage{version}
+\usepackage{theorem}
+\usepackage{listings}
+
+\usepackage[spanish]{babel}
+
+\textwidth 17.5cm
+\textheight 26cm
+\oddsidemargin -1cm
+%\evensidemargin -.3cm
+\topmargin -1cm
+\headheight 0cm
+\headsep 0cm
+
+%\textwidth 16cm
+%\textheight 25cm
+%\oddsidemargin -.64cm
+%\evensidemargin -.64cm
+%\topmargin -1.5cm
+%\headheight 0cm
+%\headsep 0cm
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstloadlanguages{Ruby}
+\lstdefinelanguage{smalltalk}{
+  morekeywords={self,super},
+  otherkeywords={:=,^ },
+  sensitive=true,
+  morecomment=[n]{"},
+  morestring=[b]'
+}
+
+% Default settings for code listings
+\lstset{%frame=tb,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\footnotesize\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  %frame=single,
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=3
+}
+
+\renewcommand{\thepage}{}
+\newcommand{\ignore}[1]{}
+\newcommand{\mat}[1]{\ensuremath{#1}}
+
+\newenvironment{display}
+   {\begin{list}{}{\setlength{\topsep}{0cm}
+                   \setlength{\leftmargin}{0cm}
+                  }}{\end{list}}
+
+\newcommand{\textfol}[1]{\ensuremath{\textsf{#1}}}
+\newcommand{\textcode}[1]{{\normalfont{\texttt{#1}}}}
+\newcommand{\propername}[1]{\textsc{#1}}
+
+%\renewcommand{\labelenumi}{\textbf{\alph{enumi})}}
+\renewcommand{\labelenumii}{\textbf{\alph{enumii})}}
+
+\newcommand{\pred}[2]{\ensuremath{\text{\textbf{#1}}(#2)}}
+\newcommand{\predName}[1]{\ensuremath{\text{\textbf{#1}}}}
+\newcommand{\var}[1]{\ensuremath{#1}}
+\newcommand{\code}[1]{\texttt{\small #1}}
+
+\newcommand{\paratodo}[2]{\ensuremath{(\forall{#1})#2}}
+\newcommand{\existe}[2]{\ensuremath{(\exists{#1})#2}}
+\newcommand{\implicasp}{\ensuremath{\Rightarrow}}
+\newcommand{\ysp}{\ensuremath{\,\wedge\,}}
+\newcommand{\osp}{\ensuremath{\,\vee\,}}
+\newcommand{\nosp}{\ensuremath{\neg}}
+\newcommand{\implica}{\ensuremath{\Rightarrow}}
+\newcommand{\y}{\ensuremath{\,\wedge\,}}
+\renewcommand{\o}{\ensuremath{\,\vee\,}}
+\newcommand{\no}{\ensuremath{\neg}}
+
+\newcommand{\agujero}[1]{\ensuremath{<}\textit{#1}\ensuremath{>}}
+\newcommand{\vble}[1]{\ensuremath{#1}}
+\newcommand{\mkP}[2]{\ensuremath{p_{{#1#2}}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Manejo de versiones (final o interna)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\final}[1]{\ifthenelse{\equal{\version}{interna}}{}{#1}}
+\newcommand{\nofinal}[1]{\ifthenelse{\equal{\version}{interna}}{#1}{}}
+
+\newcommand{\consolu}[1]{\ifthenelse{\equal{\version}{con soluciones}}{#1}{}}
+\newcommand{\sinsolu}[1]{\ifthenelse{\equal{\version}{con soluciones}}{}{#1}}
+
+\newboolean{final}
+\final{\setboolean{final}{true}}
+\nofinal{\setboolean{final}{false}}
+
+\newcommand{\internal}[1]{ 
+ \nofinal{\begin{flushleft} \textcolor{blue}{\upshape #1} \end{flushleft}}
+}
+
+\newcommand{\comentario}[1]{\textbf{\internal{#1}}}
+\newcommand{\objetivo}[1]{\internal{\textbf{Objetivo:} #1}}
+
+\sinsolu{\excludeversion{solucion}}
+\consolu{
+	\newcommand{\solucionTitle}{{\normalfont\textbf{\textcolor{blue}{Solución posible:}}}}
+	\DefineVerbatimEnvironment{solucion}{Verbatim}
+		{fontshape=n,tabsize=0,fontsize=\small,xleftmargin=16pt,formatcom=\solucionTitle\color{blue}}
+}
+
+\DefineVerbatimEnvironment{ejemplo}{Verbatim}{fontshape=n,tabsize=0,fontsize=\small,xleftmargin=16pt,}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Cuestiones específicas de cada paradigma
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\paradigma}{tadp} % medio chancho ya lo voy a ordenar.
+\newcommand{\funcional}[1]{\ifthenelse{\equal{\paradigma}{Funcional}}{#1}{}}
+\newcommand{\logico}[1]{\ifthenelse{\equal{\paradigma}{L\'ogico}}{#1}{}}
+\newcommand{\objetos}[1]{\ifthenelse{\equal{\paradigma}{Objetos}}{#1}{}}
+
+\newcommand{\aclaracionDocentes}{
+	\internal{
+	\textit{
+	\small\textbf{Recordatorio, qué queremos evaluar:}
+	\footnotesize
+	\funcional{
+		\begin{itemize}
+			\item 
+				Funciones sobre listas, algunas de: map, filter, any, all, find. 
+				Y sí o sí algún fold.
+			\item Alguna función de orden superior que hagan ellos.
+			\item Tuplas, pattern matching, composición y aplicación parcial se van mechando con lo anterior
+			\item Y alguna recursiva podría ser.
+			\item Guardas, lambda, listas por comprensión y definiciones locales los considero opcionales.			
+			\item Además estaría bueno mechar una mayoría de funciones ``directas'', 
+						es decir, donde se aplica más bien un concepto y ya, 
+						con otras más elaboradas en las que tengan que pensar más ``estratégicamente''.
+		\end{itemize}
+	}
+	\logico{
+		\begin{itemize}
+			\item Básicos: Manejos de predicados e individuos, and y or.
+			\item Functores y polimorfismo entre functores.
+			\item Existe y paratodo.
+			\item Generación.
+			\item (En menor medida) listas y findall.
+			\item (Opcional) recursividad.
+		\end{itemize}
+	}
+	\objetos{
+		\begin{itemize}
+			\item Básicos: Objeto, mensaje, parámetro. Referencia. 
+			\item Polimorfismo y delegación.
+			\item Herencia, redefinición y super.
+			\item Variables locales, de instancia y de clase.
+			\item Manejo de colecciones: collect, select, ordenar, inject into. 
+						En menor medida diferenciar entre Set, OrderedCollection y SortedCollection.
+						También puede ser interesante tener operaciones sobre conjuntos.
+		\end{itemize}
+	}
+	\small\textbf{¿Están de acuerdo con los objetivos propuestos?}
+	}}}
+
+\newcommand{\aclaracionAlumnos}{
+	\textit{
+    \small % \normalsize
+    \textbf{Aclaraciones:}
+    \footnotesize  % \small
+	\begin{itemize}
+		\item 
+			Esta evaluación es a libro abierto, 
+			pueden usar todo lo que tengan en la carpeta y los apuntes que deseen.
+      	\item 
+			Es muy importante poner nombre, nro.\ de legajo, nro.\ de hoja y 
+			cantidad total de hojas en cada hoja.
+		\item 
+			Recuerden que la intención es medir cuánto se sabe de los temas de la materia;
+			en la solución deben mostrar su conocimiento de los conceptos y herramientas que aprendieron.
+			\funcional{De estas ideas las que más nos interesan son: aplicación parcial, composición y orden superior.}
+	      \end{itemize}
+   }
+}
+\newcommand{\aclaracion}{
+  \fbox {
+    \parbox{.95\textwidth}
+    {\aclaracionAlumnos \aclaracionDocentes}
+  }
+}
+
+\newcommand{\tipoevaluacion}{Ejercicio Metaprogramación: Metabuilder}
+
+\title{Técnicas Avanzadas de Programación -- UTN -- FRBA
+       \\ \cuatrimestre  \
+       \\ \tipoevaluacion\
+       \\ \nofinal{\large \medskip Versión \version\\}
+      }
+%\date{\aclaracion}
+\date{\vspace{-5ex}}
+
+\newcommand{\newest}[1]{#1} %\textbf{Cursadas$\geq$2000:} #1 }
+\newcommand{\oldest}[1]{}%{#1}
+
+\newcommand{\flecha}{->}
+\newcommand{\newconcept}[1]{\emph{#1}}
+
+\DefineShortVerb{\|}
+
+\author{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Environments para ejercicios
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcounter{ejercicioNumero}
+\addtocounter{ejercicioNumero}{1}
+\newenvironment{ejercicio}
+	{\vspace{2mm} \noindent \textbf{Ejercicio \arabic{ejercicioNumero}} \addtocounter{ejercicioNumero}{1} \\*[3mm]}
+	{}
+	
+\newenvironment{nota}
+	{\noindent \textbf{Nota}:\\}
+	{}
+	
+	
+	
+\lstset{ %
+  language=Ruby,                % choose the language of the code
+  basicstyle={\footnotesize\ttfamily},
+  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,	                % adds a frame around the code
+  tabsize=2,	                % sets default tabsize to 2 spaces
+  captionpos=true,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=true,        % sets if automatic breaks should only happen at whitespace
+  escapeinside={\%*}{*)/},         % if you want to add a comment within your code
+  morekeywords={*,...}            % if you want to add more keywords to the set
+}
