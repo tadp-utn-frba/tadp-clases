@@ -112,7 +112,7 @@ module Atacante
     end
 end
 
-```ruby
+```
 
 Ante la aparición de los mixins, podemos estar tentados de usarlos también para definir a los Atacantes. Entonces borramos la clase Atacante y creamos el Mixin, que define el método #atacar:. 
 
