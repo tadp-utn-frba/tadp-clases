@@ -125,7 +125,7 @@ class Guerrero
     include Atacante
 end
 
-```ruby
+```
 
 
 ![image alt text](image_1.png)
