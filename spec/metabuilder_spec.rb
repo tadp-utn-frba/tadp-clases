@@ -1,4 +1,5 @@
 require 'rspec'
+require_relative '../src/builder'
 require_relative '../src/metabuilder'
 
 describe 'Metabuilder' do
@@ -16,7 +17,7 @@ describe 'Metabuilder' do
     #con el metabuilder definimos un builder
     metabuilder = Metabuilder.new
     metabuilder.set_class(Perro)
-    metabuilder.set_properties(:raza, :edad, :duenio)
+    metabuilder.with_properties(:raza, :edad, :duenio)
     builder_de_perros = metabuilder.build
 
 
@@ -42,10 +43,10 @@ describe 'Metabuilder' do
   it 'puedo crear un builder de perros con method missing' do
     metabuilder = Metabuilder.new
     metabuilder.set_class(Perro)
-    metabuilder.set_properties(:raza, :edad)
+    metabuilder.with_properties(:raza, :edad)
     builder_de_perros = metabuilder.build
 
-    builder_de_perros.set_property :raza, 'Fox Terrier'
+    builder_de_perros.set_property(:raza, 'Fox Terrier')
     builder_de_perros.raza= 'Fox Terrier'
     builder_de_perros.edad= 4
 
@@ -60,12 +61,11 @@ describe 'Metabuilder' do
     expect(perro.duenio).to eq('Cesar Millan')
   end
 
-
   it 'puedo definir validaciones que rompen' do
     #Más codigo va aca
     metabuilder = Metabuilder.new
     metabuilder.set_class(Perro)
-    metabuilder.set_properties(:raza, :edad)
+    metabuilder.with_properties(:raza, :edad)
     metabuilder.validate {
       ['Fox Terrier', 'San Bernardo'].include? raza
     }
@@ -86,7 +86,7 @@ describe 'Metabuilder' do
   it 'puedo definir validaciones que pasan' do
     metabuilder = Metabuilder.new
     metabuilder.set_class(Perro)
-    metabuilder.set_properties(:raza, :edad)
+    metabuilder.with_properties(:raza, :edad)
     metabuilder.validate {
       ['Fox Terrier', 'San Bernardo'].include? raza
     }
@@ -105,11 +105,15 @@ describe 'Metabuilder' do
 
   it 'Puedo definir Metabuilder de clases que aun no existen' do
     metabuilder = Metabuilder.new
-    metabuilder.create_class :Gato do
+    metabuilder.create_class(:Gato) do
       attr_accessor :raza, :pelaje
+
+      def miau
+        'miau'
+      end
     end
 
-    metabuilder.set_properties(:raza, :pelaje)
+    metabuilder.with_properties(:raza, :pelaje)
 
     builder_gato = metabuilder.build
     builder_gato.raza = 'Siames'
@@ -117,6 +121,7 @@ describe 'Metabuilder' do
     gato = builder_gato.build
 
     expect(gato.raza).to eq('Siames')
+    expect(gato.miau).to eq('miau')
   end
 
   # it 'agrega metodos cuando se cumple la condicion' do
