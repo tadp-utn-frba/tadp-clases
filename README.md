@@ -20,7 +20,7 @@ Ejemplos:
 - Frameworks de Testing (como JUnit): suelen usar metaprogramación para analizar la clase de Test y encontrar los tests que se deben correr.
 - Javadoc: Es una herramienta como el compilador de java, que lee el código fuente y genera documentación.
 - Code Coverage: Herramientas que miden cuánto de nuestro código es realmente ejecutado al correr los tests, y cuales lineas no.
-- Analizadores de código: Que evalúan nuestro código y genera métrics o miden violaciones a reglas definidas. Como el estilo de código, complejidad ciclomática, etc.
+- Analizadores de código: Que evalúan nuestro código y genera métricas o miden violaciones a reglas definidas. Como el estilo de código, complejidad ciclomática, etc.
 
 ## Reflection
 Es un caso particular de metaprogramación, donde "metaprogramamos" en el mismo lenguaje en que están escritos (o vamos a escribir) los programas. Es decir, todo desde el mismo lenguaje.
