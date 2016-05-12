@@ -35,6 +35,16 @@ class AtaqueTest {
     assertEquals(998, m.energia)
   }
   
+  @Test
+  def unMisilAtacaAUnaMuralla() {
+    val misil = new Misil(1966)
+    val muralla  = new Muralla
+    
+    misil.atacaA(muralla)
+    
+    assertEquals(950, muralla.energia)
+  }
+  
 }
 
 
