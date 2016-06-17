@@ -1,5 +1,5 @@
 # Objetos & Funcional
-Vamos a construir una solucion funcional a un dominio y luego vamos a ir introduciendo conceptos de OOP.
+Vamos a construir una solucion funcional de un dominio y luego vamos a ir introduciendo conceptos de OOP.
 
 ## Dominio
 Nos piden construir un programa para analizar las pociones que se enseñan a los alumnos en el colegio Hogwarts de Magia y Hechicería, y los efectos que pueden hacer sobre las personas.
@@ -18,53 +18,57 @@ def convencimiento(niveles: Niveles) = niveles._2
 def fuerza(niveles: Niveles) = niveles._3
 ```
 
+### Pociones
+Una poción es una tupla de nombre y lista de ingredientes.
+Los ingredientes son una 3-upla de nombre, cantidad del ingrediente y lista de efectos.
+
+```scala
+type Ingrediente = (String, Int, List[Efecto])
+def nombreIngrediente(ingrediente: Ingrediente) = ingrediente._1
+def cantidad(ingrediente: Ingrediente) = ingrediente._2
+def efectos(ingrediente: Ingrediente) = ingrediente._3
+
+type Pocion = (String, List[Ingrediente])
+def nombrePocion(pocion: Pocion) = pocion._1
+def ingredientes(pocion: Pocion) = pocion._2
+
+// Pociones definidas
+val pociones = List(
+  ("Felix Felices", List(("Escarabajos Machacados",52,[f1,f2]),
+    ("Ojo de Tigre Sucio",2,[f3]))
+  ),
+    ("Multijugos",[
+    ("Cuerno de Bicornio en Polvo",10, [invertir3, (\(a,b,c) → (a,a,c))]),
+    ("Sanguijuela hormonal",54,[(aplicar3 (*2)), (\(a,b,c) → (a,a,c)) ])]),
+    ("Flores de Bach",[("Orquidea Salvaje",8,[f3]), ("Rosita",1,[f1])])
+)
+```
+
 ### Personas
 Una persona es una tupla de nombre y niveles.
 
 ```scala
 type Persona = (String, Niveles)
+def nombre(persona: Persona) = persona._1
+def niveles(persona: Persona) = persona._2
 
-// Por ejemplo
+// Personas definidas
 val personas = List(
   ("Harry", (11, 5, 4)),
   ("Ron", (6, 4, 6)),
   ("Hermione", (8, 12, 2)),
   ("Draco", (7, 9, 6))
 )
-
-type Pocion = (String, List[Ingrediente])
-type Ingrediente = (String, Int, List[Efecto])
 ```
-
-
 
 Algunas funciones ya definidas:
 
 ```scala
-// Niveles
 def map(f: Int => Int)(caracteristicas: Niveles) =
   (f(caracteristicas._1), f(caracteristicas._2), f(caracteristicas._3))
 
 def invertir(caracteristicas: Niveles) =
   (caracteristicas._3, caracteristicas._2, caracteristicas._1)
-
-
-// Persona
-def nombre(persona: Persona) = persona._1
-
-def niveles(persona: Persona) = persona._2
-
-// Pocion
-def nombrePocion(pocion: Pocion) = pocion._1
-
-def ingredientes(pocion: Pocion) = pocion._2
-
-// Ingrediente
-def nombreIngrediente(ingrediente: Ingrediente) = ingrediente._1
-
-def cantidad(ingrediente: Ingrediente) = ingrediente._2
-
-def efectos(ingrediente: Ingrediente) = ingrediente._3
 ```
 
 ## Aplicación parcial
@@ -73,13 +77,8 @@ def efectos(ingrediente: Ingrediente) = ingrediente._3
 ## Deconstrucción
 ## (Opcional: Implicits y Type Classes)
 
-La información con la que se trabajará es la siguiente:
-
-    personas = [("Harry",(11, 5, 4)), ("Ron",(6,4,6)), ("Hermione",(8,12,2)), ("Draco",(7,9,6))]
-
 Donde cada tupla de la lista tiene la forma:
 
-    ("Nombre del mago o bruja", (nivelSuerte, nivelPoderDeConvencimiento, nivelFuerzaFisica) )
     f1 (ns,nc,nf) = (ns+1,nc+2,nf+3)
     f2 = aplicar3 (max 7)
     f3 (ns,nc,nf)
@@ -94,10 +93,6 @@ Donde cada tupla de la lista tiene la forma:
     ("Sanguijuela hormonal",54,[(aplicar3 (*2)), (\(a,b,c) → (a,a,c)) ])]),
     ("Flores de Bach",[("Orquidea Salvaje",8,[f3]), ("Rosita",1,[f1])])
     ]
-
-Donde cada tupla poción de la lista tiene la forma:
-
-    ("Nombre de la Pocion", [ ("NombreIngrediente", cantidadEnGramos, [efecto] ) ] )
 
 
 1) Dada una tupla de niveles definir las funciones
