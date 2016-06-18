@@ -136,74 +136,79 @@ val floresDeBach = ("Flores de Bach", List(
 val pociones: List[Pocion] = List(felixFelices, multijugos, floresDeBach)
 ```
 
+#### Funciones Parciales
+
 Decimos que una poción es "heavy" cuando al menos tiene 2 efectos. Obtengamos una lista de todas las pociones heavies.
 
 ```scala
 def efectos(ingrediente: Ingrediente) = ingrediente._3
-def ingredientes(pocion: Pocion) = pocion._2
-val esHeavy: Pocion => Boolean = ingredientes(_).flatMap(efectos).size >= 2
+val todosLosEfectos: List[Ingrediente] => List[Efecto] = _.flatMap(efectos)
+val ingredientes: Pocion => List[Ingrediente] = _._2
+val efectosPocion: Pocion => List[Efecto] = todosLosEfectos.compose(ingredientes)
+val esHeavy: Pocion => Boolean = efectosPocion(_).size >= 2
 def nombre(pocion: Pocion) = pocion._1
 val pocionesHeavies: List[Pocion] => List[String] = _.filter(esHeavy).map(nombre)
 ```
 
-## Funciones parciales
-Contar funciones parciales, orElse().
-
-#### Funciones Parciales
-
-Creemos un efecto que solo está definido para algunos de los posibles niveles, no para todos. Queremos un efecto que copia la suerte como valor del convencimiento si "suerte > convencimiento":
+Pero también podemos usar pattern matching y funciones parciales para conseguir lo mismo:
 
 ```scala
-val suerteEsConvencimiento: Efecto = {
-  case (suerte, convencimiento, fuerza) if suerte > convencimiento => (suerte, suerte, fuerza)
+val pocionesHeaviesPartial: List[Pocion] => List[String] = _.collect {
+  case (nombre, ingredientes) if todosLosEfectos(ingredientes).size >= 2 => nombre
 }
 ```
 
 Lo que acabamos de definir es una función parcial, una función que no está definida para todos los valores de su dominio.
 
-Porqué si definimos a los efectos como funciones, asignar una función parcial compila perfectamente? Por que las funciones parciales **son** funciones, en particular son "Function1[A, B]" o "A => B".
+Scala provee un azucar sintáctico para escribir funciones parciales con una sintaxis identica a la del patern matching sin iniciar con el "match".
 
-Ellas extienden la interfaz de las funciones y le agregan más comportamiento como:
-
-```scala
-def isDefinedAt(x: A): Boolean
-def lift: A => Option[B]
-def orElse(that: PartialFunction)
-```
-
-Que pasa si evalúo el efecto anterior para un valor de "suerte" <= "convencimiento"? Nos lanza una excepción "MatchError"!
-
-Definamos un fallback para cuando
-
-componer f p
-
-
-
-También podemos (abu)usar las funciones parciales para utilizar la deconstrucción por patrones y hacer más facil la definición de una función. Por ejemplo, definamos un efecto que invierte todas las características:
+En caso de querer definir una funcion parcial con la misma sintaxis, estamos obligados a hacerlo en una variable o parámetro que esté tipado explicitamente.
 
 ```scala
-// sin deconstruccíon
-def invierte(niveles: Niveles): Niveles = (niveles._3, niveles._2, niveles._1)
-// con pattern matching
-def invierte(niveles: Niveles): Niveles = niveles match {
-  case (suerte, convencimiento, fuerza) => (fuerza, convencimiento, suerte)
+val nombreDePocionHeavy: PartialFunction[Pocion, String] = {
+  case (nombre, ingredientes) if todosLosEfectos(ingredientes).size >= 2 => nombre
 }
-// con partial function
-
 ```
 
+Las funciones parciales son un tipo particular de "Function1[A, B]" o "A => B". Ellas extienden la interfaz de las funciones y le agregan más comportamiento.
 
+Que pasa si a una función parcial la evalúo con un valor para la cual no está definida? Lanza una excepción (MatchError).
 
+Para evitar esto puedo utilizar los métodos que me provee, como por ejemplo:
 
-Las funciones parciales son utilizadas también para filtrar, ya que pueden decir si un valor del dominio está definido o no.
-Scala collections => collect
-
-
+Puedo preguntar si una funcion parcial está definida para un valor:
 
 ```scala
-def invierte(niveles: Niveles): Niveles = (niveles._3, niveles._2, niveles._1)
+nombreDePocionHeavy.isDefinedAt(felixFelices) // true
+nombreDePocionHeavy.isDefinedAt(floresDeBach) // false
 ```
 
+Puedo pasarle una función de fallback:
+```scala
+val nombreDePocionConFallback = nombreDePocionHeavy.orElse {
+  case (nombre, _) => s"$nombre no es heavy"
+}
+nombreDePocionConFallback(felixFelices) // Felix Felices
+nombreDePocionConFallback(floresDeBach) // Flores de Bach no es heavy
+```
+
+Y puedo transformarla en una función que si esté definida para todo su dominio (cambia el tipo de retorno a Optional usando None para los valores no definidos):
+
+```scala
+nombreDePocionHeavy.lift(felixFelices) // Some("Felix Felices")
+nombreDePocionHeavy.lift(floresDeBach) // None
+```
+
+Ya (abu)usamos funciones parciales anteriormente para utilizar la deconstrucción por patrones y hacer más facil la definición de una función. Veamos como escribir de diferentes maneras el efecto "invierte":
+
+```scala
+val invierte1: Efecto = niveles => (niveles._3, niveles._2, niveles._1)
+val invierte2: Efecto = {
+  case (a, b, c) => (c, b, a)
+}
+```
+
+Como las funciones parciales también son funciones, la definición anterior es totalmente valida y dado que estamos incluyendo todos los valores del dominio, esas funciones son análogas.
 
 ## Deconstrucción
 ## (Opcional: Implicits y Type Classes)

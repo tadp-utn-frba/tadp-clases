@@ -2,6 +2,21 @@ import tadp.Pociones._
 
 object Worksheet {
 
-  suerteEsConvencimiento(2,2,3)
+  pocionesHeavies(pociones)
+
+  pocionesHeaviesPartial(pociones)
+
+  nombreDePocionHeavy(felixFelices)
+
+  nombreDePocionHeavy.isDefinedAt(felixFelices)
+  nombreDePocionHeavy.isDefinedAt(floresDeBach)
+
+  nombreDePocionHeavy.lift(felixFelices)
+  nombreDePocionHeavy.lift(floresDeBach)
+  nombreDePocionConFallback(felixFelices)
+  nombreDePocionConFallback(floresDeBach)
+
+  nombreDePocionHeavy(floresDeBach)
+
 
 }
