@@ -1,4 +1,4 @@
-# Objetos & Funcional
+# Objetos + Funcional
 Vamos a construir una solucion funcional de un dominio y luego vamos a ir introduciendo conceptos de OOP.
 
 ## Dominio
@@ -13,9 +13,29 @@ Los efectos son funciones que reciben una 3-upla de niveles y devuelven otra 3-u
 type Niveles = (Int, Int, Int)
 type Efecto = Niveles => Niveles
 
-def suerte(niveles: Niveles) = niveles._1
-def convencimiento(niveles: Niveles) = niveles._2
-def fuerza(niveles: Niveles) = niveles._3
+// Efectos
+val duplica: Efecto = mapNiveles(_ * 2)
+
+/**
+  * Aplica f a cada nivel
+  */
+def mapNiveles(f: Int => Int)(niveles: Niveles) =
+  (f(niveles._1), f(niveles._2), f(niveles._3))
+
+val alMenos7: Efecto = mapNiveles(_.max(7))
+
+val masFuerzaSiHaySuerte: Efecto = {
+  case (suerte, convencimiento, fuerza) if suerte >= 8 =>
+    (suerte, convencimiento, fuerza + 5)
+  case (suerte, convencimiento, fuerza) =>
+    (suerte, convencimiento, fuerza - 3)
+}
+
+val suerteEsConvencimiento: Efecto = {
+  case (suerte, convencimiento, fuerza) => (suerte, suerte, fuerza)
+}
+
+def invierte(niveles: Niveles): Niveles = (niveles._3, niveles._2, niveles._1)
 ```
 
 ### Pociones
@@ -24,24 +44,25 @@ Los ingredientes son una 3-upla de nombre, cantidad del ingrediente y lista de e
 
 ```scala
 type Ingrediente = (String, Int, List[Efecto])
-def nombreIngrediente(ingrediente: Ingrediente) = ingrediente._1
-def cantidad(ingrediente: Ingrediente) = ingrediente._2
-def efectos(ingrediente: Ingrediente) = ingrediente._3
-
 type Pocion = (String, List[Ingrediente])
-def nombrePocion(pocion: Pocion) = pocion._1
-def ingredientes(pocion: Pocion) = pocion._2
 
-// Pociones definidas
-val pociones = List(
-  ("Felix Felices", List(("Escarabajos Machacados",52,[f1,f2]),
-    ("Ojo de Tigre Sucio",2,[f3]))
-  ),
-    ("Multijugos",[
-    ("Cuerno de Bicornio en Polvo",10, [invertir3, (\(a,b,c) → (a,a,c))]),
-    ("Sanguijuela hormonal",54,[(aplicar3 (*2)), (\(a,b,c) → (a,a,c)) ])]),
-    ("Flores de Bach",[("Orquidea Salvaje",8,[f3]), ("Rosita",1,[f1])])
-)
+// Pociones
+val multijugos = ("Multijugos", List(
+  ("Cuerno de Bicornio en Polvo", 10, List(invierte(_), suerteEsConvencimiento)),
+  ("Sanguijuela hormonal", 54, List(duplica, suerteEsConvencimiento))
+))
+
+val felixFelices = ("Felix Felices", List(
+  ("Escarabajos Machacados", 52, List(duplica, alMenos7)),
+  ("Ojo de Tigre Sucio", 2, List(masFuerzaSiHaySuerte))
+))
+
+val floresDeBach = ("Flores de Bach", List(
+  ("Orquidea Salvaje", 8, List(masFuerzaSiHaySuerte)),
+  ("Rosita", 1, List(duplica))
+))
+
+val pociones: List[Pocion] = List(felixFelices, multijugos, floresDeBach)
 ```
 
 ### Personas
@@ -49,10 +70,7 @@ Una persona es una tupla de nombre y niveles.
 
 ```scala
 type Persona = (String, Niveles)
-def nombre(persona: Persona) = persona._1
-def niveles(persona: Persona) = persona._2
 
-// Personas definidas
 val personas = List(
   ("Harry", (11, 5, 4)),
   ("Ron", (6, 4, 6)),
@@ -61,43 +79,17 @@ val personas = List(
 )
 ```
 
-Algunas funciones ya definidas:
-
-```scala
-def map(f: Int => Int)(caracteristicas: Niveles) =
-  (f(caracteristicas._1), f(caracteristicas._2), f(caracteristicas._3))
-
-def invertir(caracteristicas: Niveles) =
-  (caracteristicas._3, caracteristicas._2, caracteristicas._1)
-```
-
 ## Aplicación parcial
 ## Composición de funciones/métodos
 ## Funciones parciales
 ## Deconstrucción
 ## (Opcional: Implicits y Type Classes)
 
-Donde cada tupla de la lista tiene la forma:
-
-    f1 (ns,nc,nf) = (ns+1,nc+2,nf+3)
-    f2 = aplicar3 (max 7)
-    f3 (ns,nc,nf)
-    | ns >= 8 = (ns,nc,nf+5)
-    | otherwise = (ns,nc,nf-3)
-    misPociones = [
-    ("Felix Felices",[
-    ("Escarabajos Machacados",52,[f1,f2]),
-    ("Ojo de Tigre Sucio",2,[f3])]),
-    ("Multijugos",[
-    ("Cuerno de Bicornio en Polvo",10, [invertir3, (\(a,b,c) → (a,a,c))]),
-    ("Sanguijuela hormonal",54,[(aplicar3 (*2)), (\(a,b,c) → (a,a,c)) ])]),
-    ("Flores de Bach",[("Orquidea Salvaje",8,[f3]), ("Rosita",1,[f1])])
-    ]
-
-
 1) Dada una tupla de niveles definir las funciones
-a) sumaNiveles, que suma todos los niveles
-b) diferenciaNiveles, es la diferencia entre el nivel más alto y el nivel más bajo
+
+    a) sumaNiveles, que suma todos los niveles
+    b) diferenciaNiveles, es la diferencia entre el nivel más alto y el nivel más bajo
+
  Dada una tupla persona definir las funciones
 c) sumaNivelesPersona, por ejemplo la suma de niveles de Harry es 20 (11+5+4).
 > sumaNivelesPersona ("Harry",(11, 5, 4))
