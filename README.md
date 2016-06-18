@@ -1,36 +1,82 @@
 # Objetos + Funcional
-Vamos a construir una solucion funcional de un dominio y luego vamos a ir introduciendo conceptos de OOP.
+Vamos a construir una solucion funcional de un dominio y luego vamos a ir introduciendo y combinando conceptos de OOP.
 
 ## Dominio
-Nos piden construir un programa para analizar las pociones que se enseñan a los alumnos en el colegio Hogwarts de Magia y Hechicería, y los efectos que pueden hacer sobre las personas.
+Vamos a construir un programa para analizar las pociones que se enseñan a los alumnos en el colegio Hogwarts de Magia y Hechicería, y los efectos que pueden hacer sobre las personas.
 
-Iniciemos con una definicion bien funcional:
-
-### Efectos
-Los efectos son funciones que reciben una 3-upla de niveles y devuelven otra 3-upla con alguno o todos los niveles cambiados.
+### Personas y Niveles
+Una persona es una tupla de nombre y niveles.
+Los niveles definen el estado de cada caracteristica de una persona: suerte, convencimiento, fuerza.
 
 ```scala
 type Niveles = (Int, Int, Int)
+type Persona = (String, Niveles)
+
+val personas = List(
+  ("Harry", (11, 5, 4)),
+  ("Ron", (6, 4, 6)),
+  ("Hermione", (8, 12, 2)),
+  ("Draco", (7, 9, 6))
+)
+```
+
+### Efectos
+Los efectos son funciones que reciben niveles y devuelven el nuevo estado de los niveles.
+
+```scala
 type Efecto = Niveles => Niveles
+```
 
-// Efectos
-val duplica: Efecto = mapNiveles(_ * 2)
+Definamos un efecto que duplique todos los niveles:
 
-/**
-  * Aplica f a cada nivel
-  */
+```scala
+def duplica(niveles: Niveles) = niveles._1 * 2 + niveles._2 * 2 + niveles._3 * 2
+```
+
+Si ahora queremos definir otro efecto que se quede con el máximo valor entre cada nivel y 7, tendríamos que duplicar la lógica de la función anterior en gran parte.
+
+Definamos entonces una función que dada una operación, la aplique a cada nivel:
+
+```scala
+def mapNiveles(f: Int => Int, niveles: Niveles) =
+  (f(niveles._1), f(niveles._2), f(niveles._3))
+
+val duplica: Efecto = mapNiveles(_ * 2, _)
+
+val alMenos7: Efecto = mapNiveles(_.max(7), _)
+```
+
+#### Aplicación Parcial y Currificación
+Estamos usando el "_" para aplicar parcialmente una función.
+
+Aplicar parcialmente las funciones es muy importante porque me deja transformarlas en otras funciones más específicas, para componerlas o pasarlas por parámetro.
+
+Una función en Scala puede recibir multiples grupos de parámetros. Dado que en Scala las funciones no están completamente currificadas, uno tiene que declarar "grupos de aplicación" para poder evitar el "_".
+
+Entonces podemos reescribir la función anterior como:
+
+```scala
 def mapNiveles(f: Int => Int)(niveles: Niveles) =
   (f(niveles._1), f(niveles._2), f(niveles._3))
 
+val duplica: Efecto = mapNiveles(_ * 2)
+
 val alMenos7: Efecto = mapNiveles(_.max(7))
+```
 
-val masFuerzaSiHaySuerte: Efecto = {
-  case (suerte, convencimiento, fuerza) if suerte >= 8 =>
-    (suerte, convencimiento, fuerza + 5)
-  case (suerte, convencimiento, fuerza) =>
-    (suerte, convencimiento, fuerza - 3)
-}
+#### Orden Superior: Funciones como Objetos / Objetos como Funciones
+Con las expresiones anteriores podemos ver a nuestras funciones ser asignadas a un valor. Esto nos muestra que las funciones son objetos que definen el método "apply".
 
+En objetos, lo que usas es polimorfismo.
+Todos nos ponemos de acuerdo en un mensaje para evaluar algo y de ahí en más pasamos objetos y les mandamos ese mensaje.
+Integrando ambas ideas caemos en que en scala, las funciones son objetos que entienden apply y, por ende, cualquier objeto que entienda apply puede ser evaluado como una función.
+Podemos mostrar en el código algún ejemplo piola.
+
+Las funciones son objetos que entienden apply y, por ende, cualquier objeto que entienda apply puede ser evaluado como una función.
+
+
+
+```scala
 val suerteEsConvencimiento: Efecto = {
   case (suerte, convencimiento, fuerza) => (suerte, suerte, fuerza)
 }
@@ -65,23 +111,36 @@ val floresDeBach = ("Flores de Bach", List(
 val pociones: List[Pocion] = List(felixFelices, multijugos, floresDeBach)
 ```
 
-### Personas
-Una persona es una tupla de nombre y niveles.
+## Composición de funciones / métodos
+En el paradigma funcional es importante componer porque las funciones son los ladrillitos con los que construiamos los programas.
 
-```scala
-type Persona = (String, Niveles)
+En funcional las funciones son chiquitas y cohesivas. Las combinamos entre ellas para construir algoritmos más grandes.
 
-val personas = List(
-  ("Harry", (11, 5, 4)),
-  ("Ron", (6, 4, 6)),
-  ("Hermione", (8, 12, 2)),
-  ("Draco", (7, 9, 6))
-)
-```
+Por ejemplo, en haskell es natural hacer algo como:
 
-## Aplicación parcial
-## Composición de funciones/métodos
+    (length . filter aprobado . map parcial) alumnos
+
+Tenemos las funciones length, filter y map (sin contar las que usamos cómo parámetro) y las combinamos en secuencia para hacer algoritmos más complejos.
+
+En el paradigma orientado a objetos hacemos:
+
+    alumnos.map(_.parcial).filter(_.aprobado).length
+
+Son muy parecidos, cual es la diferencia?
+En funcional cada uno tiene que construir las operaciones por afuera de los datos, en objetos los mismos datos pueden proveer las funciones. No necesitamos componer, porque podemos mandarle mensajes al resultado de una operación.
+
+Por eso la composición en objetos a primera vista no es tan importante, porque ya hay otras formas de secuenciar.
+
+Eso significa que no hay composición? No!
+
+Hay composición de funciones, sólo que se usa menos. Es particularmente útil combinado con pattern matching.
+
+Porqué?
 ## Funciones parciales
+Contar funciones parciales, andThen() y orElse().
+
+
+
 ## Deconstrucción
 ## (Opcional: Implicits y Type Classes)
 

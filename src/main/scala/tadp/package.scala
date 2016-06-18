@@ -16,48 +16,6 @@ package object pociones {
   type Ingrediente = (String, Int, List[Efecto])
   type Efecto = Niveles => Niveles
 
-  // Efectos
-  val duplica: Efecto = mapNiveles(_ * 2)
-
-  /**
-    * Aplica f a cada nivel
-    */
-  def mapNiveles(f: Int => Int)(niveles: Niveles) =
-    (f(niveles._1), f(niveles._2), f(niveles._3))
-
-  val alMenos7: Efecto = mapNiveles(_.max(7))
-
-  val masFuerzaSiHaySuerte: Efecto = {
-    case (suerte, convencimiento, fuerza) if suerte >= 8 =>
-      (suerte, convencimiento, fuerza + 5)
-    case (suerte, convencimiento, fuerza) =>
-      (suerte, convencimiento, fuerza - 3)
-  }
-
-  val suerteEsConvencimiento: Efecto = {
-    case (suerte, convencimiento, fuerza) => (suerte, suerte, fuerza)
-  }
-
-  def invierte(niveles: Niveles): Niveles = (niveles._3, niveles._2, niveles._1)
-
-  // Pociones
-  val multijugos = ("Multijugos", List(
-    ("Cuerno de Bicornio en Polvo", 10, List(invierte(_), suerteEsConvencimiento)),
-    ("Sanguijuela hormonal", 54, List(duplica, suerteEsConvencimiento))
-  ))
-
-  val felixFelices = ("Felix Felices", List(
-    ("Escarabajos Machacados", 52, List(duplica, alMenos7)),
-    ("Ojo de Tigre Sucio", 2, List(masFuerzaSiHaySuerte))
-  ))
-
-  val floresDeBach = ("Flores de Bach", List(
-    ("Orquidea Salvaje", 8, List(masFuerzaSiHaySuerte)),
-    ("Rosita", 1, List(duplica))
-  ))
-
-  val pociones: List[Pocion] = List(felixFelices, multijugos, floresDeBach)
-
   val personas = List(
     ("Harry", (11, 5, 4)),
     ("Ron", (6, 4, 6)),
@@ -65,18 +23,43 @@ package object pociones {
     ("Draco", (7, 9, 6))
   )
 
-  def min2(n: Int)(m: Int) = min(n, m)
+  // Efectos
+  /**
+    * Aplica f a cada nivel
+    */
+  def mapNiveles(f: Int => Int, niveles: Niveles) =
+    (f(niveles._1), f(niveles._2), f(niveles._3))
+
+  val duplica: Efecto = mapNiveles(_ * 2, _)
+
+  val alMenos7: Efecto = mapNiveles(_.max(7), _)
+
+  val suerteEsConvencimiento: Efecto = {
+    case (suerte, convencimiento, fuerza) => (suerte, suerte, fuerza)
+  }
+
+  val invierte: Efecto = niveles => (niveles._3, niveles._2, niveles._1)
+
+  // Pociones
+  val multijugos = ("Multijugos", List(
+    ("Cuerno de Bicornio en Polvo", 10, List(invierte, suerteEsConvencimiento)),
+    ("Sanguijuela hormonal", 54, List(duplica, suerteEsConvencimiento))
+  ))
+
+  val felixFelices = ("Felix Felices", List(
+    ("Escarabajos Machacados", 52, List(duplica, alMenos7)),
+    ("Ojo de Tigre Sucio", 2, List(suerteEsConvencimiento))
+  ))
+
+  val floresDeBach = ("Flores de Bach", List(
+    ("Rosita", 8, List(duplica))
+  ))
+
+  val pociones: List[Pocion] = List(felixFelices, multijugos, floresDeBach)
 
   // Punto 1
-  val sumaNiveles: Niveles => Int = {
-    case (s, c, f) => s + c + f
-  }
-
-  implicit class FComposition[A, B](f: A => B) {
-    def °[C](g: C => A): C => B = f.compose(g)
-
-    def <-|[C](g: C => A): C => B = f.compose(g)
-  }
+  def min2(n: Int)(m: Int) = min(n, m)
+  def sumaNiveles(niveles: Niveles): Int = niveles._1+niveles._2+niveles._3
 
   val diferenciaNiveles: Niveles => Int = {
     case (s, c, f) =>
@@ -90,7 +73,11 @@ package object pociones {
   def niveles(persona: Persona) = persona._2
 
   //  def sumaNivelesPersona(persona: Persona) = (sumaNiveles _ ° niveles)(persona)
-  val sumaNivelesPersona = sumaNiveles ° niveles
+  def sumaNivelesPersona(persona: Persona) = sumaNiveles(niveles(persona))
+
+  val niveles1: Niveles => Int = sumaNiveles
+
+  val sumaNivelesPersona2: Persona => Int = niveles1.compose(niveles(_))
 
   val diferenciaNivelesPersona = diferenciaNiveles ° niveles
 
