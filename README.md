@@ -27,6 +27,8 @@ Los efectos son funciones que reciben niveles y devuelven el nuevo estado de los
 type Efecto = Niveles => Niveles
 ```
 
+#### Aplicación Parcial y Currificación
+
 Definamos un efecto que duplique todos los niveles:
 
 ```scala
@@ -45,8 +47,6 @@ val duplica: Efecto = mapNiveles(_ * 2, _)
 
 val alMenos7: Efecto = mapNiveles(_.max(7), _)
 ```
-
-#### Aplicación Parcial y Currificación
 Estamos usando el "_" para aplicar parcialmente una función.
 
 Aplicar parcialmente las funciones es muy importante porque me deja transformarlas en otras funciones más específicas, para componerlas o pasarlas por parámetro.
@@ -64,54 +64,8 @@ val duplica: Efecto = mapNiveles(_ * 2)
 val alMenos7: Efecto = mapNiveles(_.max(7))
 ```
 
-#### Orden Superior: Funciones como Objetos / Objetos como Funciones
-Con las expresiones anteriores podemos ver a nuestras funciones ser asignadas a un valor. Esto nos muestra que las funciones son objetos que definen el método "apply".
+## Composición de Funciones
 
-En objetos, lo que usas es polimorfismo.
-Todos nos ponemos de acuerdo en un mensaje para evaluar algo y de ahí en más pasamos objetos y les mandamos ese mensaje.
-Integrando ambas ideas caemos en que en scala, las funciones son objetos que entienden apply y, por ende, cualquier objeto que entienda apply puede ser evaluado como una función.
-Podemos mostrar en el código algún ejemplo piola.
-
-Las funciones son objetos que entienden apply y, por ende, cualquier objeto que entienda apply puede ser evaluado como una función.
-
-
-
-```scala
-val suerteEsConvencimiento: Efecto = {
-  case (suerte, convencimiento, fuerza) => (suerte, suerte, fuerza)
-}
-
-def invierte(niveles: Niveles): Niveles = (niveles._3, niveles._2, niveles._1)
-```
-
-### Pociones
-Una poción es una tupla de nombre y lista de ingredientes.
-Los ingredientes son una 3-upla de nombre, cantidad del ingrediente y lista de efectos.
-
-```scala
-type Ingrediente = (String, Int, List[Efecto])
-type Pocion = (String, List[Ingrediente])
-
-// Pociones
-val multijugos = ("Multijugos", List(
-  ("Cuerno de Bicornio en Polvo", 10, List(invierte(_), suerteEsConvencimiento)),
-  ("Sanguijuela hormonal", 54, List(duplica, suerteEsConvencimiento))
-))
-
-val felixFelices = ("Felix Felices", List(
-  ("Escarabajos Machacados", 52, List(duplica, alMenos7)),
-  ("Ojo de Tigre Sucio", 2, List(masFuerzaSiHaySuerte))
-))
-
-val floresDeBach = ("Flores de Bach", List(
-  ("Orquidea Salvaje", 8, List(masFuerzaSiHaySuerte)),
-  ("Rosita", 1, List(duplica))
-))
-
-val pociones: List[Pocion] = List(felixFelices, multijugos, floresDeBach)
-```
-
-## Composición de funciones / métodos
 En el paradigma funcional es importante componer porque las funciones son los ladrillitos con los que construiamos los programas.
 
 En funcional las funciones son chiquitas y cohesivas. Las combinamos entre ellas para construir algoritmos más grandes.
@@ -126,19 +80,123 @@ En el paradigma orientado a objetos hacemos:
 
     alumnos.map(_.parcial).filter(_.aprobado).length
 
-Son muy parecidos, cual es la diferencia?
+Cual es la diferencia?
+
 En funcional cada uno tiene que construir las operaciones por afuera de los datos, en objetos los mismos datos pueden proveer las funciones. No necesitamos componer, porque podemos mandarle mensajes al resultado de una operación.
 
-Por eso la composición en objetos a primera vista no es tan importante, porque ya hay otras formas de secuenciar.
+Creemos las siguientes funciones y veamos como funciona la composición:
 
-Eso significa que no hay composición? No!
+- Sumar el valor de todos los niveles
 
-Hay composición de funciones, sólo que se usa menos. Es particularmente útil combinado con pattern matching.
+```scala
+val toList: Niveles => List[Int] = niveles => List(niveles._1, niveles._2, niveles._3)
+val sumaNiveles: Niveles => Int = toList.andThen(_.sum)
+```
 
-Porqué?
+- Calcular la diferencia entre el nivel más alto y el más bajo
+
+```scala
+val maxNivel: Niveles => Int = toList.andThen(_.max)
+val minNivel: Niveles => Int = toList.andThen(_.min)
+val diferenciaNiveles: Niveles => Int = niveles => maxNivel(niveles) - minNivel(niveles)
+```
+
+- Sumar los niveles de una persona
+
+```scala
+  def niveles(persona: Persona) = persona._2
+  val sumaNivelesPersona: Persona => Int = sumaNiveles.compose(niveles)
+```
+
+Podemos ver que las funciones pueden ser compuestas usando "andThen" y "compose" para crear nuevas funciones más complejas.
+
+### Pociones
+Una poción es una tupla de nombre y lista de ingredientes.
+Los ingredientes son una 3-upla de nombre, cantidad del ingrediente y lista de efectos.
+
+```scala
+type Ingrediente = (String, Int, List[Efecto])
+type Pocion = (String, List[Ingrediente])
+
+// Pociones
+val multijugos = ("Multijugos", List(
+  ("Cuerno de Bicornio en Polvo", 10, List(invierte, suerteEsConvencimiento)),
+  ("Sanguijuela hormonal", 54, List(duplica, suerteEsConvencimiento))
+))
+
+val felixFelices = ("Felix Felices", List(
+  ("Escarabajos Machacados", 52, List(duplica, alMenos7)),
+  ("Ojo de Tigre Sucio", 2, List(suerteEsConvencimiento))
+))
+
+val floresDeBach = ("Flores de Bach", List(
+  ("Rosita", 8, List(duplica))
+))
+
+val pociones: List[Pocion] = List(felixFelices, multijugos, floresDeBach)
+```
+
+Decimos que una poción es "heavy" cuando al menos tiene 2 efectos. Obtengamos una lista de todas las pociones heavies.
+
+
+
 ## Funciones parciales
-Contar funciones parciales, andThen() y orElse().
+Contar funciones parciales, orElse().
 
+#### Funciones Parciales
+
+Creemos un efecto que solo está definido para algunos de los posibles niveles, no para todos. Queremos un efecto que copia la suerte como valor del convencimiento si "suerte > convencimiento":
+
+```scala
+val suerteEsConvencimiento: Efecto = {
+  case (suerte, convencimiento, fuerza) if suerte > convencimiento => (suerte, suerte, fuerza)
+}
+```
+
+Lo que acabamos de definir es una función parcial, una función que no está definida para todos los valores de su dominio.
+
+Porqué si definimos a los efectos como funciones, asignar una función parcial compila perfectamente? Por que las funciones parciales **son** funciones, en particular son "Function1[A, B]" o "A => B".
+
+Ellas extienden la interfaz de las funciones y le agregan más comportamiento como:
+
+```scala
+def isDefinedAt(x: A): Boolean
+def lift: A => Option[B]
+def orElse(that: PartialFunction)
+```
+
+Que pasa si evalúo el efecto anterior para un valor de "suerte" <= "convencimiento"? Nos lanza una excepción "MatchError"!
+
+Definamos un fallback para cuando
+
+componer f p
+
+
+
+También podemos (abu)usar las funciones parciales para utilizar la deconstrucción por patrones y hacer más facil la definición de una función. Por ejemplo, definamos un efecto que invierte todas las características:
+
+```scala
+// sin deconstruccíon
+def invierte(niveles: Niveles): Niveles = (niveles._3, niveles._2, niveles._1)
+// con pattern matching
+def invierte(niveles: Niveles): Niveles = niveles match {
+  case (suerte, convencimiento, fuerza) => (fuerza, convencimiento, suerte)
+}
+// con partial function
+
+```
+
+
+
+
+Las funciones parciales son utilizadas también para filtrar, ya que pueden decir si un valor del dominio está definido o no.
+Scala collections => collect
+
+
+
+```scala
+def invierte(niveles: Niveles): Niveles = (niveles._3, niveles._2, niveles._1)
+```
 
 
 ## Deconstrucción
