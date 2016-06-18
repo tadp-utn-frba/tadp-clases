@@ -138,7 +138,13 @@ val pociones: List[Pocion] = List(felixFelices, multijugos, floresDeBach)
 
 Decimos que una poción es "heavy" cuando al menos tiene 2 efectos. Obtengamos una lista de todas las pociones heavies.
 
-
+```scala
+def efectos(ingrediente: Ingrediente) = ingrediente._3
+def ingredientes(pocion: Pocion) = pocion._2
+val esHeavy: Pocion => Boolean = ingredientes(_).flatMap(efectos).size >= 2
+def nombre(pocion: Pocion) = pocion._1
+val pocionesHeavies: List[Pocion] => List[String] = _.filter(esHeavy).map(nombre)
+```
 
 ## Funciones parciales
 Contar funciones parciales, orElse().

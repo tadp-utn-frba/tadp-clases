@@ -9,12 +9,6 @@ object Pociones {
     */
   type Niveles = (Int, Int, Int)
   type Persona = (String, Niveles)
-  type Pocion = (String, List[Ingrediente])
-  /**
-    * nombre, cantidad, efectos
-    */
-  type Ingrediente = (String, Int, List[Efecto])
-  type Efecto = Niveles => Niveles
 
   val personas = List(
     ("Harry", (11, 5, 4)),
@@ -22,6 +16,8 @@ object Pociones {
     ("Hermione", (8, 12, 2)),
     ("Draco", (7, 9, 6))
   )
+
+  type Efecto = Niveles => Niveles
 
   // Efectos
   /**
@@ -47,7 +43,14 @@ object Pociones {
   val diferenciaNiveles: Niveles => Int = niveles => maxNivel(niveles) - minNivel(niveles)
 
   def niveles(persona: Persona) = persona._2
+
   val sumaNivelesPersona: Persona => Int = sumaNiveles.compose(niveles)
+
+  /**
+    * nombre, cantidad, efectos
+    */
+  type Ingrediente = (String, Int, List[Efecto])
+  type Pocion = (String, List[Ingrediente])
 
   // Pociones
   val multijugos = ("Multijugos", List(
@@ -65,6 +68,16 @@ object Pociones {
   ))
 
   val pociones: List[Pocion] = List(felixFelices, multijugos, floresDeBach)
+
+  def efectos(ingrediente: Ingrediente) = ingrediente._3
+
+  def ingredientes(pocion: Pocion) = pocion._2
+
+  val esHeavy: Pocion => Boolean = ingredientes(_).flatMap(efectos).size >= 2
+
+  def nombre(pocion: Pocion) = pocion._1
+
+  val pocionesHeavies: List[Pocion] => List[String] = _.filter(esHeavy).map(nombre)
 
   //  // Punto 1
   //  def min2(n: Int)(m: Int) = min(n, m)
