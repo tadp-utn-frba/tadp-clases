@@ -24,7 +24,6 @@ target
 .cache
 .README.md.html
 .worksheet
-*.sc
 /bin
 .cache_main
 target/resolution-cache
