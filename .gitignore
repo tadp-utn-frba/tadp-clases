@@ -26,3 +26,4 @@ target
 .worksheet
 *.sc
 /bin
+.cache_main
