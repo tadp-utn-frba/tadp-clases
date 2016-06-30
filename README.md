@@ -176,22 +176,132 @@ mail"un-id@un-dominio.com" // retorna un Email
 mail"lalala" // falla por no cumplir el patrón
 ```
 
+Todo muy lindo pero cómo llegan esos métodos a StringContext? y que es esa palabra "implicit"? Bueno, eso
+nos lleva al siguiente tema...
 
-## Otras Cosas para contar
-     
-- String interpolators
-     
-- Implicits
- Contar:
-   - Qué son?
-   - Por donde se buscan?
- - methods
- - classes
- - parameters
-   - Implicitly
-   - Type classes
+## Implicits
+
+Los implicits son una de las herramientas más novedosas y mágicas de Scala. Vienen en varios sabores, pero
+lo que todos ellos tienen en común es que permiten poner cosas en un contexto para luego poder usarlas sin
+una referencia explicita en el código (o sea, implicitamente :P).
+
+### Implicit Class
+
+Una *Clase Implicita* es una forma declarativa y no-invasiva de extender una clase.
+
+Digamos que buscamos agregarle comportamiento a un objeto *sin cambiar su implementación*. Una forma
+conocida de hacer esto es anteponiendo otro objeto que sepa hacer el nuevo comportamiento y tenga una
+referencia al objeto viejo para poder usar el comportamiento ya existente.
+
+```scala
+class StringExtendido(unString: String) {
+	// Este método es demasiado específico para querer ponerlo en String
+	def esUnMail = unString.length > 10 && unString.contains("@") && unString.endsWith(".com") 
+}
   
-- Macros
+new StringExtendido("foobar@gmail.com").esUnMail // Sí!
+new StringExtendido("Hola Mundo!").esUnMail      // No!
+"Chau Mundo...".esUnMail                         // Esto no compila. No cambié la clase String.
+```
+
+La ventaja de esta aproximación es que puedo agregar tantos métodos cómo quiero sin preocuparme de que
+colisionen diferentes implementaciones, ya que cada uno puede instanciar el "wrapper" de String que
+prefiere; lo malo es que ensuciar el código para envolver al String.
+
+Pero qué tal si pudiera explicarle al compilador lo que estoy tratando de hacer? Qué tal si pudiera pedirle
+que, cuando vea que estoy mandandole a un String un mensaje que no entiende, que se fije a ver si está
+definido en esta clase wrapper y, si está, que en vez de fallar me lo envuelva él solito?
+
+Bueno, eso es exactamente lo que son las *Clases Implicitas*: Una clase común y corriente que, cuando están
+en contexto, el compilador usa para wrapear objetos que no hubieran entendido algún mensaje.
+
+Para definir una clase implicita, alcanza con hacerle recibir un único parámetro de clase del tipo que
+quiero wrappear y anteponer la palabra "implicit" para que el compilador sepa que puede usarla:  
+
+```scala
+implicit class StringExtendido(unString: String) {
+	def esUnMail = unString.length > 10 && unString.contains("@") && unString.endsWith(".com") 
+}
+  
+"foobar@gmail.com".esUnMail // Ahora esto funciona! El compilador wrappea el string sin que yo lo vea.
+new StringExtendido("foobar@gmail.com").esUnMail // La linea de arriba se reescribe a esto. 
+```
+
+Es importante notar que el wrappeo automático sólo ocurre cuando mando un mensaje *que el objeto no
+entiende*. Esto significa que las clases implicitas sirven para extender un tipo, pero no para redefinirle
+implementaciones. Esto las convierte en una forma segura de extender una interfaz, sin preocuparse por
+romper la implementación previa. Este es un buen momento para mirar el código que usamos para extender StringContext en
+el tema anterior y asegurarse de entender que está pasando.
+
+También hay que saber que el compilador no va a tratar de encadenar más de una aplicación de implicits por
+expresión, así que hay que cuidar las firmas... 
+
+## Implicit Methods (Implicit Conversions)
+
+Las conversiones implicitas son similares a las clases implicitas pero, en lugar de definir una nueva clase para extender
+una referencia, se utiliza para convertir algo de un tipo a otro ya existente.
+ 
+Digamos, por ejemplo, que tenemos un sistema con las siguientes interfaces::
+
+```scala
+class Punto(x: Int, y: Int)
+object Mapa { def nombreDelLugar(lugar: Punto): String = ??? }
+object Input { def puntoPresionado: (Int, Int) = ??? }
+ 
+// Pedirle al mapa el nombre del punto presionado 
+val lugar = Input.puntoPresionado
+
+Mapa nombreDelLugar Input.puntoPresionado // Sería lindo poder hacerlo así, pero una tupla no es un punto...
+
+Mapa.nombreDelLugar(new Punto(lugar._1, lugar._2)) // Hay que hacer una conversión
+```
+
+Algo incomodo en este código es que, al pedir el punto presionado, recibo una Tupla2 pero lo que necesito es un Punto.
+Semánticamente no es un problema, dado que tengo una forma concreta de convertir cualquier Tupla2 en un Punto. Podría
+incluso evitar una posible repetición de esta lógica extrayendo esa conversión en una función:
+
+```scala
+def tuplaAPunto(lugar: (Int,Int)) = new Punto(lugar._1, lugar._2)
+
+Mapa.nombreDelLugar(tuplaAPunto(lugar)) // Ahora puedo usarlo así
+```
+
+Mejor? Sí. Pero si siempre que tengo una tupla y espero un punto tengo que aplicar esta función, sería lindo poder pedirle
+al compilador que lo haga sin que yo lo tenga que escribir explicitamente; después de todo, mi función *tuplaAPunto* es
+una transformación de Tuplas a Puntos.
+
+Esto es exactamente para lo que las conversiones implicitas sirven. Puedo convertir una función que espera un único
+parámetro en una conversión implicita anteponiendo la palabra implicit a su definición:
+
+```scala
+implicit def tuplaAPunto(lugar: (Int,Int)) = new Punto(lugar._1, lugar._2)
+```
+
+De ahora en adelante, si esta función (que es del tipo Tupla2 => Punto) está en contexto, el compilador va a aplicarla
+automáticamente cada vez que usemos una Tupla2 en un lugar donde se esperaba un Punto. Eso permite reescribir nuestro uso
+así:
+
+```scala
+Mapa.nombreDelLugar(Input.puntoPresionado)
+```
+
+Otro detalle interesante es que, por la forma en que Scala busca estos implicits, es posible, en lugar de importar la
+función implicita en el contexto, definirla en el companion object de uno de los tipos en cuestión.
+
+```scala
+object Punto {
+	implicit def tuplaAPunto(lugar: (Int,Int)) = new Punto(lugar._1, lugar._2)
+}
+
+Mapa.nombreDelLugar(Input.puntoPresionado) // No necesito importar la función!
+```
+De esta manera estamos oficializando que un Punto puede ser obtenido a partir de una tupla en cualquier lugar.  
+
+### Implicit parámeters
+
+**TODO:** Contar el ejemplo.
+  
+## Macros
    Contar
      - tipos:
 - whitebox
@@ -201,10 +311,14 @@ mail"lalala" // falla por no cumplir el patrón
 - debugger
 - email
 
-- dynamics
+## Dynamics
  - ejemplo con macros y dynamics
 
  
 ### Referencias
 - http://docs.scala-lang.org/tutorials/tour/case-classes.html
 - http://docs.scala-lang.org/overviews/core/string-interpolation.html
+- http://docs.scala-lang.org/overviews/core/implicit-classes.html
+- http://docs.scala-lang.org/tutorials/tour/implicit-conversions
+- http://docs.scala-lang.org/tutorials/tour/implicit-parameters.html
+- http://docs.scala-lang.org/tutorials/FAQ/finding-implicits.html
