@@ -79,7 +79,7 @@ object E03_Implicits {
 	}
 
 	//▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-	// group_name
+	// Type Classes
 	//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 
 	object SQL { def run(query: String) = ??? }
@@ -147,24 +147,9 @@ object E03_Implicits {
 //		SQL run s"INSERT INTO ${persistible.tabla(obj)} VALUES ${persistible.valores(obj)}"
 //	}
 //
-//	// Redis
-//	trait PersistibleConRedis[T] {
-//		def clave(obj: T): String
-//		def valor(obj: T): String
-//	}
-//
-//	def persistirConRedis[T](obj: T)(persistible: PersistibleConRedis[T]) = {
-//		Redis guardar (persistible.clave(obj), persistible.valor(obj))
-//	}
-//
 //	// Dominio
 //
 //	case class C(f1: String, f2: String)
-//
-//	object CRedis extends PersistibleConRedis[C] {
-//		def clave(obj: C) = "C"
-//		def valor(obj: C) = s"{f1: ${obj.f1}, f2: ${obj.f2}}"
-//	}
 //
 //	object CSQL extends PersistibleConSQL[C] {
 //		def tabla(obj: C) = "C"
@@ -178,9 +163,8 @@ object E03_Implicits {
 //	val c3 = new C("B", "3")
 //
 //	persistirConSQL(c1)(CSQL)
-//	persistirConRedis(c2)(CRedis)
+//	persistirConSQL(c2)(CSQL)
 //	persistirConSQL(c3)(CSQL)
-//	persistirConRedis(c3)(CRedis)
 	
 	//─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 	// Mejorando el uso con implicits
@@ -196,24 +180,9 @@ object E03_Implicits {
 //		SQL run s"INSERT INTO ${persistible.tabla(obj)} VALUES ${persistible.valores(obj)}"
 //	}
 //
-//	// Redis
-//	trait PersistibleConRedis[T] {
-//		def clave(obj: T): String
-//		def valor(obj: T): String
-//	}
-//
-//	def persistirConRedis[T](obj: T)(implicit persistible: PersistibleConRedis[T]) = {
-//		Redis guardar (persistible.clave(obj), persistible.valor(obj))
-//	}
-//
 //	// Dominio
 //
 //	case class C(f1: String, f2: String)
-//
-//	implicit object CRedis extends PersistibleConRedis[C] {
-//		def clave(obj: C) = "C"
-//		def valor(obj: C) = s"{f1: ${obj.f1}, f2: ${obj.f2}}"
-//	}
 //
 //	implicit object CSQL extends PersistibleConSQL[C] {
 //		def tabla(obj: C) = "C"
@@ -227,60 +196,59 @@ object E03_Implicits {
 //	val c3 = new C("B", "3")
 //
 //	persistirConSQL(c1)
-//	persistirConRedis(c2)
 //	persistirConSQL(c3)
-//	persistirConRedis(c3)
 	
 	//─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 	// Mejorando un poquito más usando implicitly
 	//─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
-	// SQL
-	trait PersistibleConSQL[T] {
-		def tabla(obj: T): String
-		def valores(obj: T): List[String]
-	}
-
-	// def persistirConSQL[T](obj: T)(implicit persistible: PersistibleConSQL[T])
-	def persistirConSQL[T: PersistibleConSQL](obj: T) = {
-		val persistible = implicitly[PersistibleConSQL[T]]
-		SQL run s"INSERT INTO ${persistible.tabla(obj)} VALUES ${persistible.valores(obj)}"
-	}
-
-	// Redis
-	trait PersistibleConRedis[T] {
-		def clave(obj: T): String
-		def valor(obj: T): String
-	}
-
-	def persistirConRedis[T:PersistibleConRedis](obj: T) = {
-		val persistible = implicitly[PersistibleConRedis[T]]
-		Redis guardar (persistible.clave(obj), persistible.valor(obj))
-	}
-
-	// Dominio
-
-	case class C(f1: String, f2: String)
-
-	implicit object CRedis extends PersistibleConRedis[C] {
-		def clave(obj: C) = "C"
-		def valor(obj: C) = s"{f1: ${obj.f1}, f2: ${obj.f2}}"
-	}
-
-	implicit object CSQL extends PersistibleConSQL[C] {
-		def tabla(obj: C) = "C"
-		def valores(obj: C) = List(obj.f1, obj.f2)
-	}
-
-	// Uso
-	
-	val c1 = new C("A", "1")
-	val c2 = new C("B", "2")
-	val c3 = new C("B", "3")
-
-	persistirConSQL(c1)
-	persistirConRedis(c2)
-	persistirConSQL(c3)
-	persistirConRedis(c3)
+//	// SQL
+//	trait PersistibleConSQL[T] {
+//		def tabla(obj: T): String
+//		def valores(obj: T): List[String]
+//	}
+//
+//	// def persistirConSQL[T](obj: T)(implicit persistible: PersistibleConSQL[T])
+//	def persistirConSQL[T: PersistibleConSQL](obj: T) = {
+//		val persistible = implicitly[PersistibleConSQL[T]]
+//		SQL run s"INSERT INTO ${persistible.tabla(obj)} VALUES ${persistible.valores(obj)}"
+//	}
+//
+//	// Redis
+//	trait PersistibleConRedis[T] {
+//		def clave(obj: T): String
+//		def valor(obj: T): String
+//	}
+//
+//	def persistirConRedis[T:PersistibleConRedis](obj: T) = {
+//		val persistible = implicitly[PersistibleConRedis[T]]
+//		Redis guardar (persistible.clave(obj), persistible.valor(obj))
+//	}
+//
+//	// Dominio
+//
+//	case class C(f1: String, f2: String)
+//	object C {
+//		implicit object CSQL extends PersistibleConSQL[C] {
+//			def tabla(obj: C) = "C"
+//					def valores(obj: C) = List(obj.f1, obj.f2)
+//		}
+//	}
+//
+//	implicit object CRedis extends PersistibleConRedis[C] {
+//		def clave(obj: C) = "C"
+//		def valor(obj: C) = s"{f1: ${obj.f1}, f2: ${obj.f2}}"
+//	}
+//
+//	// Uso
+//	
+//	val c1 = new C("A", "1")
+//	val c2 = new C("B", "2")
+//	val c3 = new C("B", "3")
+//
+//	persistirConSQL(c1)
+//	persistirConRedis(c2)
+//	persistirConSQL(c3)
+//	persistirConRedis(c3)
 	
 }
