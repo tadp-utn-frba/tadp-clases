@@ -37,7 +37,7 @@ object E02_StringInterpolation {
 
 	implicit class EmailsContext(val context: StringContext) {
 		def emails(arguments: Any*): String =
-			("" /: context.parts.zip(arguments)) {
+			("" /: context.parts.zipAll(arguments, "", "")) {
 				case (acum, (part, exp: Email)) => acum + part + exp.toEncriptedString
 				case (acum, (part, exp)) => acum + part + exp
 			}
