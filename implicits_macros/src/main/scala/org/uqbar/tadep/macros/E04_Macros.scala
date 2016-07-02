@@ -18,7 +18,16 @@ object E04_Macros {
 	//═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 	// Ejemplo con Quasiquotes
 	//═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
+	def assert(contidion: Boolean, msg: String): Unit = macro assert_impl
+	
+	def assert_impl(c: Context)(contidion: c.Expr[Boolean], msg: c.Expr[String]) = {
+	  import c.universe._
+	  
+	  val q"assert ($condition, $msg)" = c.macroApplication
+	  q"if (!$condition) raise($msg)"
+	}
+	
+	
 	def debug(code: => Unit): Unit = macro debug_impl
 
 	def debug_impl(c: Context)(code: c.Tree) = {

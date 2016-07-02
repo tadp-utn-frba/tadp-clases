@@ -525,6 +525,17 @@ declaración de una macro es muy similar a definir una función común pero, en 
   def miMacro_impl(c: Context)(parametro1: c.Expr[String], parametro2: c.Expr[Int]) = ???
 ```
 
+### Usos
+
+Veremos que hay varias maneras de colgarse del proceso de compilador, por lo que tenemos distintos tipos de macros propuestos por scala, solo que en este caso nos estaremos enfocando en uno de los tipos de macros. Otra consideración a tener en cuenta es que la interfaz que tenemos de macros como la de reflection en scala puede ir variando en el tiempo, ya que son aún implementaciones experimentales y no se ha llegado a un estado final de como sería la implementación definitiva.
+
+Las macros han sido utilizados durante la versión 2.10 de Scala, tanto para aplicaciones de investigación como industriales, y la conclusión según [1], es que las macros han sido útiles para aplicaciones tales como:
+
+- Code Generation
+- Implementation of DSLs
+- Static checking among others
+
+
 ### Tipos
 
 Existen 2 tipos de macros, las llamadas "de caja blanca" o *whitebox* y las "de caja negra" o *blackbox*. La diferencia
@@ -555,7 +566,36 @@ def id_impl(c: Context)(n: c.Expr[Int]): c.Expr[Int] = n
 No fue tan difícil, no? Nuestra función id espera un Int y retorna un Int, por lo tanto, la macro con la que la
 implementamos debe recibir (además del contexto) una expresión de tipo Int y retornar esa misma expresión. Es importante
 notar que una expresión de tipo Int *no es* un Int, sino un fragmento de AST que, de ser evaluado, daría como resultado
-un Int. 
+un Int. Que sería el contexto en este caso y porque existe? Antes de eso vamos a explicar un poco algunos conceptos de lo que vimos recién. En el ejemplo que vimos el mismo se denominan def macros, y son métodos cuyas llamadas se expanden en tiempo de compilación, y con expansión se refiere en macros, a la transformación a código pero a nivel de compilación (no a al texto sintáctico ni al bytecode ejecutable, sino una representación intermedia de este) derivado del método al que se esta llamando con sus argumentos. El contexto se refiere al mismo en el cual se expone el código que será expandido y las rutinas que definimos que manipulan el código que deseemos transformar.
+
+Otra parte del contexto de la macro es la funcion macroApplication, que nos permite proveer acceso al árbol de la expansión de la macro, y a pesar de que este arbol puede ser encontrado en argumentos de la implementación de la macro y en el método prefix, macroApplication nos permite dar un panorama más completo del contexto de la macro.
+
+Veamos un ejemplo un poco más completo, por ejemplo implementemos un assert con macros...
+
+~~~scala 
+  def assert(contidion: Boolean, msg: String): Unit = macro assert_impl
+
+  def assert_impl(c: Context)(contidion: c.Expr[Boolean], msg: c.Expr[String]) = {
+    import c.universe._
+  
+    val q"assert ($condition, $msg)" = c.macroApplication
+    q"if (!$condition) raise($msg)"
+  }
+~~~
+
+El ejemplo tiene un par de cosas nuevas, por un lado vemos un q seguido de un string con signos de $ refiriendose a variables, para empezar q es básicamente un método que nos permite, mediante un string interpolator al cual podemos referinos a parámetros o valores dentro de la implementación de la macro, crear y hacer pattern matching código que podemos generar o transformar. En este caso lo que se esta haciendo es pattern matchear todo el contexto que recibimos del assert a dos variables y luego genera un código condicional, en otras palabras si llamamos a 
+
+~~~scala 
+assert("1 == 1", "Uno no es igual a uno")
+~~~
+
+este código se reemplaza en tiempo de compilación cuando la macro se invoke y realice la expansión a 
+
+~~~scala 
+if(! 1 == 1) raise("Uno no es igual a uno")
+~~~
+
+en la próxima sección veremos un poco más de lo que es este método q que permite que podamos crear estructuras mediante string interpolation.
 
 ### Quasiquotes
 
