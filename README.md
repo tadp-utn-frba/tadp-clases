@@ -1,7 +1,3 @@
-## [Script de la clase](https://docs.google.com/document/d/1UTn6Qzi_MyVQlxfezJa_6Fg_NuKYGfjTJ8fTvIq8CQQ/pub)
-
-
-
 # Clase 5: Ejercicio Integrador
 
 En estas dos clases (clase 5 y 6) estaremos viendo y avanzando con un ejercicio integrador en el que vayamos aplicando los distintos conceptos de metaprogramación y aplicar también lo visto del metamodelo de Ruby. Para ello empezaremos viendo el enunciado del Prototype, que en algún momento fue un TP y ahora lo estamos dando como un ejercicio integrador. 
