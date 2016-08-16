@@ -22,7 +22,7 @@ Vamos a comenzar pensando un juego de estrategia, similar al Age of Empires. En 
 
 * Cada Guerrero entiende el mensaje atacar, que recibe por parámetro a otro guerrero y se implementa de la siguiente manera:
 
-```ruby
+~~~ruby
 class Guerrero
     attr_accessor :energia, :potencial_ofensivo, :potencial_defensivo
 
@@ -37,7 +37,7 @@ class Guerrero
         self.energia= self.energia - danio
     end
 end
-```
+~~~
 
 Sobre los detalles de la implementación de Ruby no las trataremos con mucho detalle en clase, pero en este script podemos dedicarle algunas líneas a explicar brevemente un poco sobre su sintaxis.
 
@@ -45,17 +45,17 @@ En Ruby vemos que para declarar una clase se lo hace mediante Class x …. end. 
 
 Otro tema es la sentencia attr_accesor, por ahora solamente lo que nos interesa es que nos permite definir los accessors (getter y setter) para una variable de instancia. El nombre de las variables de instancia no se definen como strings sino con un : antes del identificador. Esto es porque lo que sea la sintaxis :<lo que sea> se lo conoce como símbolo en Ruby, esto es simplemente un string, no es un objeto o una clase. La propiedad que lo diferencia es que es inmutable, no se pueden hacer declaraciones del tipo
 
-```ruby
+~~~ruby
 :algo = ‘algo mas’
-```
+~~~
 
 Pero si se pueden hacer asignaciones o comparaciones usando símbolos.
 
-```ruby
+~~~ruby
 	A = :bleh
 
 	A == :bleh
-```
+~~~
 
 Para más información sobre símbolos en Ruby ver: [http://rubylearning.com/blog/2007/11/26/akitaonrails-on-ruby-symbols/](http://rubylearning.com/blog/2007/11/26/akitaonrails-on-ruby-symbols/)
 
@@ -73,7 +73,7 @@ Ahora agregamos un caso especial de Guerrero: los espadachines, que se parecen m
 
 En Espadachin redefinimos el método potencial_ofensivo de la siguiente manera:
 
-```ruby
+~~~ruby
 
 class Espada
     attr_accessor :potencial_ofensivo
@@ -86,7 +86,7 @@ class Espadachin < Guerrero
         self.espada.potencial_ofensivo * super.potencial_ofensivo
     end
 end
-```
+~~~
 
 Luego agregamos Misiles, que pueden atacar pero no tiene sentido que se defiendan. Se nos ocurrió hacer una superclase Atacante, que sea superclase entre Misil y Guerrero. Movimos el atacar a la superclase. La clase Atacante no va a tener instancias, a este tipo de clases las denominamos **clases abstractas**.
 
@@ -104,7 +104,7 @@ Un mixin es similar a una clase, en el sentido de que permite definir un conjunt
 
 Para crear el Mixin debemos escribir, en el lugar donde normalmente definimos las clases:
 
-```ruby
+~~~ruby
 
 module Atacante
     def atacar(un_defensor)
@@ -112,20 +112,20 @@ module Atacante
     end
 end
 
-```
+~~~
 
 Ante la aparición de los mixins, podemos estar tentados de usarlos también para definir a los Atacantes. Entonces borramos la clase Atacante y creamos el Mixin, que define el método #atacar:. 
 
 Usando los mixins la clase Guerrero puede implementarse de la siguiente manera:
 
-```ruby
+~~~ruby
 
 class Guerrero
     include Defensor
     include Atacante
 end
 
-```
+~~~
 
 
 ![image alt text](image_1.png)
