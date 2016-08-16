@@ -23,7 +23,7 @@ Queremos que los guerreros formen parte de un pelotón. Cuando un guerrero es at
 
 Arranquemos por el Defensor, cuando un defensor descansa, suma 10 de energía.
 
-```ruby
+~~~ruby
 module Defensor
 
     def descansar
@@ -31,11 +31,11 @@ module Defensor
     end
 
 end
-```
+~~~
 
 Por otro lado, cuando le decimos "descansar" al atacante, este ataca con el doble de energía en su próxima pelea.
 
-```ruby
+~~~ruby
 module Atacante
 
   def atacar(un_defensor)
@@ -55,7 +55,7 @@ module Atacante
   end
 
 end
-```
+~~~
 
 Hasta acá todo muy bien, pero ahora, surge el problema de que Guerrero, como usa el mixin Atacante, y el mixin Defensor, estaría trayendo dos métodos iguales, por lo que surge un conflicto. Entonces la pregunta es, ¿cómo se va a comportar el guerrero si le mandamos el mensaje descansar?
 
@@ -65,7 +65,7 @@ Pero para los Guerreros vamos a querer que descanse como atacante y luego como d
 
 Para lograr esto, vamos a usar la posibilidad de crear alias methods que nos provee ruby:
 
-```ruby
+~~~ruby
 class Guerrero
   include Atacante
   alias_method :descansar_atacante, :descansar
@@ -77,7 +77,7 @@ class Guerrero
     self.descansar_defensor
   end
 end
-```
+~~~
 
 Nótese que no solucionamos el conflicto sólo con definir los alias, lo que vamos a tener son tres métodos: :descansar_atacante, :descansar_defensor y :descansar (cuya implementación va a coincidir con la de Defensor).
 
@@ -86,7 +86,7 @@ Es necesario sobreescribir el método :descansar para lograr el comportamiento q
 ## **Kamikaze**
 Ahora queremos agregar los Kamikaze, que son Atacantes y Defensores, pero descansan solo como Atacante porque van a morir de todas maneras:
 
-```ruby
+~~~ruby
 class Kamikaze
   include Defensor
   include Atacante
@@ -103,12 +103,12 @@ class Kamikaze
   end
   
 end
-```
+~~~
 
 ## **Pelotones**
 A continuación vamos a agregar los Pelotones, que tienen un conjunto de Guerreros que lo integran. Queremos que entiendan descansar y que hagan descansar a todos los integrantes que estén cansados. ¿Queremos que el Peloton sea un Defensor o un Atacante? ¿Qué aportan estos Mixins en cuanto a compartición de código? ¿Sería una buena idea desde el punto de vista de la naturaleza?
 
-```ruby
+~~~ruby
 class Guerrero
   attr_accessor :peloton
 end
@@ -131,13 +131,13 @@ class Peloton
   end
 
 end
-```
+~~~
 
 Cabe destacar que los bloques (tanto si los escribimos con llaves como con do y end) **no son objetos** y sólo se puede pasar un bloque como último parámetro del método.
 
 Como necesitamos que los guerreros puedan avisarle a su pelotón que sufrieron daño para que el pelotón decida cómo reaccionar, tenemos que redefinir cómo reciben daño los Guerreros.
 
-```ruby
+~~~ruby
 class Guerrero
 
   def sufri_danio(danio)
@@ -150,11 +150,11 @@ class Guerrero
   end 
 
 end
-```
+~~~
 
 Ahora, lo que vamos a hacer es modelar las estrategias que sigue el Pelotón, donde cada estrategia es una clase distinta (ver patrón Strategy):
 
-```ruby
+~~~ruby
 class Peloton
   attr_accessor :integrantes, :retirado, :estrategia
 
@@ -186,7 +186,7 @@ class Cobarde
    peloton.retirate
   end
 end
-```
+~~~
 
 El problema que tenemos aca es que cada vez que se quiera crear un nuevo tipo de estrategia, debe crearse una nueva clase. Esto en principio no es muy problemático, pero es algo que puede ser molesto si hay muchos tipos de estrategias para cuando se lastima el pelotón, tendría un montón de clases para que definan sólo un método.
 
@@ -196,7 +196,7 @@ La parte simpática de tener una clase por cada estrategia era la facilidad de c
 
 Para definir estos métodos de clase vamos a esperar que nos pasen bloques y en el método convertirlo en un closure que pueda ser referenciado por el pelotón y usado más adelante con el mensaje call.
 
-```ruby
+~~~ruby
 class Peloton
   attr_accessor :integrantes, :retirado, :estrategia
 
@@ -225,13 +225,13 @@ class Peloton
   end
 
 end
-```
+~~~
 
 Retomando el tema de las diferencias entre procs y lambdas, los procs no checkean la cantidad de argumentos que reciben mientras que las lambdas sí. Por otro lado también hay una diferencia con el uso de return dentro de una lambda o de un proc, ya que en return en la lambda sólo finaliza la ejecución de ella misma sin afectar al contexto en el cual se encuentra, mientras que el proc hace que se retorne del método que lo contiene.
 
 Tanto procs como lambdas son instancias de la clase Proc.
 
-```ruby
+~~~ruby
 lam = lambda { |x| puts x }    # creates a lambda that takes 1 argument
 lam.call(2)                    # prints out 2
 lam.call                       # ArgumentError: wrong number of arguments (0 for 1)
@@ -265,7 +265,7 @@ p.call # 6
 p.call # 7
 
 a   # 7
-```
+~~~
 
 ## **Anexo**
 
@@ -285,7 +285,7 @@ En el caso de descansar, podríamos haber definido solo el alias method para Ata
 
 Hay que notar que si nosotros hubiésemos incluido más modules, podríamos hacer super (si todos tienen descansar en común) del último que incluimos, porque es la superclase inmediata, y del resto, definir alias methods.
 
-```ruby
+~~~ruby
 [38] pry(main)> Guerrero.ancestors
 => [Guerrero, Defensor, Atacante, Object, PP::ObjectMixin, Kernel, BasicObject]
 ### Aca vemos que su primer Superclase es Defensor.
@@ -305,18 +305,20 @@ end
 [40] pry(main)> un_guerrero.descansar
 soy atacante
 soy defensor
-```
+~~~
+
 **Lazy Initialization**
 
 Podemos usar ```||=``` para inicializar una variable, pero hay que tomar algunas consideraciones con eso. Hay que tener en cuenta que Ruby tiene algunos valores que considera que son false o que son true. Por ejemplo, a nil lo considera false, y otros valores como numeros, letras, etc, los considera true.
 Supongamos que quiero inicializar```@a```:
 
-```ruby
+~~~ruby
 def inicializar
  @a ||= @b
 end
-```
-``` ruby
+~~~
+
+~~~ruby
 ### a. Si @variable es true o se considera true, toma el valor de  @a, sin importar el valor de @b
 [15] pry(main)> @a = 3
 => 3
@@ -353,29 +355,31 @@ end
 => false
 [14] pry(main)> @a ||= @b
 => false
-```
+~~~
 
 ## **Sobre bloques como objetos**
 
 Ademas de todo lo visto de bloques, puede ser muy útil guardar un bloque como un objeto (un proc) y ya vimos que lo único que hay que hacer es agregar la palabra proc antes del mismo. Esto permite que podamos guardarlo en una variable y que le podamos hacer:
-```ruby
+
+~~~ruby
 @a_block.call(...args...)
-```
+~~~
+
 Ahora, suponiendo que queremos revertir esto y convertir el objeto que era un bloque, en un bloque de nuevo, lo único que tenemos que hacer es agregar un ```&```, por ejemplo: ```&@a_block```, ya no es un objeto, sino un bloque, pero hay que entender que lo podemos hacer mientras un metodo lo vaya a recibir como argumento. 
 Un método puede recibir solo un bloque, pero varios argumentos. Por ejemplo:
 
-```ruby
+~~~ruby
 [1] pry(main)> def un_metodo(a,b,&a_block)
 ### Para poder mandarle un bloque hay que agregar &
 [1] pry(main)*   a_block.call
 [1] pry(main)* end  
 => :un_metodo
-```
+~~~
 
 Es un método que va a recibir dos argumentos y un bloque. Si yo tuviese un proc ```@a_proc```, para pasárselo efectivamente debería hacer ```&@a_proc```.
 Probamos lo que pasa:
 
-```ruby
+~~~ruby
 [2] pry(main)> @a_proc = proc do "hello!" end
 => #<Proc:0x0000000205c600@(pry):101>
 
@@ -383,9 +387,9 @@ Probamos lo que pasa:
 [3] pry(main)> un_metodo 0, 0, @a_proc
 ArgumentError: wrong number of arguments (given 3, expected 2)
 from (pry):79:in `un_metodo'
-```
+~~~
 
-```ruby
+~~~ruby
 ### En cambio, si le paso un bloque:
 
 [5] pry(main)> un_metodo 0,0,&@a_proc
@@ -397,5 +401,5 @@ hello!
 [6] pry(main)> un_metodo(0,0) do puts "hello!" end
 hello!
 => nil
-```
+~~~
 
