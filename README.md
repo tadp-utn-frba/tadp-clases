@@ -2,7 +2,7 @@
 
 ######Primero vamos a comparar con lo que hacíamos anteriormente en Ruby
 
-```ruby
+~~~ruby
 class Persona
   :attr_accessor :name
   
@@ -18,7 +18,7 @@ class Saludador
 end
 
 Saludador.new().saludar(Persona.new("asd"))
-```
+~~~
 
 Esto rompe en ejecución cuando intento mandar este mensaje, porque persona no entiende :nombre, sino que entiende :name.
 
@@ -53,7 +53,7 @@ y rompa. El análisis es sobre la **declaración**. Ej: Haskell.
 
 ###### Ahora, en Scala:
 
-``` scala
+~~~scala
 object Saludador extends App {
   case class Persona(name: String)
   
@@ -64,7 +64,7 @@ object Saludador extends App {
   
   new Saludador().saludar(Persona.new("asdds"))
 }
-```
+~~~
 
 Además, si la firma de saludar fuese diferente y recibiera algo de tipo Any, por más de que en todo el código nunca se
 llame al metodo saludar con algo que no entienda el método nombre, rompe igual porque en el chequeo estático se fija
@@ -92,7 +92,8 @@ Haskell tiene tipado explícito **inferido**. Scala tiene inferencia, pero no pu
 - Programas que puedo hacer sólo con tipado dinámico
 
 ######Errores que creemos que deberían ser de tipo pero en teoría no lo son
-``` scala
+
+~~~scala
 val x = 5
 val y = 0
 
@@ -100,7 +101,8 @@ x/y // Los numeros entienden la división, por eso no sería un error de tipos e
 
 val list = List()
 list.head // Las listas también entienden head, el problema es que está vacía
-```
+~~~
+
 Acá aparece la **operación parcial**, que encapsula a un error de tipos, cuando puramente no lo son.
 
 ## Desarrollo del ejercicio
@@ -109,26 +111,30 @@ Si a un parámetro le pongo val o var, lo expone como si fuera público.
 Puedo recrear un constructor haciendo algo del estilo class A(variableA = valor) pero en realidad no es un constructor en sí mismo.
 
 Necesitamos que un parámetro esté expuesto, si tenemos que accederlo después, por ejemplo
-``` scala
+
+~~~scala
 class Guerrero(potencialOfensivo = 10)
 
 def atacarA (unGuerrero : Guerrero) = {
  .. .... unGuerrero.potencialOfensivo // si no estaba expuesto en la clase, no podía hacerlo.
 }
-```
+~~~
+
 En este caso, era trivial poner ese **=**, de lo contrario me va a devolver **Unit** (void).
 
 No es necesario poner las llaves si tengo una sola expresión adentro.
 
 En cambio, si yo quiero hacer algo del estilo
-``` scala
+
+~~~scala
 atila.atacarA(unaMuralla)
-```
+~~~
+
 No funciona, aunque podría ser perfectamente válido, porque entiende los mismos mensajes. Pero yo explicité el tipo de unGuerrero, y debe ser Guerrero.
 
 En cambio, si en vez de definir el tipo de forma **nominal** como lo teníamos, y lo hacemos **estructural**:
 
-``` scala
+~~~scala
 type Atacable = {
   def potencialDefensivo : Int  // metodo abstracto
   def perderEnergia(a:Int) : Unit // metodo abstracto
@@ -137,14 +143,14 @@ type Atacable = {
 def atacarA(unAtacable : Atacable) = {
   ....
   }
+~~~
 
-```
 Lo que hicimos en este caso, fue decir que atacarA recibe a cualquier cosa que entienda esos dos métodos con esa firma.
 Ahora, puede aceptar tanto Muralla como Guerrero.
 
 Cambiemos la forma de hacer esto:
 
-``` scala
+~~~scala
 abstract class Defensor = {
   def potencialDefensivo : Int  // metodo abstracto
   def perderEnergia(a:Int) : Unit // metodo abstracto
@@ -159,16 +165,18 @@ class Muralla(altura: Int) extends Defensor {
   // var energia = 1000 tampoco, porque estaría pisando la variable energia con otra variable energia.
   energia = 1000
   }
-  
-```
+~~~
+
 Al extender una clase, tengo que pasarle tambien los parametros a la clase de la cual está extendiendo.
 La linearización va de derecha a izquierda, teniendo menos prioridad la superclase siempre porque esa clase podria tener superclases, muchos mixins.
-``` scala
+
+~~~scala
 extends Klass with Mixin1 with Mixin2 with Mixin3
-```
+~~~
+
 En este caso, tiene más prioridad el Mixin3 y menor prioridad su superclase Klass.
 
-``` scala
+~~~scala
   def leerDeLaBase(q: String): Any = {
   //....
   new Guerrero(3,13)
@@ -176,11 +184,12 @@ En este caso, tiene más prioridad el Mixin3 y menor prioridad su superclase Kla
   }
   // no podemos hacer  val atila = leerDeLaBase("asdasd"), sino:
   val atila = leerDeLaBase("asdasd").asInstanceOf[Guerrero]
-```
+~~~
+
 Aunque lo que estamos devolviendo sabemos que es un Guerrero, como no le explicitamos que era uno, sino que era un Any
 esto no compila. Hay que castearlo. Ahora puedo tratar al guerrero como tal. En cambio, si:
 
-``` scala
+~~~scala
   def leerDeLaBase(q: String): Any = {
   //....
   new Guerrero(3,13)
@@ -188,5 +197,6 @@ esto no compila. Hay que castearlo. Ahora puedo tratar al guerrero como tal. En 
   }
   // lo de abajo rompe
   val atila = leerDeLaBase("asdasd").asInstanceOf[Guerrero]
-```
+~~~
+
 Y está bien que rompa. Porque no hay ningún lugar en el cual compartan un tipo o se pueda convertir un String a un Guerrero.
