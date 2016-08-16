@@ -6,7 +6,7 @@ Empezamos contando el patrón visitor[1] del libro de Gamma. La idea es que vean
 
 Con esto podemos empezar a ver el problema actual (ejercicio Microprocesador), mostrando la solución en objetos basada en el patrón Visitor:  
 
-[https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/objetos-puro](https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/objetos-puro)
+[https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/objetos-puro](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/objetos-puro)
 
 Acá se puede apreciar que la solución en objetos es bastante complicada, a pesar de ser lo mejor que podemos hacer utilizando solamente polimorfismo ad-hoc. ¿cómo se puede mejorar entonces? Usando pattern matching.
 
@@ -18,7 +18,7 @@ Entonces, ¿qué es pattern matching? En principio es una forma de ejecutar dist
 
 Pasamos a una nueva solución que usa Pattern Matching en vez del Visitor:
 
-[https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-mutable](https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-mutable)
+[https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-mutable](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-mutable)
 
 Veamos cómo queda la nueva implementación para ejecutar el programa. Esta nueva implementación también usa pattern matching sobre la lista de instrucciones para trabajarla recursivamente mediante el patrón cabeza y cola, y para los casos en los cuales la lista no es vacía, se decide cómo ejecutar la siguiente instrucción en base a su forma:
 
@@ -306,7 +306,7 @@ La clase que viene vamos a partir de esta solución que todavía no está tan co
 
 El código final luego de este paso se encuentra acá:
 
-[https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-inmutable](https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-inmutable)
+[https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-inmutable](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-inmutable)
 
 [1] [SourceMaking: Visitor](https://www.google.com/url?q=https://sourcemaking.com/design_patterns/visitor&sa=D&ust=1465054556955000&usg=AFQjCNF250rlMRq7KCXAtkNT9cwuhA_cxA)
 
