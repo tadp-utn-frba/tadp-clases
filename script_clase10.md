@@ -4,8 +4,8 @@
 
 Empezamos repasando la solución a la que habíamos llegado la clase pasada para el ejercicio del microprocesador:
 
-[https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-inmutable
-](https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-inmutable)
+[repo funcional-inmutable
+](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-inmutable)
 
 Teníamos una solución que ejecutaba el programa recursivamente, nuestros objetos eran inmutables y para manejar los resultados (tanto normales como excepcionales) teníamos distintos tipos de resultados de ejecución (Ejecutando, Halt y Error) que contenían al micro en el estado correspondiente a ese punto de la ejecución.
 
@@ -15,7 +15,7 @@ Si en algún momento se llegaba a un resultado que no fuera Ejecutando, la recur
 
 El siguiente paso que queremos dar es eliminar el algoritmo recursivo cambiándolo por una abstracción de orden superior que es la reducción (o fold), y de esa forma poder olvidarnos del manejo estructural de la lista de instrucciones y sólo pensar cómo pasar del estado de ejecución anterior al siguiente en base a la instrucción a ejecutar:
 
-[https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-fold](https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-fold)
+[repo funcional-fold](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-fold)
 
 Vemos cómo el matcheo de la lista vacía para retornar un resultado de ejecución Ejecutando con el micro en el estado en el cual nos haya llegado por parámetro se vuelve la semilla del foldeo.
 
@@ -143,7 +143,7 @@ Try entiende map, flatmap y filter pero no fold, pero ya vimos que hay otra form
 
 Estas cajitas contenedoras son denominadas Mónadas (o Monoides para en el caso de Try, ya que no cumple con todas las propiedades de las Mónadas). Una construcción propia puede también implementar el comportamiento necesario para poder ser usado de esta forma, por eso para aprovechar estas ideas, hacemos que el ResultadoDeEjecucion, que puede ser pensado como un contenedor de un microprocesador, implemente map, flatmap, filter y fold, y cambiamos la ejecución para que se base en esos mensajes:
 
-[https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-monadas](https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/tree/master/funcional-monadas)
+[repo funcional-monadas](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-monadas)
 
 Halt y Error son estados absorbentes, entonces al intentar ejecutar una función en este estado, debería retornarse a sí mismo, mientras que el Ejecutando efectivamente debería ejecutar lo pedido y retornar el próximo resultado de ejecución.
 
@@ -193,7 +193,7 @@ Finalmente vemos que ResultadoDeEjecucion es muy similar a un Try, lo único que
 
 Pueden verse estas nuevas soluciones comentadas en
 
-[https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/blob/master/funcional-monadas/src/main/scala/ar/edu/utn/tadp/microprocesador/package.scala
-](https://github.com/uqbar-paco/tadp-2015c2-clase9-microprocesador/blob/master/funcional-monadas/src/main/scala/ar/edu/utn/tadp/microprocesador/package.scala)
+[https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-monadas/src/main/scala/ar/edu/utn/tadp/microprocesador/package.scala
+](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-monadas/src/main/scala/ar/edu/utn/tadp/microprocesador/package.scala)
 
 
