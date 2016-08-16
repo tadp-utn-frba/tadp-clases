@@ -2,7 +2,7 @@
 
 En estas dos clases (clase 5 y 6) estaremos viendo y avanzando con un ejercicio integrador en el que vayamos aplicando los distintos conceptos de metaprogramación y aplicar también lo visto del metamodelo de Ruby. Para ello empezaremos viendo el enunciado del Prototype, que en algún momento fue un TP y ahora lo estamos dando como un ejercicio integrador. 
 
-La resolución a la que llegamos está en el siguiente repositorio (https://github.com/uqbar-paco/tadp-2015c2-clase5-prototype)
+La resolución a la que llegamos está en el siguiente repositorio (https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/ruby-prototype)
 
 ## Cuál fue la problemática en la resolución de este enunciado?
 
@@ -58,6 +58,6 @@ Es por esto que se deberá optar por otro mecanismo aún si en teoría lo que pr
 
 El mismo problema hubiera surgido si en vez de pedírselo a la instancia y luego mandarle unbind se lo hubiéramos pedido a su eigenclass mandándole el mensaje instance_method, ya que nos retornaría ya un UnboundMethod pero tiraría un error al tratar de bindearlo con otro_guerrero.
 
-La resolución final esta en el siguiente repositorio: [https://github.com/uqbar-paco/tadp-clase5-prototype](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/ruby-prototype)
+La resolución final esta en el siguiente [repositorio](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/ruby-prototype).
 
 
