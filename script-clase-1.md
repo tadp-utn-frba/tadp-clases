@@ -22,23 +22,6 @@ Vamos a comenzar pensando un juego de estrategia, similar al Age of Empires. En 
 
 * Cada Guerrero entiende el mensaje atacar, que recibe por parámetro a otro guerrero y se implementa de la siguiente manera:
 
-{% prism javascript %}
-class Guerrero
-    attr_accessor :energia, :potencial_ofensivo, :potencial_defensivo
-
-    def atacar(otro_guerrero)
-        if(self.potencial_ofensivo >= otro_guerrero.potencial_defensivo)
-            danio = self.potencial_ofensivo - otro_guerrero.potencial_defensivo
-            otro_guerrero.sufri_danio(danio)
-        end
-    end
-
-    def sufri_danio(danio)
-        self.energia= self.energia - danio
-    end
-end
-{% endprism %}
-
 ~~~ruby
 class Guerrero
     attr_accessor :energia, :potencial_ofensivo, :potencial_defensivo
