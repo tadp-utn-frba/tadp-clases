@@ -143,7 +143,7 @@ Try entiende map, flatmap y filter pero no fold, pero ya vimos que hay otra form
 
 Estas cajitas contenedoras son denominadas Mónadas (o Monoides para en el caso de Try, ya que no cumple con todas las propiedades de las Mónadas). Una construcción propia puede también implementar el comportamiento necesario para poder ser usado de esta forma, por eso para aprovechar estas ideas, hacemos que el ResultadoDeEjecucion, que puede ser pensado como un contenedor de un microprocesador, implemente map, flatmap, filter y fold, y cambiamos la ejecución para que se base en esos mensajes:
 
-[repo funcional-monadas](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-monadas)
+[repo funcional-monadas](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/funcional-monadas)
 
 Halt y Error son estados absorbentes, entonces al intentar ejecutar una función en este estado, debería retornarse a sí mismo, mientras que el Ejecutando efectivamente debería ejecutar lo pedido y retornar el próximo resultado de ejecución.
 
