@@ -58,6 +58,6 @@ Es por esto que se deberá optar por otro mecanismo aún si en teoría lo que pr
 
 El mismo problema hubiera surgido si en vez de pedírselo a la instancia y luego mandarle unbind se lo hubiéramos pedido a su eigenclass mandándole el mensaje instance_method, ya que nos retornaría ya un UnboundMethod pero tiraría un error al tratar de bindearlo con otro_guerrero.
 
-La resolución final esta en el siguiente [repositorio](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/ruby-prototype).
+La resolución final esta en el siguiente [repositorio](https://github.com/tadp-utn-frba/tadp-clases/tree/ruby-prototype).
 
 
