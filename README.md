@@ -282,4 +282,4 @@ Dibujar la singleton class de Guerrero (donde definí “gritar”)
 Espadachin.gritar  #=>haaaa
 ~~~
 
-![](/Metamodelo_de_Ruby.jpg)
+![](https://raw.githubusercontent.com/tadp-utn-frba/tadp-clases/ruby-metaprogramming/Metamodelo_de_Ruby.jpg)
