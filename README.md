@@ -495,6 +495,7 @@ def persistirConSQL[T : PersistibleConSQL](obj: T) { ??? } // Acá se ve más cl
 ~~~ 
 
 Uh... Pero ahora ya no está el parámetro "persistible"! Cómo consigo la instancia? Scala provee una función llamada *implicitly* para estas situaciones:
+
 ~~~scala
 def persistirConSQL[T: PersistibleConSQL](obj: T) = {
 	val persistible - implicitly[PersistibleConSQL[T]]
@@ -511,9 +512,13 @@ Macros es una herramienta muy poderosa que permite definir reescrituras de AST (
 muchos lenguajes y tecnologías. A grandes razgos, la útilidad de las macros consiste en tomar una construcción sintáctica
 válida y reemplazarla por otra en tiempo de compilación, permitiendo así que la sintaxis que normalmente construiría un
 cierto programa construya otro totalmente diferente.
+En Scala, la utilización de macros está definida en el paquete 
 
-En Scala, la utilización de macros está definida en el paquete ~~~scala.language.experimental.macros~~~, el cual debe ser
-importado para poder trabajar.
+~~~scala 
+scala.language.experimental.macros
+~~~
+
+el cual debe ser importado para poder trabajar.
 
 Una macro de Scala se compone de dos partes: Una declaración y una implementación. Al momento de compilar, los usos de la
 función declaración son procesados para reemplazarlos por el resultado de aplicar la función implementación. Definir la
