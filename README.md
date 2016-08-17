@@ -2,7 +2,7 @@
 
 En estas dos clases (clase 5 y 6) estaremos viendo y avanzando con un ejercicio integrador en el que vayamos aplicando los distintos conceptos de metaprogramación y aplicar también lo visto del metamodelo de Ruby. Para ello empezaremos viendo el enunciado del Prototype, que en algún momento fue un TP y ahora lo estamos dando como un ejercicio integrador. 
 
-La resolución a la que llegamos está en el siguiente repositorio (https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/ruby-prototype)
+La resolución a la que llegamos está en el siguiente repositorio (https://github.com/tadp-utn-frba/tadp-clases/tree/ruby-prototype)
 
 ## Cuál fue la problemática en la resolución de este enunciado?
 
