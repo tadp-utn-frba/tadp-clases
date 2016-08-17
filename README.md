@@ -24,6 +24,7 @@ en el compilador: Por cada Case Class se define una clase común y corriente, pe
 automáticamente algunos métodos bien conocidos coyo código es predecible o repetitivo.
 
 Entonces, una *Case Class* es simplemente *una clase cualquiera* al que el compilador le agrega:
+
 - Properties de sólo lectura para cada parámetro de clase
 - Una forma sencilla de clonarla (método copy)
 - Una conversión a String clara, basada en su nombre y sus parámetros de clase
