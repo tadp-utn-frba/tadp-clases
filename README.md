@@ -41,7 +41,7 @@ Sobre el ejercicio
 
 El enunciado del ejercicio esta [acá](https://www.google.com/url?q=http://drive.google.com/open?id%3D1_yCtJQdQbhaeWny5ByMJKNJKpCmEdTELoTEoCZG4_4Q&sa=D&ust=1471097603702000&usg=AFQjCNHbRgVqvmyQL0fi9u3_cIJPY15dXQ)
 
-El código al que llegamos al final de la clase esta en este [repo](https://www.google.com/url?q=https://github.com/uqbar-paco/tadp-2015c2-clase6-multimethods/tree/2016-1c&sa=D&ust=1471097603703000&usg=AFQjCNFun2wmaE3O82_8PFpqQip0UG49bA)
+El código al que llegamos al final de la clase esta en este [repo](https://github.com/tadp-utn-frba/tadp-clases/tree/ruby-multimethods)
 
 En el primer punto implementamos algo del estilo
 
