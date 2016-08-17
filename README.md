@@ -184,6 +184,7 @@ nombreDePocionHeavy.isDefinedAt(floresDeBach) // false
 ~~~
 
 Puedo pasarle una función de fallback:
+
 ~~~scala
 val nombreDePocionConFallback = nombreDePocionHeavy.orElse {
   case (nombre, _) => s"$nombre no es heavy"
