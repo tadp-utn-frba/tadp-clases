@@ -2,7 +2,7 @@
 
 Queremos modelar un Meta Builder, el cual nos ofrece la posibilidad de armar Builders para cualquier clase que queramos, ahorrandonos el desarrollo de un builder por cada clase de nuestro dominio o modelo de negocio. 
 
-La resolución del Meta Builder en clase está en el siguiente [repo](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/ruby-metabuilder).
+La resolución del Meta Builder en clase está en el siguiente [repo](https://github.com/tadp-utn-frba/tadp-clases/tree/ruby-metabuilder).
 
 ## Punto 1: Sintaxis básica del Meta Builder
 
