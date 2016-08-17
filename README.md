@@ -35,7 +35,7 @@ Sólo con este poquito las diferencias que se producen en el cógido son enormes
 implementaciones de la misma(\*) clase, una usando *case classes* y una sin ellas.
 
 ###Con Case Classes
-```scala
+~~~scala
 // Properties de sólo lectura
 // Copy
 // Conversión a String lindo
@@ -46,10 +46,10 @@ implementaciones de la misma(\*) clase, una usando *case classes* y una sin ella
 case class Materia(nombre: String, ciclo: Int)(criterioDeAprobación: Alumno => Boolean) {
 	def aprobados(curso: Curso) = curso filter criterioDeAprobación
 }
-```
+~~~
 
 ###Sin Case Classes
-```scala
+~~~scala
 class Materia {
 	// Properties de sólo lectura
 	private var _nombre: String = _
@@ -91,7 +91,7 @@ object Materia {
 	// Unapply
 	def unapply(materia: Materia): Option[(String, Int)] = ???
 }
-```
+~~~
 
 ## String Interpolators
 
@@ -102,7 +102,7 @@ multiples objetos.
 La forma de hacer esto en scala es precediendo el string con una *s* y envolviendo las expresiones a
 interpolar con ${...} (las expresiones que sólo consisten en una variable pueden prescindir de las llaves). 
 
-```scala
+~~~scala
 val nombre = "Técnicas Avanzadas de Programación"
 val ciclo = 3
 val alumnos: List[Alumno] = ...
@@ -110,21 +110,21 @@ val alumnos: List[Alumno] = ...
 val sinInterpolación = "La materia " + nombre + " del ciclo " + ciclo + " tiene " + alumnos.size + "alumnos"
 
 val conInterpolación = s"La materia $nombre del ciclo $ciclo tiene ${alumnos.size} alumnos"
-```
+~~~
 
 La prueba de que esta forma de escritura es (al menos ligeramente) mejor que la concatenación directa está
 en que la mayoría de la gente no nota a simple vista que al último string del ejemplo le falta un espacio ;)
 
 Además de la "s" Scala ofrece otros interpoladores:
 
-```scala
+~~~scala
 // f: Permite preceder las expresiones insertadas por un patron de formateo. Y es type safe!
 val formateado = f"El promedio en $nombre%s es ${alumnos.sum / alumnos.size}%2.2f"
 
 // raw: Trata a los caracteres especiales que modificarían el string como caracteres normales. 
 val procesado   = s"Estos\nSon\nSaltos\nDe\nLinea"
 val sinProcesar = raw"Estos\nNo\nSon\nSaltos\nDe\nLinea"
-```
+~~~
 
 Sin embargo, el aspecto más interesante de la interpolación de strings en Scala es que *no son palabras
 reservadas, sino mensajes*. Tanto *s* y *f* como *raw* son en realidad mensajes que el compilador envía a
@@ -136,7 +136,7 @@ mails mostrando sólo las primeras 4 letras y el dominio de cada uno (para evita
 posible para hacer esto es definir un interpolador que procese los parametros del tipo Email de forma
 distinta a los demás:
 
-```scala
+~~~scala
 class Email(val id: String, val dominio: String) {
 	override def toString = s"$id@$dominio"
 	def toEncriptedString = s"${id.take(4)}...@$dominio"
@@ -155,13 +155,13 @@ val ivan = new Email("ivanlocolosredoooo1964", "hotmail.com.es")
 
 emails"$nico, $ernesto, $ivan" // Esto va a mostrar los mails encriptados
 s"$nico, $ernesto, $ivan" // Esto va a mostrar los mails completos
-```
+~~~
 
 Este es sólo un pequeño ejemplo de lo que se puede hacer con interpoladores. Noten que no hay ninguna
 necesidad de que el método que se envía a un StringContext sea un String; esto quiere decir que podemos
 usarlos para construir todo tipo de objetos a partir de Strings!
 
-```scala
+~~~scala
 implicit class EmailContext(val context: StringContext) {
 	def mail(arguments: Any*): Email = {
 		val mergeado = context.s(arguments:_*)
@@ -174,7 +174,7 @@ implicit class EmailContext(val context: StringContext) {
 
 mail"un-id@un-dominio.com" // retorna un Email
 mail"lalala" // falla por no cumplir el patrón
-```
+~~~
 
 Todo muy lindo pero cómo llegan esos métodos a StringContext? y que es esa palabra "implicit"? Bueno, eso
 nos lleva al siguiente tema...
@@ -193,7 +193,7 @@ Digamos que buscamos agregarle comportamiento a un objeto *sin cambiar su implem
 conocida de hacer esto es anteponiendo otro objeto que sepa hacer el nuevo comportamiento y tenga una
 referencia al objeto viejo para poder usar el comportamiento ya existente.
 
-```scala
+~~~scala
 class StringExtendido(unString: String) {
 	// Este método es demasiado específico para querer ponerlo en String
 	def esUnMail = unString.length > 10 && unString.contains("@") && unString.endsWith(".com") 
@@ -202,7 +202,7 @@ class StringExtendido(unString: String) {
 new StringExtendido("foobar@gmail.com").esUnMail // Sí!
 new StringExtendido("Hola Mundo!").esUnMail      // No!
 "Chau Mundo...".esUnMail                         // Esto no compila. No cambié la clase String.
-```
+~~~
 
 La ventaja de esta aproximación es que puedo agregar tantos métodos cómo quiero sin preocuparme de que
 colisionen diferentes implementaciones, ya que cada uno puede instanciar el "wrapper" de String que
@@ -218,14 +218,14 @@ en contexto, el compilador usa para wrapear objetos que no hubieran entendido al
 Para definir una clase implicita, alcanza con hacerle recibir un único parámetro de clase del tipo que
 quiero wrappear y anteponer la palabra "implicit" para que el compilador sepa que puede usarla:  
 
-```scala
+~~~scala
 implicit class StringExtendido(unString: String) {
 	def esUnMail = unString.length > 10 && unString.contains("@") && unString.endsWith(".com") 
 }
   
 "foobar@gmail.com".esUnMail // Ahora esto funciona! El compilador wrappea el string sin que yo lo vea.
 new StringExtendido("foobar@gmail.com").esUnMail // La linea de arriba se reescribe a esto. 
-```
+~~~
 
 Es importante notar que el wrappeo automático sólo ocurre cuando mando un mensaje *que el objeto no
 entiende*. Esto significa que las clases implicitas sirven para extender un tipo, pero no para redefinirle
@@ -243,7 +243,7 @@ una referencia, se utiliza para convertir algo de un tipo a otro ya existente.
  
 Digamos, por ejemplo, que tenemos un sistema con las siguientes interfaces::
 
-```scala
+~~~scala
 class Punto(x: Int, y: Int)
 object Mapa { def nombreDelLugar(lugar: Punto): String = ??? }
 object Input { def puntoPresionado: (Int, Int) = ??? }
@@ -254,17 +254,17 @@ val lugar = Input.puntoPresionado
 Mapa nombreDelLugar Input.puntoPresionado // Sería lindo poder hacerlo así, pero una tupla no es un punto...
 
 Mapa.nombreDelLugar(new Punto(lugar._1, lugar._2)) // Hay que hacer una conversión
-```
+~~~
 
 Algo incomodo en este código es que, al pedir el punto presionado, recibo una Tupla2 pero lo que necesito es un Punto.
 Semánticamente no es un problema, dado que tengo una forma concreta de convertir cualquier Tupla2 en un Punto. Podría
 incluso evitar una posible repetición de esta lógica extrayendo esa conversión en una función:
 
-```scala
+~~~scala
 def tuplaAPunto(lugar: (Int,Int)) = new Punto(lugar._1, lugar._2)
 
 Mapa.nombreDelLugar(tuplaAPunto(lugar)) // Ahora puedo usarlo así
-```
+~~~
 
 Mejor? Sí. Pero si siempre que tengo una tupla y espero un punto tengo que aplicar esta función, sería lindo poder pedirle
 al compilador que lo haga sin que yo lo tenga que escribir explicitamente; después de todo, mi función *tuplaAPunto* es
@@ -273,28 +273,28 @@ una transformación de Tuplas a Puntos.
 Esto es exactamente para lo que las conversiones implicitas sirven. Puedo convertir una función que espera un único
 parámetro en una conversión implicita anteponiendo la palabra implicit a su definición:
 
-```scala
+~~~scala
 implicit def tuplaAPunto(lugar: (Int,Int)) = new Punto(lugar._1, lugar._2)
-```
+~~~
 
 De ahora en adelante, si esta función (que es del tipo Tupla2 => Punto) está en contexto, el compilador va a aplicarla
 automáticamente cada vez que usemos una Tupla2 en un lugar donde se esperaba un Punto. Eso permite reescribir nuestro uso
 así:
 
-```scala
+~~~scala
 Mapa.nombreDelLugar(Input.puntoPresionado)
-```
+~~~
 
 Otro detalle interesante es que, por la forma en que Scala busca estos implicits, es posible, en lugar de importar la
 función implicita en el contexto, definirla en el companion object de uno de los tipos en cuestión.
 
-```scala
+~~~scala
 object Punto {
 	implicit def tuplaAPunto(lugar: (Int,Int)) = new Punto(lugar._1, lugar._2)
 }
 
 Mapa.nombreDelLugar(Input.puntoPresionado) // No necesito importar la función!
-```
+~~~
 De esta manera estamos oficializando que un Punto puede ser obtenido a partir de una tupla en cualquier lugar.  
 
 ### Implicit parámeters
@@ -304,7 +304,7 @@ contexto. Si existe al momento de evaluar una función un valor implicito del ti
 este valor se usa como parámetro automáticamente sin necesidad de escribirlo. Esto es especialmente útil cuando existen
 una gran cantidad de llamadas a funciones que usan el mismo parámetro en un contexto:
 
-```scala
+~~~scala
 	class Persona { def persistir(db: BaseDeDatos) = ??? }
 		
 	class Familia(padre: Persona, madre: Persona, hijos: List[Persona], abuelos: List[Persona]) {
@@ -320,13 +320,13 @@ una gran cantidad de llamadas a funciones que usan el mismo parámetro en un con
 	
 	val db: BaseDeDatos = ???
 	unaFamilia.persistir(db)
-```
+~~~
 
 En este ejemplo, la base de datos del método persistir puede declararse como un parámetro implicito anteponiendo la
 palabra *implicit* al nombre del parámetro. Cabe aclarar que los parámetros implicitos deben ser los últimos parámetros
 de la firma y deben estar en su propio grupo de aplicación. 
 
-```scala
+~~~scala
 	class Persona { def persistir(implicit db: BaseDeDatos) = ??? }
 		
 	class Familia(padre: Persona, madre: Persona, hijos: List[Persona], abuelos: List[Persona]) {
@@ -342,7 +342,7 @@ de la firma y deben estar en su propio grupo de aplicación.
 	
 	implicit val db: BaseDeDatos = ???
 	unaFamilia.persistir
-```
+~~~
 
 Noten que, para poder evitar pasar el parámetro, es necesario que haya un *valor implicito* en el contexo. Los parámetros
 implicitos son, a su vez, valores implicitos en el contexto del método.  
@@ -355,17 +355,17 @@ guardar objetos (sin volver a leerlos o cambiarlos después).
 
 Digamos que contamos con las siguientes interfaces para nuestras bases de datos:
 
-```scala
+~~~scala
 	object SQL { def run(query: String) = ??? }
 	object Redis { def guardar(clave: String, valor: String) = ??? }
-``` 
+~~~ 
 
 #### Aproximación Naíve
 
 Una primera manera para integrar nuestro código a estas APIs es extendiendo la interfaz de nuestros objetos, agregando métodos para persistir en cada
 tecnología.
 
-```scala
+~~~scala
 // SQL --------------------------------------------------------------------------------------------
 
 trait PersistibleConSQL {
@@ -408,7 +408,7 @@ persistirConSQL(c1)
 persistirConRedis(c2)
 persistirConSQL(c3)
 persistirConRedis(c3)
-``` 
+~~~ 
 
 Esta aproximación tiene varios problemas: Es muy invasiva y requiere que todos las clases que se desean persistir puedan ser modificadas, ensucia la
 interfaz de dominio y, si bien no es el caso en este ejemplo, podrían haber conflictos entre las interfaces requeridas por cada base de datos.
@@ -423,22 +423,22 @@ type class C si alguien provee las operaciones que ella exige.
 Guiandonos por esta idea, podemos definir una Type Class "PersistibleConSQL" que especifique todo lo que un Tipo debe poder hacer para ser considerado
 persistible usando SQL:
 
-```scala
+~~~scala
 trait PersistibleConSQL[T] {
 	def tabla(obj: T): String
 	def valores(obj: T): List[String]
 }
-```
+~~~
 
 Es importante notar que este trait no pretende ser *extendido* por los tipos persistibles con SQL, simplemente dice qué debe ser posible hacer con sus
 instancias (en este caso, obtener una tabla y una lista de valores). Usando este trait, podemos reescribir nuestra función de persisitencia de la
 siguiente forma:
 
-```scala
+~~~scala
 def persistirConSQL[T](obj: T)(persistible: PersistibleConSQL[T]) = {
 	SQL run s"INSERT INTO ${persistible.tabla(obj)} VALUES ${persistible.valores(obj)}"
 }
-```
+~~~
 
 La función persistir ahora trabaja con dos parámetros: Uno de ellos es una instancia del tipo T, el cual queremos persistir. El otro parámetro debe ser
 alguien que implemente las funciones tabla y valores sobre T. Este objeto es el que permite que T sea persistible con SQL, permitiendo desacoplar la idea
@@ -447,7 +447,7 @@ de persistencia de nuestro tipo de dominio.
 Ahora podemos reescribir nuestro código sin ensuciarlo con lógica de persistencia. A cambio, debemos implementar un objeto aparte que lo vuelva
 persistible:
 
-```scala
+~~~scala
 case class C(f1: String, f2: String)
 
 object CSQL extends PersistibleConSQL[C] {
@@ -458,7 +458,7 @@ object CSQL extends PersistibleConSQL[C] {
 // uso
 
 persistirConSQL(new C("foo", "bar"))(CSQL)
-```
+~~~
 
 Podemos pensar que el trait PersistibleConSQL[T] es una Type Class y nuestro tipo de dominio C la implementa a travéz del objeto CSQL.
 
@@ -468,7 +468,7 @@ El problema de esta solución es que ahora tengo que preocuparme por tener en co
 Ahí es donde los parámetros implicitos hacen lo suyo! Si cambiamos nuestra función de persistencia para que el parametro que provee las funciones sea
 implicito podemos dejar que el compilador lo escriba por nosotros.
 
-```scala
+~~~scala
 def persistirConSQL[T](obj: T)(implicit persistible: PersistibleConSQL[T]) = {
 	SQL run s"INSERT INTO ${persistible.tabla(obj)} VALUES ${persistible.valores(obj)}"
 }
@@ -482,22 +482,22 @@ implicit object CSQL extends PersistibleConSQL[C] {
 
 persistirConSQL(new C("foo", "bar"))
 
-```
+~~~
 
 Esta forma de "extender" tipos es tan común y flexible que Scala provee una notación especial para definir funciones con type clases:
 
-```scala
+~~~scala
 def persistirConSQL[T](obj: T)(implicit persistible: PersistibleConSQL[T]) { ??? } // Esto mismo puede escribirse como está en la linea de abajo  
 def persistirConSQL[T : PersistibleConSQL](obj: T) { ??? } // Acá se ve más claro que esperamos un tipo T que pertenece a la typeclass PersistibleConSQL 
-``` 
+~~~ 
 
 Uh... Pero ahora ya no está el parámetro "persistible"! Cómo consigo la instancia? Scala provee una función llamada *implicitly* para estas situaciones:
-```scala
+~~~scala
 def persistirConSQL[T: PersistibleConSQL](obj: T) = {
 	val persistible - implicitly[PersistibleConSQL[T]]
 	SQL run s"INSERT INTO ${persistible.tabla(obj)} VALUES ${persistible.valores(obj)}"
 }
-```
+~~~
 
 
 ## Macros
@@ -509,7 +509,7 @@ muchos lenguajes y tecnologías. A grandes razgos, la útilidad de las macros co
 válida y reemplazarla por otra en tiempo de compilación, permitiendo así que la sintaxis que normalmente construiría un
 cierto programa construya otro totalmente diferente.
 
-En Scala, la utilización de macros está definida en el paquete ```scala.language.experimental.macros```, el cual debe ser
+En Scala, la utilización de macros está definida en el paquete ~~~scala.language.experimental.macros~~~, el cual debe ser
 importado para poder trabajar.
 
 Una macro de Scala se compone de dos partes: Una declaración y una implementación. Al momento de compilar, los usos de la
@@ -517,13 +517,13 @@ función declaración son procesados para reemplazarlos por el resultado de apli
 declaración de una macro es muy similar a definir una función común pero, en lugar del cuerpo, se utiliza la palabra clave
 *macro* seguida del nombre de la función implementación. 
 
-```scala
+~~~scala
   // declaración
   def miMacro(parametro1: String, parametro2: Int) = macro miMacro_impl
   
   // implementación
   def miMacro_impl(c: Context)(parametro1: c.Expr[String], parametro2: c.Expr[Int]) = ???
-```
+~~~
 
 ### Usos
 
@@ -544,8 +544,8 @@ que quiero implementar usando macros, mientras que las de caja blanca se usan cu
 macros de caja blanca son más flexibles pero menos seguras, ya que no pueden tiparse y van a ser discontinuadas en
 versiones futuras de Scala, por esa razón vamos a concentrarnos en las definiciones de caja negra.
 
-Para elegir uno de estos dos enfoques es necesario importar el paquete correspondiente ```scala.reflect.macros.whitebox```
-para las de caja blanca y ```import scala.reflect.macros.blackbox``` para las de caja negra.
+Para elegir uno de estos dos enfoques es necesario importar el paquete correspondiente ~~~scala.reflect.macros.whitebox~~~
+para las de caja blanca y ~~~import scala.reflect.macros.blackbox~~~ para las de caja negra.
 
 La clase Context que se usó en el código anterior está definida en estos paquetes.
 
@@ -557,11 +557,11 @@ el mismo nombre y un tipo de expresión que coincida. creado a partir del contex
 
 Empecemos por hacer una macros sencilla: la función identidad, que recibe un número y lo retorna:
 
-```scala
+~~~scala
 def id(n: Int): Int = macro id_impl
 
 def id_impl(c: Context)(n: c.Expr[Int]): c.Expr[Int] = n
-```
+~~~
 
 No fue tan difícil, no? Nuestra función id espera un Int y retorna un Int, por lo tanto, la macro con la que la
 implementamos debe recibir (además del contexto) una expresión de tipo Int y retornar esa misma expresión. Es importante
@@ -612,7 +612,7 @@ constituyen una interfaz relativamente accesible para manipular las expresiones.
 El siguiente ejemplo usa quasiquotes para definir una macro que recibe una expresion por parámetro y loguea por consola
 un aviso de que sentencia se va a ejecutar antes de evaluarla. 
 
-```scala
+~~~scala
 def debug(code: => Unit): Unit = macro debug_impl
 
 def debug_impl(c: Context)(code: c.Tree) = {
@@ -640,7 +640,7 @@ debug {
   val z = x + y      // Se va a ejecutar: val z = x + y
 }
 
-```
+~~~
 
 ### Validaciones y manejo de errores
 
@@ -652,7 +652,7 @@ El siguiente ejemplo retoma la idea de los mails con una macro que recibe un Str
 string no tiene el formato correcto. Este feedback puede verse en el mismo IDE, ya que se controla en tiempo de
 compilación!
 
-```scala
+~~~scala
 case class Email(id: String, domain: String)
 
 def email(str: String): Email = macro email_impl
@@ -670,7 +670,7 @@ def email_impl(c: Context)(str: c.Expr[String]) = {
 //uso
 email("lalala@gmail.com") // Retorna Email("lalala", "gmail.com")
 email("lalalagmail.com") // Error de compilación! Formato inválido!
-```
+~~~
 
 ## Poniendo todo junto
 
@@ -679,7 +679,7 @@ extenderse StringContext mediante implicits para crear mails que son validados e
 poner un poco de esfuerzo extra para adecuar las firmas y los usos, este es un gran ejemplo de lo poderosas que pueden
 ser estas herramientas cuando se usan juntas. 
 
-```scala
+~~~scala
 case class Email(id: String, domain: String)
 
 implicit class EmailStringContext(strCtx: StringContext) {
@@ -704,7 +704,8 @@ def email_impl(c: Context)(arguments: c.Expr[Any]*) = {
 		case _ => c.abort(c.enclosingPosition, "Invalid mail!!!")
 	}
 }
-```
+~~~
+
 Noten que no podemos pasarle a la macro el parámetro extra que el StringContext necesita, así que tenemos que obtenerlo
 en base al contexto. 
  
