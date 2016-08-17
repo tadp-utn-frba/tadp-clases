@@ -92,7 +92,7 @@ Luego agregamos Misiles, que pueden atacar pero no tiene sentido que se defienda
 
 Los misiles tienen un potencial ofensivo fijo de 1000, por lo tanto esa implementación no será compartida con los demás Atacantes. Si bien observamos que no es necesario, vemos que puede ser piola definir el método abstracto potencial_ofensivo en Atacante, para explicitar que las subclases deberían proveer una implementación de este método. A este tipo de métodos los llamamos **métodos abstractos**. 
 
-![image alt text](image_0.png)
+![image alt text](https://raw.githubusercontent.com/tadp-utn-frba/tadp-clases/ruby-age/image_0.png)
 
 ## Mixins
 
