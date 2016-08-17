@@ -128,7 +128,7 @@ end
 ~~~
 
 
-![image alt text](https://raw.githubusercontent.com/tadp-utn-frba/tadp-utn-frba.github.io/ruby-age/image_1.png)
+![image alt text](https://raw.githubusercontent.com/tadp-utn-frba/tadp-clases/ruby-age/image_1.png)
 
 ### Más cuestiones sobre mixins
 
