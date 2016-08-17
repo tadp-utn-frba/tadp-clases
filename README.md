@@ -547,8 +547,19 @@ que quiero implementar usando macros, mientras que las de caja blanca se usan cu
 macros de caja blanca son más flexibles pero menos seguras, ya que no pueden tiparse y van a ser discontinuadas en
 versiones futuras de Scala, por esa razón vamos a concentrarnos en las definiciones de caja negra.
 
-Para elegir uno de estos dos enfoques es necesario importar el paquete correspondiente ~~~scala.reflect.macros.whitebox~~~
-para las de caja blanca y ~~~import scala.reflect.macros.blackbox~~~ para las de caja negra.
+Para elegir uno de estos dos enfoques es necesario importar el paquete correspondiente 
+
+~~~scala 
+import scala.reflect.macros.whitebox
+~~~
+
+para las de caja blanca y 
+
+~~~scala 
+import scala.reflect.macros.blackbox
+~~~ 
+
+para las de caja negra.
 
 La clase Context que se usó en el código anterior está definida en estos paquetes.
 
