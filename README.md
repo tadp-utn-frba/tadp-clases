@@ -9,9 +9,9 @@ En principio, la intención es usar el TP de [Pokemon](https://docs.google.com/d
 
 Se utilizó esta versión [reducida](https://docs.google.com/document/d/1aewVvR4YcU3-1fXZDKEGEGgH5i2ar-mTpugKn2uGMhg/edit#)
 
-Podemos basarnos en la implementación de referencia que hizo [NicoS](https://github.com/uqbar-paco/documentos/tree/master/tadp/tps/2015c1-TP2-Gimnasio-Pokemon/pokemon)
+Podemos basarnos en la implementación de referencia que hizo [NicoS](https://github.com/bossiernesto/tp-pokemon)
 
-Y también podemos basarnos en la implementación que hizo el grupo [wololos](https://github.com/uqbar-paco/documentos/tree/master/tadp/tps/2015c1-TP2-Gimnasio-Pokemon/pokemon)
+Y también podemos basarnos en la implementación que hizo el grupo [wololos](https://github.com/iluetich/wololos-1c-2015-tp-tadp-pokemon)
 
 - Comenzar planteando el caso de uso de implementar algunas actividades sencillas y sin parámetros extra: Descansar y fingir intercambio.
 - Con estas dos actividades, debería surgir la idea de que quizás las actividades pueden ser funciones, pero de momento podemos dejarla de lado. Que quede colgada.
