@@ -1,3 +1,9 @@
+{% highlight ruby linenos %}
+def dosomething
+  delegate :some, :thing, :with, :unicorns, :and, :shrimps => :yolo, :someother key => true, :maybeonemore => true
+end
+{% endhighlight %}
+
 # El compilador y usted
 
 Uno de los features más interesantes que ofrece un lenguaje es la capacidad de extenderlo. En mayor o menor
