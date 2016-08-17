@@ -5,7 +5,7 @@
 Empezamos repasando la solución a la que habíamos llegado la clase pasada para el ejercicio del microprocesador:
 
 [repo funcional-inmutable
-](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-inmutable)
+](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/funcional-inmutable)
 
 Teníamos una solución que ejecutaba el programa recursivamente, nuestros objetos eran inmutables y para manejar los resultados (tanto normales como excepcionales) teníamos distintos tipos de resultados de ejecución (Ejecutando, Halt y Error) que contenían al micro en el estado correspondiente a ese punto de la ejecución.
 
@@ -15,7 +15,7 @@ Si en algún momento se llegaba a un resultado que no fuera Ejecutando, la recur
 
 El siguiente paso que queremos dar es eliminar el algoritmo recursivo cambiándolo por una abstracción de orden superior que es la reducción (o fold), y de esa forma poder olvidarnos del manejo estructural de la lista de instrucciones y sólo pensar cómo pasar del estado de ejecución anterior al siguiente en base a la instrucción a ejecutar:
 
-[repo funcional-fold](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-fold)
+[repo funcional-fold](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/funcional-fold)
 
 Vemos cómo el matcheo de la lista vacía para retornar un resultado de ejecución Ejecutando con el micro en el estado en el cual nos haya llegado por parámetro se vuelve la semilla del foldeo.
 
@@ -193,7 +193,7 @@ Finalmente vemos que ResultadoDeEjecucion es muy similar a un Try, lo único que
 
 Pueden verse estas nuevas soluciones comentadas en
 
-[https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-monadas/src/main/scala/ar/edu/utn/tadp/microprocesador/package.scala
-](https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/tree/scala-microprocesador/funcional-monadas/src/main/scala/ar/edu/utn/tadp/microprocesador/package.scala)
+[https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/funcional-monadas/src/main/scala/ar/edu/utn/tadp/microprocesador/package.scala
+](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/funcional-monadas/src/main/scala/ar/edu/utn/tadp/microprocesador/package.scala)
 
 
