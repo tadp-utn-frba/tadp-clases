@@ -11,8 +11,7 @@ module Atacante
   end
 
   def potencial_ofensivo
-    self.descansado ? @potencial_ofensivo * 2
-      : @potencial_ofensivo
+    self.descansado ? @potencial_ofensivo * 2 : @potencial_ofensivo
   end
 
   def descansar
@@ -137,13 +136,13 @@ class Peloton
   attr_accessor :integrantes, :estrategia, :retirado
 
   def self.cobarde(integrantes)
-      self.new(integrantes) {|peloton|
-        peloton.retirate
-      }
+    self.new(integrantes) { |peloton|
+      peloton.retirate
+    }
   end
 
   def self.descansador(integrantes)
-    self.new(integrantes) {|peloton|
+    self.new(integrantes) { |peloton|
       peloton.descansar
     }
   end

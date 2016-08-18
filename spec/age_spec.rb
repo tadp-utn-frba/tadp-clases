@@ -19,7 +19,7 @@ describe 'age of empires tests' do
     expect(atila.energia).to eq(40)
   end
 
-  it 'atila ataca a vikingo pero no le hace daño' do
+  it 'atila ataca a vikingo pero no le hace danio' do
     atila= Guerrero.new
     vikingo = Guerrero.new 70
 
