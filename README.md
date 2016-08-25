@@ -1,5 +1,14 @@
 Clase 2 TADP 2C2016
 
+## **Traits vs Mixins**
+Flattening: 
+    - Se define qué traits se van a agregar y cómo en un momento determinado. Luego de eso, para el que usa la clase todo funciona como si el comportamiento traido de los traits fuese propio de la clase.
+Linearización:
+    - Se agregan lugares donde buscar para el method lookup. Hay un orden definido en el cual se recorren todos esos lugares por lo que no es ambiguo la implementación del método que se va a usar.
+Resolución de conflictos:
+    - Automática: hay una manera predeterminada que sabe como resolver el conflicto. Por ej si incluis dos mixines en ruby, el segundo va a tener más precedencia que el primero. 
+    - Manual: cuando hay conflictos, el programador explícitamente tiene que decidir como se resuelve.
+    
 # Continuación ejercicio age of empires
 Sobre el ejercicio de la clase anterior agregamos la posibilidad de que los atacantes y defensores puedan "descansar" y los siguientes requerimientos.
 
@@ -63,13 +72,57 @@ No se va a romper, porque los conflictos de mixins se resuelven automáticamente
 
 Pero para los Guerreros vamos a querer que descanse como atacante y luego como defensor (o sea de ambas formas).
 
-Para lograr esto, vamos a usar la posibilidad de crear alias methods que nos provee ruby:
+Para lograr esto, hay diferentes soluciones:
+
+#### Hacer un 'decorator' con los mixines, en los que cada mixin llama a super y tienen un mixin padre con el caso base, que en este ejemplo simplemente no hace nada.
+
+~~~ruby
+module Atacante
+  include Unidad
+  
+  def descansar
+    self.descansado = true
+    super
+  end
+end
+ 
+module Defensor
+  include Unidad
+  
+  def descansar
+    self.energia += 10
+    super
+  end
+end
+ 
+module Unidad
+  def descansar
+  end
+end
+ 
+class Guerrero
+  include Atacante
+  include Defensor
+end
+~~~
+
+En este caso, si Guerrero incluye tanto Atacante como Defensor, el method lookup seguiría el siguiente camino resultado de la linearización:
+
+Guerrero ~> Defensor ~> Atacante ~> Unidad ~> Object
+
+Entonces, Defensor y Atacante van a hacer lo suyo y luego van a delegar la responsabilidad de seguir descansando al siguiente de la lista. El objetivo de Unidad es terminar la cadena, si no estuviera ahí eventualmente se llegaría a un NoMethodError porque un Object no conoce el mensaje descansar.  
+
+
+#### Crear alias methods que nos provee ruby:
 
 ~~~ruby
 class Guerrero
   include Atacante
+  
   alias_method :descansar_atacante, :descansar
+  
   include Defensor
+  
   alias_method :descansar_defensor, :descansar
 
   def descansar
@@ -119,7 +172,7 @@ class Peloton
   def initialize(integrantes)
      self.integrantes = integrantes
      self.integrantes.each { |integrante|integrante.peloton = self} 
-  end
+  end.
 
   def descansar     
     cansados = self.integrantes.select { |integrante| 
@@ -190,7 +243,7 @@ end
 
 El problema que tenemos aca es que cada vez que se quiera crear un nuevo tipo de estrategia, debe crearse una nueva clase. Esto en principio no es muy problemático, pero es algo que puede ser molesto si hay muchos tipos de estrategias para cuando se lastima el pelotón, tendría un montón de clases para que definan sólo un método.
 
-Una alternativa para este problema sería que el Peloton conozca un bloque de código en vez de una instancia de Descansador o Cobarde. Si bien los bloques de Ruby no son objetos, y necesitaríamos que lo sean para que el pelotón lo conozca y lo pueda ejecutar cuando sea necesario mandándole un mensaje, lo que podemos usar son procs o lambdas, que **sí son objetos**. Para evitar confusiones a los procs y lambdas vamos a decirles closures, después podemos ver en qué se diferencian pero no hace al ejemplo.
+Una alternativa para este problema sería que el Pelotón conozca un bloque de código en vez de una instancia de Descansador o Cobarde. Si bien los bloques de Ruby no son objetos, y necesitaríamos que lo sean para que el pelotón lo conozca y lo pueda ejecutar cuando sea necesario mandándole un mensaje, lo que podemos usar son procs o lambdas, que **sí son objetos**. Para evitar confusiones a los procs y lambdas vamos a decirles closures, después podemos ver en qué se diferencian pero no hace al ejemplo.
 
 La parte simpática de tener una clase por cada estrategia era la facilidad de creación de un ejército descansador por ejemplo, ya que si tenemos que inicializarlo con el closure adecuado podría llevarnos a repetir lógica. Por eso definimos métodos de clase que devuelven el Peloton creado y configurado con el código de la acción a tomar.
 
