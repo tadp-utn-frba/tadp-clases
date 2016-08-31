@@ -701,8 +701,8 @@ moduleMirror.instance // returns C
 [9]: https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html
 [10]: https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-5.html
 [11]:  https://www.artima.com/insidejvm/ed2/lifetype.html
-[NivelesDeAbstraccion]: images/NivelesDeAbstraccion.png
-[JerarquiaDeTipos]: images/JerarquiaDeTipos.png
-[ArquitecturaJVM]: images/ArquitecturaJVM.gif
-[InicializacionJVM]: images/InicializacionJVM.png
-[Link]: images/Link.gif
+[NivelesDeAbstraccion]: https://raw.githubusercontent.com/tadp-utn-frba/tadp-clases/scala-reflection/images/NivelesDeAbstraccion.png
+[JerarquiaDeTipos]: https://raw.githubusercontent.com/tadp-utn-frba/tadp-clases/scala-reflection/images/JerarquiaDeTipos.png
+[ArquitecturaJVM]: https://raw.githubusercontent.com/tadp-utn-frba/tadp-clases/scala-reflection/images/ArquitecturaJVM.gif
+[InicializacionJVM]: https://raw.githubusercontent.com/tadp-utn-frba/tadp-clases/scala-reflection/images/InicializacionJVM.png
+[Link]: https://raw.githubusercontent.com/tadp-utn-frba/tadp-clases/scala-reflection/images/Link.gif
