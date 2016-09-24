@@ -11,19 +11,19 @@ git checkout <nombre del branch>
 
 ## Clases
 
-| Clase                                                                   |   branch                 |
-|:-----------------------------------------------------------------------:|:------------------------:|
-| Clase 1 - Intro a la materia y Mixins => ruby-age                       |   ruby-age               |
-| Clase 2 - Mixins: Resolución de Conflictos                              |   ruby-age               |
-| Clase 3 - Metaprogramación                                              |   ruby-metaprogramming   |
-| Clase 4 - Metabuilder (instance_eval y method missing)                  |   ruby-metabuilder       |
-| Clase 5 - Prototype                                                     |   ruby-prototype         | 
-| Clase 6 - Multimethods                                                  |   ruby-multimethods      |
-| Clase 7 - Intro a chequeo estático de tipos en Objetos                  |   scala-age              |
-| Clase 8 - Contratos, Binding, Type Arguments, Varianza                  |   scala-granja           |
-| Clase 9 - Pattern Matching vs Polimorfismo, Inmutabilidad, Case Classes |   scala-microprocesador  |
-| Clase 10 - Comportamiento vs Estructura, Mónadas                        |   scala-microprocesador  |
-| Clase 11 - Ejercicio de Diseño Objetos Funcional                        |   scala-pokemon          |
-| Clase 12 - Objetos + Funcional                                          |   scala-pociones         |
-| Clase 13 - Reflection en Scala                                          |   scala-reflection       |
-| Clase 14 - Macros en Scala                                              |   scala-macros           |
+| Clase                                                                   |   branch                        |
+|:-----------------------------------------------------------------------:|:-------------------------------:|
+| Clase 1 - Intro a la materia y Mixins => ruby-age                       |   ruby-age                      |
+| Clase 2 - Mixins: Resolución de Conflictos                              |   ruby-age                      |
+| Clase 3 - Metaprogramación                                              |   ruby-metaprogramming          |
+| Clase 4 - Metabuilder (instance_eval y method missing)                  |   method-missing-instance-eval  |
+| Clase 5 - Prototype                                                     |   ruby-prototype                | 
+| Clase 6 - Multimethods                                                  |   ruby-multimethods             |
+| Clase 7 - Intro a chequeo estático de tipos en Objetos                  |   scala-age                     |
+| Clase 8 - Contratos, Binding, Type Arguments, Varianza                  |   scala-granja                  |
+| Clase 9 - Pattern Matching vs Polimorfismo, Inmutabilidad, Case Classes |   scala-microprocesador         |
+| Clase 10 - Comportamiento vs Estructura, Mónadas                        |   scala-microprocesador         |
+| Clase 11 - Ejercicio de Diseño Objetos Funcional                        |   scala-pokemon                 |
+| Clase 12 - Objetos + Funcional                                          |   scala-pociones                |
+| Clase 13 - Reflection en Scala                                          |   scala-reflection              |
+| Clase 14 - Macros en Scala                                              |   scala-macros                  |
