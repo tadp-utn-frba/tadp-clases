@@ -2,10 +2,6 @@ require 'rspec'
 require_relative '../src/age'
 
 describe 'Peloton' do
-  before(:all){
-    Peloton.definir(:descansador){descansar}
-    Peloton.cobarde= proc{ retirate }
-  }
 
   it('Peloton descansador hace descansar a sus guerreros que no estan descansados') do
     atila = Guerrero.new

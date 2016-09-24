@@ -13,6 +13,7 @@ class Peloton
     cansados = self.integrantes.select { |integrante|
       integrante.cansado
     }
+
     cansados.each { |integrante|
       integrante.descansar
     }
@@ -22,65 +23,31 @@ class Peloton
     self.retirado = true
   end
 
-  # Anterior
-  # def self.cobarde(integrantes)
-  #   self.new(integrantes) {|peloton| 
-  #     peloton.retirate
-  #   }
-  # end
-  #
-  # def self.descansador(integrantes)
-  #   self.new( integrantes) { |peloton|
-  #     peloton.descansar
-  #   }
-  # end
-  # def lastimado(defensor)
-  #   self.estrategia.call(self)
-  # end
-
-  #V1 con instance_eval
-  # def self.cobarde(integrantes)
-  #   self.new(integrantes) { retirate }
-  # end
-  #
-  # def self.descansador(integrantes)
-  #   self.new( integrantes) { descansar }
-  # end
-
   def lastimado
-    self.instance_eval(&estrategia)
+    self.instance_eval &self.estrategia
   end
 
-  #V2 con métodos de clase definidos en runtime con :definir
-  #Peloton.descansador(integrantes) -> NoMethodError
-  #Peloton.definir(:descansador) {descansar}
-  #Peloton.descansador(integrantes) -> el peloton
-
-  def self.definir(nombre, &bloque)
-    self.define_singleton_method(nombre){|integrantes|
-      self.new(integrantes,&bloque)
-    }
-  end
-
-  #V3 porque usar explicítamente el método definir es para la gilada
-  #Peloton.descansador(integrantes) -> NoMethodError
-  #Peloton.descansador = {descansar}
-  #Peloton.descansador(integrantes) -> el peloton
-
-  def self.method_missing(selector, *args)
-    if selector[-1] == '='
-      self.definir(selector[0..-2].to_sym, &args[0])
-    else
-      super(selector, *args)
+  def self.definir(nombre, &estrategia)
+    self.define_singleton_method nombre do |integrantes|
+      self.new(integrantes, &estrategia)
     end
   end
 
-  def self.respond_to_missing?(selector, include_all=false)
-    selector[-1] == '=' || super(selector, include_all)
+
+  def self.method_missing(symbol, *args, &block)
+      self.definir symbol, &block
   end
+
+  def self.respond_to_missing?(symbol, include_all=false)
+    true
+  end
+
+  descansador do descansar end
+  cobarde do retirate end
 end
 
 
+#Modelo de age
 
 module Atacante
 
