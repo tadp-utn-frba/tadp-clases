@@ -1,6 +1,6 @@
 # Intro
 
-Para poder entender cómo trabaja el framework de reflection en Scala, primero hay que entender su metamodelo y cómo se representa en runtime. Scala no tiene un lenguaje de representación intermedia propio, sino que se compila a bytecode de Java para ejecutarse sobre la JVM (Java Virtual Machine). Eso significa que un programa Scala se traduce a un programa Java que debe funcionar utilizando sólo las representaciones internas pensadas para Java; por lo tanto durante la ejecución de un programa, las abstracciones propias del metamodelo del Scala **no existen**.
+Para poder entender cómo trabaja el framework de reflection en Scala, primero hay que entender su metamodelo y cómo se representa en runtime. Scala no tiene un lenguaje de representación intermedia propio, sino que se compila a bytecode de Java para ejecutarse sobre la JVM (Java Virtual Machine). Eso significa que un programa Scala se traduce a un programa Java que debe funcionar utilizando sólo las representaciones internas pensadas para Java; por lo tanto durante la ejecución de un programa, las abstracciones propias del metamodelo de Scala **no existen**.
 
 Pero el metamodelo de Scala no incluye al de Java? Y… Más o menos. Por ejemplo, tanto Scala como Java tienen clases, pero las de Java no pueden ser linearizadas con mixins, ni recibir parámetros de clase, lo cual las vuelve construcciones similares, pero no idénticas. Por otro lado Java tiene construcciones como las Interfaces que no son soportadas por Scala.
 
