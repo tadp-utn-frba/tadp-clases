@@ -1,4 +1,4 @@
-name := "TADP 2016c1 implicits and macros"
+name := "TADP-2016c1-implicits-and-macros"
 
 description := "Ejemplos de Implicits, typeclasses y macros"
 
