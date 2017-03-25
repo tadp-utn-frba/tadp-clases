@@ -98,10 +98,6 @@ class Misil
   def initialize(potencial_ofensivo=200)
     self.potencial_ofensivo = potencial_ofensivo
   end
-
-  def sufri_danio(energia)
-    raise 'Yo no deberia recibir esto'
-  end
 end
 
 class Muralla
