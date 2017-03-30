@@ -145,7 +145,7 @@ end
 2+2  #=> 123
 ```
 
-Otra manera de abrir las clases y definir metodos es usando en la clase el ´define_method´ pero este es privado y como ya vimos podemos pasarlo por arriba invocando el send.
+Otra manera de abrir las clases y definir metodos es usando en la clase el `define_method` pero este es privado y como ya vimos podemos pasarlo por arriba invocando el send.
  
 ```ruby
 Guerrero.send(:define_method, :saluda) {
@@ -181,13 +181,13 @@ Guerrero.new.saludo # NoMethodError
 ## METAMODELO
 Empecemos a descubrir el modelo de clases.
 
-Vamos a jugar un poco más con el metamodelo, ya sabemos que existe el mensaje ´class´ que lo entienden todos los objetos, si queremos saber la superclase de una clase tenemos el mensaje ´superclass´. Podríamos pensar en base a eso quiénes le proveen comportamiento a cada uno de nuestros objetos.
+Vamos a jugar un poco más con el metamodelo, ya sabemos que existe el mensaje `class` que lo entienden todos los objetos, si queremos saber la superclase de una clase tenemos el mensaje `superclass`. Podríamos pensar en base a eso quiénes le proveen comportamiento a cada uno de nuestros objetos.
 
 ```ruby
 zorro = Espadachin.new(Espada.new(123))
 ```
 
-Tenemos al zorro que es instancia de Espadachin, que hereda de Guerrero. Si le pedimos los métodos al zorro vemos que incluye a los ´instance_methods´ de Espadachin y de Guerrero, así como todos los que se definen para las instancias de Object.
+Tenemos al zorro que es instancia de Espadachin, que hereda de Guerrero. Si le pedimos los métodos al zorro vemos que incluye a los `instance_methods` de Espadachin y de Guerrero, así como todos los que se definen para las instancias de Object.
 
 ### Autoclases / Eigen Class
 Pero nosotros no le agregamos comportamiento sólo a las instancias, también teníamos un par de métodos de clase que habíamos definido para Peloton, como por ejemplo cobarde.
@@ -204,7 +204,7 @@ Peloton.class.instance_methods.include? :new  #=> true
 Peloton.class.instance_methods.include? :cobarde  #=> false
 ```
 
-Esto sólo lo entiende la clase Peloton, o sea que está definido para un sólo objeto. El objeto que le provee el comportamiento a un sólo objeto es la autoclase. En Ruby podemos obtener la autoclase de un objeto mandándole ´singleton_class´.
+Esto sólo lo entiende la clase Peloton, o sea que está definido para un sólo objeto. El objeto que le provee el comportamiento a un sólo objeto es la autoclase. En Ruby podemos obtener la autoclase de un objeto mandándole `singleton_class`.
 
 ```ruby
 Peloton.singleton_class.instance_methods(false)  #=> [:cobarde, :descansador]
@@ -229,7 +229,7 @@ b.extend W
 b.m  #=>123
 ```
 
-Agreguemos un test en el que atila cuando se lastima descansa y se come un pollo, incorporando ´comerse_un_pollo´:
+Agreguemos un test en el que atila cuando se lastima descansa y se come un pollo, incorporando `comerse_un_pollo`:
 
 ```ruby
 atila = Guerrero.new
@@ -249,7 +249,7 @@ atila.edad  #=> 5
 Guerrero.new.edad  #=> NoMethodError
 ```
 
-Vemos que no aparecen los mixins que tiene la clase Guerrero si vamos preguntando las super clases. El mensaje ´superclass´ no mustra los mixins (porque no son clases), para poder ver la linearización tenemos que pedir quienes proveen comportamiento con el mensaje ancestors.
+Vemos que no aparecen los mixins que tiene la clase Guerrero si vamos preguntando las super clases. El mensaje `superclass` no mustra los mixins (porque no son clases), para poder ver la linearización tenemos que pedir quienes proveen comportamiento con el mensaje ancestors.
 
 ```ruby
 Guerrero.ancestors  #=> [Guerrero, Defensor, Atacante, Object, PP::ObjectMixin, Kernel, BasicObject]
@@ -286,7 +286,7 @@ atila.gritar  #=> NoMethodError
 Guerrero.gritar  #=> haaaa
 ```
 
-Veamos en el diagrama, la singleton class de Guerrero (donde definimos ´gritar´)
+Veamos en el diagrama, la singleton class de Guerrero (donde definimos `gritar`)
 
 ```ruby
 Espadachin.gritar  #=>haaaa
