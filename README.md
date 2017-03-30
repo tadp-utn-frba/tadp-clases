@@ -119,7 +119,7 @@ atila #=> pretty print muestra el estado interno
 ```
 
 ### Self-Modification
-## Open classes
+#### Open classes
 
 Nos permite definir métodos y atributos en una clase ya existente.
 Es una forma de self modification con azucar sintáctica para no tener que hacerlo mediante mensajes.
