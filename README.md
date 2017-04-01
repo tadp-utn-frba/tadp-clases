@@ -26,7 +26,7 @@ Como la unidad va a morir luego de atacar, puede descansar como atacante, pero n
 
 Atacando de la mano
 
-Queremos que los guerreros formen parte de un pelotón. Cuando un guerrero es atacado, el pelotón puede tomar alguna acción. Ciertos pelotones se retiran cuando alguna de sus unidades es lastimada. Otros pelotones hacen que el guerrero descanse cuando recibe un daño y no está descansado. Un guerrero está descansado cuando su energía es mayor a 40.
+Queremos que los guerreros formen parte de un pelotón. Cuando un guerrero es atacado, el pelotón puede tomar alguna acción. Ciertos pelotones se retiran cuando alguna de sus unidades es lastimada. Otros pelotones hacen que sus unidades descansen cuando alguno de sus integrantes es lastimado. Solo hará descansar aquellos guerreros que no están descansados. Un guerrero está descansado cuando su energía es mayor a 40.
 
 ## **Implementación**
 
