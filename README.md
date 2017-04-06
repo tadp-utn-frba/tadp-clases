@@ -67,7 +67,10 @@ end
 ~~~
 
 Si ejecutamos el código anterior, Ruby nos va a tirar el siguiente error:
+~~~ruby
 undefined method `cobarde' for Peloton:Class
+~~~
+
 Lo que pasó es que intentamos mandarle el mensaje cobarde a Peloton y no estaba definido(teniendo en cuanta que borramos la definición anterior).
 Cuando le mandamos a un objeto un mensaje que no entiende, antes de romper se le manda el mensaje method_missing al receptor del mensaje original, cuya definición default es tirar una excepción.
 Podemos redefinir method_missing para lograr lo que queríamos:
