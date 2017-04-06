@@ -35,7 +35,7 @@ class Peloton
 
 
   def self.method_missing(symbol, *args, &block)
-      self.definir symbol, &block
+    self.definir symbol, &block
   end
 
   def self.respond_to_missing?(symbol, include_all=false)
