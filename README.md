@@ -9,6 +9,7 @@ Se usa define_singleton_method para definir los métodos de clase dinámicamente
 
 ## Script
 La clase anterior el código de Peloton quedó así:
+
 ~~~ruby
   def lastimado
     self.estrategia.call(self)
@@ -16,6 +17,7 @@ La clase anterior el código de Peloton quedó así:
 ~~~
 
 Las estrategias eran bloques que reciben el pelotón por parámetro
+
 ~~~ruby
   lambda { |peloton|
       peloton.descansar
@@ -23,6 +25,7 @@ Las estrategias eran bloques que reciben el pelotón por parámetro
 ~~~	           
 
 Queremos que no sea necesario pasar el pelotón:
+
 ~~~ruby
   def self.descansador(integrantes)
     self.new(integrantes) {
@@ -30,8 +33,10 @@ Queremos que no sea necesario pasar el pelotón:
     }
   end
 ~~~
+
 Para lograr esto tenemos que lograr que el bloque se ejecute en el contexto del pelotón, o dicho de otra manera, que dentro del bloque self referencie al pelotón.
 Podemos usar instance_eval que justamente sirve para este objetivo.
+
 ~~~ruby
   def lastimado
     self.instance_eval &self.estrategia
@@ -40,6 +45,7 @@ Podemos usar instance_eval que justamente sirve para este objetivo.
 
 Así como tenemos instance_eval, existe un mensaje que entienden las clases: class_eval.
 La diferencia entre los dos es como se comporta un bloque def.
+
 ~~~ruby
 un_objeto.instance_eval do
   def m1 # define m1 en la singleton class del objeto o
@@ -61,13 +67,16 @@ end
 ~~~
 
 Ya tenemos dos factory methods para construir distintos tipos de Peloton: descansador y cobarde. Queremos tener una forma de definir dinámicamente métodos similares con distintas estrategias. Uso:
+
 ~~~ruby
  Peloton.definir :descansador_cobarde do 
-	          descansar
-	          retirate
-	        end
+          descansar
+          retirate
+ end
 ~~~
+
 Tiene que definir un método de clase en Peloton:
+
 ~~~ruby  
   un_peloton = Peloton.descansador_cobarde integrantes
 
@@ -81,6 +90,7 @@ Tiene que definir un método de clase en Peloton:
 En este caso self es la clase Peloton, por lo que define_singleton_method va a definir un método en la singleton class de Peloton(#Peloton).
 
 A continuación queremos agregar un pequeño DSL(domain specific language) para crear factory methods con la siguiente sintaxis:
+
 ~~~ruby
 class Peloton
   descansador do descansar end
@@ -89,6 +99,7 @@ end
 ~~~
 
 Si ejecutamos el código anterior, Ruby nos va a tirar el siguiente error:
+
 ~~~ruby
 undefined method `cobarde' for Peloton:Class
 ~~~
@@ -96,6 +107,7 @@ undefined method `cobarde' for Peloton:Class
 Lo que pasó es que intentamos mandarle el mensaje cobarde a Peloton y no estaba definido(teniendo en cuanta que borramos la definición anterior).
 Cuando le mandamos a un objeto un mensaje que no entiende, antes de romper se le manda el mensaje method_missing al receptor del mensaje original, cuya definición default es tirar una excepción.
 Podemos redefinir method_missing para lograr lo que queríamos:
+
 ~~~ruby
   def self.method_missing(symbol, *args, &block)
     self.definir symbol, &block
@@ -104,6 +116,7 @@ Podemos redefinir method_missing para lograr lo que queríamos:
 
 Redefinir method_missing tiene un efecto no deseado, Peloton ahora entiende mensajes que no devuelve methods y respond_to? retorna false.
 Para mitigar este problema, el contrato cuando se redefine method_missing es que hay que redefinir respond_to_missing?
+
 ~~~ruby  
   def self.respond_to_missing?(symbol, include_all=false)
     true
@@ -112,6 +125,7 @@ Para mitigar este problema, el contrato cuando se redefine method_missing es que
 
 ## Anexo
 Para definir constantes en ruby, se puede usar Class>>const_set
+
 ~~~ruby
 class Guerrero
 
@@ -121,7 +135,9 @@ Object.const_set :Atila, Guerrero.new
 
 Atila.atacar(otro)
 ~~~
+
 Sólo las clases pueden definir constantes y solo viven en el scope de la clase que la definió.
+
 ~~~ruby
 class Bla
   def m
@@ -146,6 +162,7 @@ end
 ~~~
 
 También existe el método const_missing, que al igual que const_set, lo entienden sólo las clases. Cumple la misma función que method_missing, pero para cuando no se encuentra una constante. 
+
 ~~~ruby
 class Bla
   def self.const_missing const
