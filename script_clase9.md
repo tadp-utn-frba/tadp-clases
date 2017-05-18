@@ -23,7 +23,7 @@ El resultado final tiende a exhibir las ventajas y facilidades de extensión de 
 
 Esto no quiere decir que el patrón esté mal. Al contrario, la recurrencia del problema que inspiró el patrón es un indicio de que, a veces, Polimorfismo, Delegación y Encapsulamiento pueden no ser la mejor opción.
 
-Para ilustrar este punto podemos ver el siguiente ejercicio, en el cual se presenta para el mismo problema una implementación "pura" y una basada en el patrón visitor:
+Para ilustrar este punto podemos ver el siguiente ejercicio, cuyo enunciado pueden encontrar [acá](https://docs.google.com/document/d/1z_sAMk2xXMiQkuaXY6tohXCQ5eZMlsp8NaA8jX2WOx0/edit?usp=sharing), en el cual se presenta para el mismo problema una implementación "pura" y una basada en el patrón visitor:
 
 [repo objetos-puro](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/objetos-puro)
 
