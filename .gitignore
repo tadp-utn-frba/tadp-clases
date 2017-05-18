@@ -11,3 +11,4 @@ target
 .README.md.html
 .tmpBin
 *.sc
+*/.cache-main

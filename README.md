@@ -4,12 +4,14 @@ tadp2015c2-scala-objetofuncional-microprocesador
 Este proyecto esta separado en varios proyectos pequeños de microporcesador en el que se iŕan introduciendo nuevos conceptos del paradigma funcional sobre el de objetos.
 
 * objetos-puro: Ejercicio inicial resolviendo el problema del microprocesador aplicando el patrón [Visitor](http://en.wikipedia.org/wiki/Visitor_pattern).
-* functional-mutable: Ejercicio pasando de objetos a funcional con Pattern Matching.
-* functional-inmutable: Ejercicio cambiando el microporcesador para que haya inmutabilidad.
+* funcional-mutable: Reemplazamos el Visitor por conceptos del paradigma Funcional.
+* funcional-inmutable: Volvemos al microprocesador inmutable para trabajar en condiciones más cercanas a Funcional.
+* funcional-fold: Aplicamos orden superior para controlar el flujo del programa y evitamos las excepciones.
+* funcional-monadas: Refinamos la solución utilizando pseudo-mónadas.
 
 ## Instalación
 
-Para utilizar el proyecto desde el scala-ide, se neceita la dependencia sbt previamente, para ello hay que instalar diche dependencia:
+Para utilizar el proyecto desde el Scala-IDE es necesario tener instalado SBT (la herramienta de buildeo de Scala):
 
 * [Para Windows](http://www.scala-sbt.org/release/tutorial/Installing-sbt-on-Windows.html)
 * [Para Linux](http://www.scala-sbt.org/release/tutorial/Installing-sbt-on-Linux.html)
@@ -22,7 +24,7 @@ una vez instalado sbt, basta desde la linea de comandos ir a cualquiera de los p
 sbt eclipse
 ```
 
-Esto instalará todas las dependencias necesarias para usar el proyecto, luego de eso desde eclipse basta con importar el proyecto elegido. Scala IDE detectará automaticamente la estructura del proyecto, desde ahí el proyecto puede usarse normalmente desde la ide
+Esto instalará todas las dependencias necesarias para usar el proyecto, luego de eso desde eclipse basta con importar el proyecto elegido. Scala-IDE detectará automaticamente la estructura del proyecto, desde ahí el proyecto puede usarse normalmente.
 
 ### Ejecutando los tests desde sbt
 

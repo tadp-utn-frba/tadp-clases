@@ -2,7 +2,13 @@
 
 ## Intro
 
-Empezamos contando el patrón visitor[1] del libro de Gamma. La idea es que vean como se resuelve en objetos un problema en donde la solución depende de dos tipos para poder resolverlo.
+Empezamos contando el patrón visitor[1] del libro de Gamma. La idea es notar que este patrón, visto bajo la luz correcta, pareciera ir en contra de los conceptos principales de objetos (*Polimorfismo*, *Delegación* y *Encapsulamiento*).
+
+Por supuesto el patrón no va abiertamente en contra de estas 3 ideas, pero las usa de tal modo que el resultado final es el opuesto al que normalmente se busca:
+
+Los objetos "visitados", en lugar de implementar su própia lógica, implementan una interfaz (más bien anémica) que permite navegarlos. Los objetos "visitantes" representan una operación que normalmente sería parte de la interfaz de los visitados, quedando fuertemente acoplados a estos, pero permitiendo agregar nuevas operaciones de forma sencilla. Eso hace que los objetos visitados no puedan ser tratados polimorficamente con otros objetos que implementen dichas operaciones, dado que no exponen en su interfaz mensajes para las mismas (-Polimorfismo-); la lógica de negocio no está definida en los objetos que representan la estructura, donde normalmente estarían (-Delegación-) y su estructura queda abierta a los visitadores, que dependen de esto para poder recorrerlos (-encapsulamiento-).
+
+Esto no quiere decir que el patrón esté mal. Al contrario, la recurrencia de esta solución es un indicio de que, a veces, Polimorfismo, Delegación y Encapsulamiento pueden no ser la mejor opción.
 
 Con esto podemos empezar a ver el problema actual (ejercicio Microprocesador), mostrando la solución en objetos basada en el patrón Visitor:  
 
