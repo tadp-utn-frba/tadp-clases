@@ -1,318 +1,82 @@
-# TADP - 2015 C2 - Clase 09 - Pattern Matching vs Polimorfismo Ad-Hoc, Inmutabilidad
+# TADP - 2015 C2 - Clase 09 - Intro Hibrido Objeto/Funcional
 
 ## Intro
 
-Empezamos contando el patrón visitor[1] del libro de Gamma. La idea es notar que este patrón, visto bajo la luz correcta, pareciera ir en contra de los conceptos principales de objetos (*Polimorfismo*, *Delegación* y *Encapsulamiento*).
+Empezamos recordando los conceptos que consideramos más importantes del paradigma de objetos: **Encapsulamiento**, **Delegación** y **Polimorfismo (ad-hoc)**. Pero porqué son importantes? Qué nos dan? Hablamos de como la combinación de estas ideas hace que sea fácil agregar nuevas entidades para extender operaciones existentes, pero puede dificultar agregar nuevas operaciones (especialmente cuando no hay un único claro responsable de implementarla).
 
-Por supuesto el patrón no va abiertamente en contra de estas 3 ideas, pero las usa de tal modo que el resultado final es el opuesto al que normalmente se busca:
+En el paradigma funcional donde las estructuras de datos están separadas de las operaciones estos conceptos parecen tener poco o ningún sentido, y son mayormente reemplazados por nociones como **Transparencia Referencial** (que implica falta de *efecto colateral* y, por lo tanto, *inmutabilidad* y conlleva la escencia de funcional: pensar los programas como transformaciones entre dominios), **Polimorfismo Paramétrico** y **Orden Superior** (termino que usamos de forma laxa, para referirnos al uso de las operaciones como individuos de primer orden).
+
+Es fácil ver que estas ideas se contraponen: El *Polimorfismo Paramétrico* depende de conocer desde la operación la forma de los datos, lo cual choca con la idea de *Encapsulamiento*. Separar los datos de las operaciones favorece el *orden superior*, pero hace imposible *delegar* en los datos y compromete el *polimorfismo ad-hoc*; sin embargo también hace más sencillo agregar nuevas operaciones, aunque se complica agregar nuevas estructuras.
+
+Visto así, no parece buena idea mezclar estos dos mundos, hasta que empezamos a entender que el Paradigma de Objetos no siempre es del todo feliz usando **Encapsulamiento**, **Delegación** y **Polimorfismo (ad-hoc)**...
+
+
+## Visitor
+
+Entra a la cancha el patrón visitor[1], el cual podemos leer del libro de Gamma. La idea es notar que este patrón, visto bajo la luz correcta, pareciera ir en contra de los conceptos principales de objetos.
+
+Por supuesto el patrón no propone abiertamente romper estas 3 ideas, sino que las usa de tal modo que el resultado final es el opuesto al que normalmente estas buscan:
 
 Los objetos "visitados", en lugar de implementar su própia lógica, implementan una interfaz (más bien anémica) que permite navegarlos. Los objetos "visitantes" representan una operación que normalmente sería parte de la interfaz de los visitados, quedando fuertemente acoplados a estos, pero permitiendo agregar nuevas operaciones de forma sencilla. Eso hace que los objetos visitados no puedan ser tratados polimorficamente con otros objetos que implementen dichas operaciones, dado que no exponen en su interfaz mensajes para las mismas (-Polimorfismo-); la lógica de negocio no está definida en los objetos que representan la estructura, donde normalmente estarían (-Delegación-) y su estructura queda abierta a los visitadores, que dependen de esto para poder recorrerlos (-encapsulamiento-).
 
-Esto no quiere decir que el patrón esté mal. Al contrario, la recurrencia de esta solución es un indicio de que, a veces, Polimorfismo, Delegación y Encapsulamiento pueden no ser la mejor opción.
+El resultado final tiende a exhibir las ventajas y facilidades de extensión de la aproximación funcional (en lugar de la de objetos), aunque con el costo de ser bastante burocrático (no es raro encontrar implementaciones con *multiple dispatches* y código difícil de seguir).
 
-Con esto podemos empezar a ver el problema actual (ejercicio Microprocesador), mostrando la solución en objetos basada en el patrón Visitor:  
+Esto no quiere decir que el patrón esté mal. Al contrario, la recurrencia del problema que inspiró el patrón es un indicio de que, a veces, Polimorfismo, Delegación y Encapsulamiento pueden no ser la mejor opción.
+
+Para ilustrar este punto podemos ver el siguiente ejercicio, en el cual se presenta para el mismo problema una implementación "pura" y una basada en el patrón visitor:
 
 [repo objetos-puro](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/objetos-puro)
 
-Acá se puede apreciar que la solución en objetos es bastante complicada, a pesar de ser lo mejor que podemos hacer utilizando solamente polimorfismo ad-hoc. ¿cómo se puede mejorar entonces? Usando pattern matching.
+Se puede apreciar que la solución con el visitor desacopla la lógica (operaciones como ejecutar un programa, imprimirlo o simplificarlo) de la estructura (las instrucciones del lenguaje), con lo cual es posible agregar nuevas operaciones relativamente fácil sin tener que cambiar en absoluto las instrucciones. Esto es especialmente conveniente, dado que, por la naturaleza de este problema puntual, es más probable que haya que cambiar o agregar operaciones que instrucciones.
 
-Dado que es más probable que agreguemos más operaciones (como ejecutar, simplificar, pretty printing, etc) que instrucciones, es menos problemático si en vez de usar polimorfismo, miramos explícitamente la estructura. En definitiva es lo que se hacía antes con el visitor, solamente que ahora esto se define dentro de la operación directamente.
+El problema de este enfoque es que se ve muy verboso, la navegación y delegación son considerablemente más complicados y hay muchas operaciones que se vuelven más complejas por tener que adecuarse al contrato de navegación propuesto por el visitor (ej: simplify). Es dificil mejorar estos aspectos estando atados a las reglas de Objetos, pero qué tal si en lugar de tratar de usar los conceptos de objetos para obtener las ventajas de funcional rompemos el paradigma e introducimos herramientas nuevas?
+
+De esto se va a tratar lo que queda del cuatrimestre. Vamos a tratar de tomar el mundo de objetos y el de funcional y combinarlos de forma consistente, tratando de desarrollar un criterio sobre cuando conviene usar herramientas de uno o el otro y porqué.
+
+Empezamos entonces por introducir de a poco conceptos de funcional para tratar de mejorar nuestra solución, a ver donde nos lleva...
+
 
 ## Pattern Matching
 
-Entonces, ¿qué es pattern matching? En principio es una forma de ejecutar distinto comportamiento dependiendo de la forma del objeto. Pero en vez de delegar esta decisión en el objeto, lo realiza el objeto que lo usa. Como vamos a ir viendo, “dependiendo de la forma del objeto” es más que simplemente ver de qué tipo es, sino también ver que cosas tiene dentro.
+Qué es pattern matching? Podemos quedarnos con la intuición de que se trata de elegir una pieza de código para ejecutar en base a la *"forma"* de un valor. Trasladado al paradigma de objetos, esto va a implicar decidir desde afuera del mismo qué hacer basandonos en su clase y estado interno, en lugar de delegar la decisión en él. En objetos esto es una mala práctica (de hecho el antipatrón tiene un nombre y todo: *"Switch Statement"*) pero en funcional es lo más natural del mundo.
 
-Pasamos a una nueva solución que usa Pattern Matching en vez del Visitor:
+Si prestamos atención, podemos ver que el Visitor termina haciendo esto también (sólo porque lo hace a través de un ida y vuelta de mensajes en lugar de un *type check* no cambia el hecho de que el resultado final termina produciendo las mismas consecuencias que el antipatrón) con el agregado de que el código está disperso y es más difícil de seguir.
+
+Probamos entonces una nueva solución que reemplaza el *double-dispatch* del Visitor por Pattern Matching:
 
 [repo funcional-mutable](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/funcional-mutable)
 
-Veamos cómo queda la nueva implementación para ejecutar el programa. Esta nueva implementación también usa pattern matching sobre la lista de instrucciones para trabajarla recursivamente mediante el patrón cabeza y cola, y para los casos en los cuales la lista no es vacía, se decide cómo ejecutar la siguiente instrucción en base a su forma:
+Aprovechamos para contar cómo trabaja Scala y sus *case-classes*.
 
-~~~scala
- class HaltException extends Exception
+En esta nueva implementación no sólo las instrucciones son más concisas sino que, al estar implementadas desde afuera de los objetos involucrados y no tener que preocuparse por encontrar un lugar en el algoritmo de recorrido predefinido, muchas de las operaciones terminan resolviendose mucho más fácil (ej. simplify).
 
- def ejecutar(micro: Microprocesador, programa: Instruccion*) = {
+Tiene sentido... Si lo que buscabamos para este caso eran las ventajas de extensión que del *Polimorfismo Paramétrico*, porqué usar un ida y vuelta de mensajes basado en *Polimorfismo ad-hoc*? Pare de sufrir!
 
-        def ejecutarR(programa: List[Instruccion]): Unit =
 
-          programa match {
+## Transparencia Referencial
 
-          case Nil =>
+Se dice que una expresión posee *Transparencia Referencial* cuando su evaluación puede ser reemplazada por su resultado sin que dicho cambio altere el programa. Esto, que a primera vista podría parecer una característica poco relevante, encierra en cierto modo la escencia de la filosofía que mueve al paradigma funcional. La construcción principal de este paradigma es, por supuesto, *la Función*: una relación unidireccional entre un dominio y una imagen. Las funciones no cambian estados ni producen efectos, solamente conectan puntos. Programar en funcional implica pensar en el programa como un viaje entre un dominio y una imagen: "Estoy acá y quiero llegar allá. Qué pasos doy?".
 
-          case HALT :: _ => throw new HaltException
+Una vez que uno le toma la mano a este enfoque es sorprendentemente sencillo, no tanto porque aporte alguna construcción nueva, sino por todos los problemas que **No** tiene: No hay que preocuparse de mantener la consistencia de un estado, porque no hay estado. No hay que preocuparse por problemas de concurrencia porque todo lo que necesito para trabajar son los parámetros que recibo y no puedo modificarlos, solo analizarlos para llegar a la imagen que busco. Los algoritmos se vuelven más sencillos simplemente porque tengo menos componentes con los cuales construirlos y toda operación puede ser llamada en cualquier momento desde cualquier lugar con la certeza de que no puede cambiar al programa.
 
-          case siguiente :: restantes =>
+Si volvemos a mirar el código de nuestra solución actual y la comparamos con la versión anterior, podemos ver que algunas operaciones se simplificaron significativamente al reemplazar su implementación de un Visitor a una función (el simplify, por ejemplo, ya no necesita mantener un estado complejo, lo cual hace que el código sea mucho más fácil de mantener).
 
-                  siguiente match {
+Sin embargo, especialmente en la operación *run*, todavía dependemos fuertemente de producir cambios de estados. Imaginemos que queremos debuguear el código del *simplify*: Podríamos empezar a ejecutarlo, poner breakpoints, evaluar la siguiente expresión o el siguiente paso para ver que retorna o volver a ejecutar un paso que ya dimos para entender porqué dio cierto resultado. Incluso podríamos "deshacer" la ejecución dropeando frames del stack de ejecución sin que eso comprometa la integridad del programa.
 
-              case NOP =>
+Podríamos hacer lo mismo con el *run*? Y... No. Cada paso de ejecución modifica el estado interno del Micro (e incluso algunos pasos podrían lanzar una excepción), con lo cual, si durante un debugue ejecutamos de nuevo el paso anterior estamos potencialmente comprometiendo el estado de ejecución, lo cual nos obliga a empezar todo de nuevo.
 
-              case ADD => micro.guardar(micro.a + micro.b)
-
-              case MUL => micro.guardar(micro.a * micro.b)
-
-              case SWAP =>
-
-                val temp = micro.a
-
-                micro.a = micro.b
-
-                micro.b = temp
-
-              case LODV(valor) => micro.a = valor
-
-              case LOD(direccion) =>
-
-micro.a = micro.memoriaDeDatos(direccion)
-
-              case STR(direccion) =>
-
-micro.memoriaDeDatos(direccion) = micro.a
-
-              case IFNZ(instrucciones @ _*) =>
-
-                micro.pc += siguiente.bytes
-
-                if (micro.a != 0) ejecutarR(instrucciones)
-
-                else micro.pc += instrucciones.map(_.bytes).sum
-
-            }
-
-            micro.pc += siguiente.bytes
-
-            ejecutarR(restantes)
-
-        }
-
-        try ejecutarR(programa.toList)
-
-        catch {
-
-          case e: HaltException =>
-
-        }
-
-  }
-~~~
-
-Para poder hacer esto, las instrucciones tienen que poder ser matcheadas con los patrones correspondientes. La forma más fácil de lograr esto (pero no la única) es definiendo las instrucciones como case classes/objects.
-
-El case es un modificador que agrega de forma transparente comportamiento extra, y como el pattern matching en Scala se basa en entender ciertos mensajes, al decir que por ejemplo IFNZ es una case class hacemos que este tipo de instrucciones incorporen la implementación por defecto de dichos mensajes, entre otras cosas simpáticas como la igualdad y el hash code, y la forma de imprimirse, que se basan en los parámetros de clase.
-
-Así quedan las instrucciones luego de este cambio:
-
-~~~scala
-abstract class Instruccion(val bytes: Int = 1)
-
-case object NOP extends Instruccion
-
-case object ADD extends Instruccion
-
-case object MUL extends Instruccion
-
-case object SWAP extends Instruccion
-
-case object HALT extends Instruccion
-
-case class LODV(valor: Short) extends Instruccion(2)
-
-case class LOD(direccion: Int) extends Instruccion(3)
-
-case class STR(direccion: Int) extends Instruccion(3)
-
-case class IFNZ(instrucciones: Instruccion*) extends Instruccion
-
-object END {
-
-  val bytes = 1
-
-}
-~~~
-
-Algo a tener en cuenta sobre los objetos sobre los cuales vamos a querer trabajar usando pattern matching, es que no deberían poder mutar aquellos valores sobre los cuales pretendemos matchear. Por ese motivo, los parámetros de clase de una case class son por defecto vals, podemos acceder al valor de forma pública pero no pueden ser modificados.
-
-Vemos que con este nuevo enfoque, hacer una operación para simplificar un programa es muy sencillo, y lograr esta misma funcionalidad con el enfoque del visitor hubiera sido inviable por la complejidad extra de tener que analizar varios elementos consecutivos de la lista de instrucciones a la vez, con lo cual también el recorrido de la lista deja de ser trivial.
-
-~~~scala
-def simplificar(programa: Instruccion*): Seq[Instruccion] = {
-
-    programa.toList match {
-
-      case Nil => Nil
-
-      case NOP :: restantes => simplificar(restantes: _*)
-
-      case SWAP :: SWAP :: restantes => simplificar(restantes: _*)  
-
-      case LODV(_) :: LODV(y) :: restantes =>
-
-            simplificar ( LODV(y) :: restantes: _*)
-
-      case LOD(_) :: LOD(y) :: restantes =>
-
-            simplificar ( LOD(y) :: restantes: _*)
-
-      case STR(_) :: STR(y) :: restantes =>
-
-            simplificar ( STR(y) :: restantes: _*)
-
-      case IFNZ() :: restantes => simplificar(restantes: _*)
-
-      case IFNZ(instrucciones @ _*) :: restantes =>
-
-              val r = simplificar(instrucciones: _*)
-
-              if(r.isEmpty) simplificar(restantes: _*)
-
-              else IFNZ(r: _*) :: simplificar( restantes: _*)
-
-      case siguiente :: restantes =>
-
-            siguiente :: simplificar(restantes : _*)
-
-    }
-
-}
-~~~
-
-## Inmutabilidad
-
-Ya en el paso anterior nos empezamos a meter con la idea de inmutabilidad porque el pattern matching se para sobre estructuras inmutables, pero nuestra solución todavía trabaja con efecto colateral sobre el microprocesador.
-
-¿Por qué queremos hacer el micro inmutable? En principio, un valor es más sencillo de manejar que un objeto. Al no haber mutabilidad, una operación es siempre predecible y podría simplificar el debuggeo y testeo de la solución. Además, esto nos va a permitir más adelante utilizar otros conceptos de funcional (como mónadas), pero por ahora esa parte nos la tienen que creer.
-
-Además de hacer el micro inmutable, hay que tener en cuenta el manejo de errores. Actualmente se está usando una excepción para manejar la instrucción HALT. Esto tiene un efecto que es modificar el stack, lo cual rompe un poco con la idea de la transparencia referencial que es un concepto fundamental para el paradigma funcional.
-
-Entonces debemos hacer al menos 3 cosas para acercarnos más a una solución funcionalosa:
-
-- Hacer que el micro sea inmutable e ir generando nuevas copias del micro a medida que se ejecuta
-- Reemplazar las excepciones por algo que represente la ejecución del programa (ejecutando, terminado, error)
-- Incluir toda esa información en el valor de retorno de la ejecución en vez de tener un valor de retorno de tipo Unit
-
-Para hacer el punto 1, es conveniente hacer del micro una case class, sólo por el hecho de que Scala ya nos provee un copy que es útil para no tener que ir instanciando todo de nuevo (es un chiche, pero es mucho más cómodo que hacer el new del micro y pasarle siempre TODAS las cosas).
-
-~~~scala
-case class Microprocesador(memoriaDeDatos: List[Short] =
-
-  (1 to 1024).map(i => 0:Short), a: Short = 0, b: Short = 0,
-
-  pc: Int = 0)
-
-{
-
-  def pc_+=(inc: Int) = copy(pc = pc + inc)
-
-  def guardar(valor: Int) = copy(
-
-        a = ((valor & 0xFF00) >> 4).toShort,
-
-        b = (valor & 0x00FF).toShort
-
-  )
-
-}
-~~~
-
-Para el punto 2 hay que tener en cuenta 2 cosas: por un lado este resultado es el que va a ir llevando el estado durante toda la ejecución, así que parte de su responsabilidad va a ser esa. Y por otro lado, ¡por esta clase nomás!, vamos a tener que manejar este retorno dentro de la ejecución para saber si seguir ejecutando o no (más pattern matching), por eso también hacemos que sean case classes.
-
-~~~scala
-trait ResultadoDeEjecucion
-
-case class Ejecutando(micro: Microprocesador) extends ResultadoDeEjecucion
-
-case class Halt(micro: Microprocesador) extends ResultadoDeEjecucion
-
-case class Error(micro: Microprocesador, descripcion: String) extends ResultadoDeEjecucion
-~~~
-
-Finalmente para el punto 3, así nos queda la ejecución retornando los resultados de ejecución:
-
-~~~scala
-def ejecutar(micro: Microprocesador, programa: Instruccion*): ResultadoDeEjecucion = programa.toList match {
-
-case Nil => Ejecutando(micro)
-
-case instruccionActual :: restantes =>
-
-  val resultado = instruccionActual match {
-
-    case HALT => Halt(micro)
-
-    case IFNZ(instruccionesInternas @ _*) =>
-
-      if (micro.a != 0)
-
-            ejecutar(micro pc_+= instruccionActual.bytes,
-
-              instruccionesInternas: _*) match {
-
-                    case Ejecutando(m) => Ejecutando(m pc_+= END.bytes)
-
-                    case otro => otro
-
-              }
-
-      else Ejecutando(micro pc_+= instruccionActual.bytes +
-
-            instruccionesInternas.map(_.bytes).sum + END.bytes)
-
-   
-
-    case DIV =>
-
-      if(micro.b == 0)
-
-            Error(micro, "Division por 0.")
-
-      Ejecutando(micro.guardar(micro.a/micro.b))
-
-           
-
-    case otra =>
-
-      val siguienteMicro = otra match {
-
-            case NOP => micro
-
-            case ADD => micro.guardar(micro.a + micro.b)
-
-            case MUL => micro.guardar(micro.a * micro.b)
-
-            case SWAP => micro.copy(a = micro.b, b = micro.a)
-
-            case LODV(valor) => micro.copy(a = valor)
-
-            case LOD(direccion) =>
-
-                    micro.copy(a = micro.memoriaDeDatos(direccion))
-
-            case STR(direccion) =>
-
-                    micro.copy(memoriaDeDatos = micro.memoriaDeDatos.updated(direccion, micro.a))
-
-      }
-
-      Ejecutando(siguienteMicro.pc_+=(otra.bytes))
-
-  }
-
-  resultado match {
-
-    case Ejecutando(micro) => ejecutar(micro, restantes: _*)
-
-    case x => x
-
-  }
-
-}
-~~~
-
-La clase que viene vamos a partir de esta solución que todavía no está tan copada, porque el manejo del resultado de ejecución es engorroso y más manual de lo que nos gustaría. Sólo quedémonos con la idea de que dimos un paso grande hacia la felicidad!
-
-El código final luego de este paso se encuentra acá:
+En el siguiente ejemplo nos paramos en el código anterior para ir gradualmente eliminando el uso de efecto colateral y mutabilidad y acercarnos de a poco a la *Transparencia Referencial*.
 
 [repo funcional-inmutable](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/funcional-inmutable)
 
-[1] [SourceMaking: Visitor](https://www.google.com/url?q=https://sourcemaking.com/design_patterns/visitor&sa=D&ust=1465054556955000&usg=AFQjCNF250rlMRq7KCXAtkNT9cwuhA_cxA)
+Una consecuencia feliz de esta nueva aproximación es que ahora que nuestra ejecución es una función (o sea, va de un dominio a una imagen) su tipo es mucho más representativo de lo que hace:
 
+~~~scala
+  run(m: Micro, p: Program): Result // Describe muy claramente lo que pasa, porque pasa poco y nada. Solamente va de un micro y un programa a un resultado.
+  run(m: Micro, p: Program): Unit   // No termina de contar para qué sirve, ni qué cambia de cuál parámetro
+~~~
+
+La clase que viene vamos a partir de esta solución y, luego de aprender algunas cosas nuevas, vamos a tratar de mejorarla un poco más utilizando *Orden Superior* y abstracciones de más alto nivel.
+
+
+[1] [SourceMaking: Visitor](https://www.google.com/url?q=https://sourcemaking.com/design_patterns/visitor&sa=D&ust=1465054556955000&usg=AFQjCNF250rlMRq7KCXAtkNT9cwuhA_cxA)
