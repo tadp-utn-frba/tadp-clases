@@ -33,6 +33,27 @@ class OrderingTest extends WordSpec with Matchers {
       nameSorted shouldEqual List(User(2, "Jose"), User(1, "Pepe"))
     }
 
+    "sort composed Ordering" in {
+      case class User(id: Long, name: String)
+      case class Message[T](content: T)
+
+      implicit def messageOrder[T: Ordering] = new Ordering[Message[T]] {
+        import Ordered._
+
+        override def compare(x: Message[T], y: Message[T]): Int = x.content.compare(y.content)
+      }
+
+      implicit val userIdOrder = new Ordering[User] {
+        override def compare(x: User, y: User): Int = x.id.compare(y.id)
+      }
+
+      val idSorted = List(Message(User(2, "Jose")), Message(User(1, "Pepe"))).sorted
+      idSorted shouldEqual List(Message(User(1, "Pepe")), Message(User(2, "Jose")))
+
+      val numMessages = List(Message(2), Message(3), Message(1)).sorted
+      numMessages shouldEqual List(Message(1), Message(2), Message(3))
+    }
+
   }
 
 }
