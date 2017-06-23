@@ -1,11 +1,9 @@
-name := "tadp-2015c2-clase14-implicits-typeclasses"
+name := "tadp-2017c2-clase14-implicits-typeclasses"
 
 version := "1.0"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.12.2"
 
 libraryDependencies ++= Seq(
-   "org.specs2" %% "specs2-core" % "3.6.5" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
-
-scalacOptions in Test ++= Seq("-Yrangepos")
