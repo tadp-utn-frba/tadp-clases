@@ -7,5 +7,5 @@ object ContextBounds {
   }
 
   def saludo[A: Saludador](a: A) = implicitly[Saludador[A]].saluda(a)
-  
+
 }
