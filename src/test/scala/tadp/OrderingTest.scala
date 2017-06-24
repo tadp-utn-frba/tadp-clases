@@ -19,11 +19,13 @@ class OrderingTest extends WordSpec with Matchers {
       case class User(id: Long, name: String)
 
       implicit val userIdOrder = new Ordering[User] {
-        override def compare(x: User, y: User): Int = x.id.compare(y.id)
+        override def compare(x: User, y: User): Int =
+          x.id.compare(y.id)
       }
 
       val userNameOrder = new Ordering[User] {
-        override def compare(x: User, y: User): Int = x.name.compare(y.name)
+        override def compare(x: User, y: User): Int =
+          x.name.compare(y.name)
       }
 
       val idSorted = List(User(2, "Jose"), User(1, "Pepe")).sorted
@@ -37,10 +39,15 @@ class OrderingTest extends WordSpec with Matchers {
       case class User(id: Long, name: String)
       case class Message[T](content: T)
 
-      implicit def messageOrder[T: Ordering] = new Ordering[Message[T]] {
-        import Ordered._
+      implicit def messageOrdering[T](implicit contentOrdering: Ordering[T]) =
+        new Ordering[Message[T]] {
+        import Ordered.orderingToOrdered
 
-        override def compare(x: Message[T], y: Message[T]): Int = x.content.compare(y.content)
+        override def compare(x: Message[T], y: Message[T]): Int = {
+//          implicitly[Ordering[T]]
+          //contentOrdering.compare(x.content, y.content)
+          x.content.compare(y.content)
+        }
       }
 
       implicit val userIdOrder = new Ordering[User] {

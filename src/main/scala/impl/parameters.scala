@@ -1,19 +1,21 @@
 package impls
 
-trait Config {
+trait Config[_] {
   def fin: String
 }
 
 object Parameters {
 
-  def saluda(persona: Persona)(implicit config: Config) = s"Hola ${persona.nombre}${config.fin}"
+  def saluda[_: Config](persona: Persona) = otraCosa(persona.nombre)
 
-  implicit object duda extends Config {
-    def fin = "?"
-  }
+  def otraCosa(nombre: String)(implicit config: Config[_]) = s"Hola ${nombre}${config.fin}"
 
-  implicit val admiracion = new Config {
-    def fin = "!"
-  }
+//  implicit object duda extends Config[_] {
+//    def fin = "?"
+//  }
+//
+//  implicit val admiracion = new Config[_] {
+//    def fin = "!"
+//  }
 
 }
