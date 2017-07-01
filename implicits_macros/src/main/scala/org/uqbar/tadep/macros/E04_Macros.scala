@@ -4,7 +4,6 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 import scala.reflect.runtime.universe.showRaw //for getting the showRaw
 
-
 object E04_Macros {
 
   //═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -20,22 +19,19 @@ object E04_Macros {
   //═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
   // Ejemplo con Quasiquotes
   //═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-  def assert(contidion: Boolean, msg: String): Unit = macro assert_impl
+  def assert(condition: Boolean, msg: String): Unit = macro assert_impl
 
-  def assert_impl(c: Context)(contidion: c.Expr[Boolean], msg: c.Expr[String]) = {
+  def assert_impl(c: Context)(condition: c.Expr[Boolean], msg: c.Expr[String]) = {
     import c.universe._
-
-    val q"assert ($condition, $msg)" = c.macroApplication
-    q"if (!$condition) raise($msg)"
+     q"if (!$condition) throw new RuntimeException($msg)"
   }
 
-  def getValMacro(c: Context)(code: c.Expr[Any]): c.Expr[Any] = {
+  def getValMacro(c: Context)(code: c.Expr[Any]): c.Tree = {
     import c.universe._
-    val q"val $name = $value" = code.tree match { case Block(List(valdef), _) => valdef }
-    c.Expr(value)
+    code.tree match { case Block(List(q"val $name = $value"), _) => value }
   }
 
-  def getVal(code: Any) = macro getValMacro
+  def getVal(code: Any): Any = macro getValMacro
 
   //getVal{val a = "Bleh"}
   //ejecutar en otro contexto de ejecucion
@@ -55,17 +51,20 @@ object E04_Macros {
   def debug_impl(c: Context)(code: c.Tree) = {
     import c.universe._
 
-    val q"..$sentences" = code
+    code match {
+      case q"..$sentences" => {
+        val loggedSentences = (sentences :\ List[c.Tree]()) {
+          case (sentence, acum) =>
+            val msg = "executing " + showCode(sentence)
+            val printSentence = q"println($msg)"
 
-    val loggedSentences = (sentences :\ List[c.Tree]()) {
-      case (sentence, acum) =>
-        val msg = "executing " + showCode(sentence)
-        val printSentence = q"println($msg)"
+            printSentence :: sentence :: acum
+        }
 
-        printSentence :: sentence :: acum
+        q"..$loggedSentences"
+      }
     }
 
-    q"..$loggedSentences"
   }
 
   //═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -120,5 +119,4 @@ object E04_Macros {
 
 object USO {
   import E04_Macros._
-
 }
