@@ -2,13 +2,15 @@ require 'rspec'
 require_relative '../src/age'
 
 describe 'age of empires tests' do
-  #Los guerreros tienen estos parámetros por default: potencial_ofensivo=20, energia=100, potencial_defensivo=10
+
+  #Los guerreros tienen estos parámetros por default:
+  # potencial_ofensivo=20, energia=100, potencial_defensivo=10
   it 'vikingo ataca a atila' do
     atila= Guerrero.new
     vikingo = Guerrero.new 70
 
     vikingo.atacar atila
-    expect(atila.energia).to eq(40)
+    expect(atila.energia).to eq 90
   end
 
   it 'espadachin ataca a atila' do
@@ -17,6 +19,7 @@ describe 'age of empires tests' do
 
     don_quijote.atacar atila
     expect(atila.energia).to eq(40)
+    expect(don_quijote.energia).to eq(70)
   end
 
   it 'atila ataca a vikingo pero no le hace danio' do
