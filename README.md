@@ -30,10 +30,10 @@ Para esto, generalmente, es necesario contar con facilidades o herramientas espe
 
 - **Introspection**: Se refiere a la capacidad de un sistema, de analizarse a sí mismo. Algo así como la introspección humana, pero en términos de programa. Para eso, el lenguaje debe proveer ciertas herramientas, que le permitan al mismo programa, "ver" o "reflejar" cada uno de sus componentes.
 - **Self-Modification**: Es la capacidad de un programa de modificarse a sí mismo. Nuevamente esto requiere cierto soporte del lenguaje. Y las limitaciones van a depender de este soporte.
-- **Intercession**: Es la capacidad de modificar las características del lenguaje desde el mismo. Por ejemplo: agregarle orientacin a objetos a Lisp (CLOS).
+- **Intercession**: Es la capacidad de modificar las características del lenguaje desde el mismo. Por ejemplo: agregarle orientación a objetos a Lisp (CLOS).
 
 ### Modelos y metamodelos
-Así como todo programa construye un modelo para describir su dominio, los lenguajes pueden hacer lo mismo para describir sus abstracciones. El domino de un metaprograma son los programas.
+Así como todo programa construye un modelo para describir su dominio, los lenguajes pueden hacer lo mismo para describir sus abstracciones. El dominio de un metaprograma son los programas.
 
 El programa describe las características de los elementos del dominio utilizando clases, métodos, atributos entre otros. Entonces, el modelo puede contener por ejemplo una clase Guerrero, que modela a los guerreros en el domino.
 
@@ -99,7 +99,7 @@ metodo.bind(Hijo.new).call  #=> 'correr como padre'
 ~~~
 
 Como vemos los Unbound Methods se escapan al metodo lookup.
-Tambien podemos pregunarle cosas a los metodos.
+Tambien podemos preguntarle cosas a los metodos.
 
 ~~~ruby
 metodo = atila.method(:atacar) #=> #<Method: Guerrero(Atacante)#atacar>
@@ -126,7 +126,7 @@ Es una forma de self modification con azucar sintáctica para no tener que hacer
 
 Los métodos que se definan con el mismo nombre que otro ya existente, serán reemplazados (es destructivo).
 
-Para Ruby, las firmas de los métodos están definidas solo por el nombre. Un método con el mismo nombre y diferente cantidad de parametros definen el mísmo método.
+Para Ruby, las firmas de los métodos están definidas solo por el nombre. Un método con el mismo nombre y diferente cantidad de parametros definen el mismo método.
 
 ~~~ruby
 class String
@@ -175,7 +175,7 @@ atila.define_singleton_method(:saluda) {
   'Hola soy Atila'
 }
 atila.saluda  #=> "Hola soy Atila"
-Guerrero.new.saludo # NoMethodError
+Guerrero.new.saluda # NoMethodError
 ~~~
 
 ## METAMODELO
@@ -249,14 +249,14 @@ atila.edad  #=> 5
 Guerrero.new.edad  #=> NoMethodError
 ~~~
 
-Vemos que no aparecen los mixins que tiene la clase Guerrero si vamos preguntando las super clases. El mensaje `superclass` no mustra los mixins (porque no son clases), para poder ver la linearización tenemos que pedir quienes proveen comportamiento con el mensaje ancestors.
+Vemos que no aparecen los mixins que tiene la clase Guerrero si vamos preguntando las super clases. El mensaje `superclass` no muestra los mixins (porque no son clases), para poder ver la linearización tenemos que pedir quienes proveen comportamiento con el mensaje ancestors.
 
 ~~~ruby
 Guerrero.ancestors  #=> [Guerrero, Defensor, Atacante, Object, PP::ObjectMixin, Kernel, BasicObject]
 ~~~
 
 #### Nota
-Las ultimas veriones de ruby incluyen a la singleton class de Guerrero, las anteriores a 2.1.0 NO incluyen a las singleton classes:
+Las últimas versiones de ruby incluyen a la singleton class de Guerrero, las anteriores a 2.1.0 NO incluyen a las singleton classes:
 
 ~~~ruby
 Guerrero.new.singleton_class.ancestors
