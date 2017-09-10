@@ -182,4 +182,19 @@ describe 'age of empires tests' do
 
     expect(giordano.energia).to be(30)
   end
+
+  it('Peloton pasivo hace descansar a sus guerreros que no estan descansados y huyen despues') do
+    atila = Guerrero.new
+    vikingo = Guerrero.new 100, 70
+    don_quijote = Espadachin.new(Espada.new(50))
+    peloton = Peloton.pasivo(atila, vikingo)
+
+    don_quijote.atacar(vikingo)
+    #Al ser atacado, el vikingo le avisa al ejercito. El vikingo no esta descansado luego de recibir el ataque
+    expect(atila.energia).to eq(100) #Atila no descansa, porque esta descansado
+    expect(vikingo.energia).to eq(50) #En un test anterior energia quedaba en 40, pero ahora como descanso queda en 50
+    expect(vikingo.potencial_ofensivo).to eq(140) #Ademas, su potencial_ofensivo se duplica (para el proximo ataque)
+
+    expect(peloton.retirado).to be(true)
+  end
 end

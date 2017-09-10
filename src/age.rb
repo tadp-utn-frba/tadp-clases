@@ -210,4 +210,32 @@ class Peloton
   def fue_atacado(un_guerrero)
     self.instance_eval &self.accion
   end
+
+  def self.definir(nombre, &estrategia)
+    self.define_singleton_method nombre do |*integrantes|
+      self.crear_con(*integrantes, &estrategia)
+    end
+  end
+
+  def self.respond_to_missing?(symbol, include_all=false)
+    true
+  end
+
+  def es_patorero(victima)
+    self.instance_eval &self.class.bloque_patotero(victima)
+  end
+
+  def es_cobarde
+    self.instance_eval &self.class.bloque_cobarde
+  end
+
+  def es_peresozo
+    self.instance_eval &self.class.bloque_descansador
+  end
+
+  definir :pasivo do
+    es_cobarde
+    es_peresozo
+  end
+
 end
