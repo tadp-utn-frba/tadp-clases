@@ -37,7 +37,7 @@ module UnidadOfensiva
   end
 
   def potencial_ofensivo
-    if(self.descansado)
+    if (self.descansado)
       self.potencial_ofensivo_base * 2
     else
       self.potencial_ofensivo_base
@@ -72,7 +72,7 @@ class Guerrero
 
   def ser_atacado(potencial_ofensivo)
     super
-    self.interesados.each{ |un_interesado| un_interesado.fue_atacado(self) }
+    self.interesados.each {|un_interesado| un_interesado.fue_atacado(self)}
   end
 
   def interesados
@@ -151,7 +151,7 @@ class Peloton
   def self.crear_con(*guerreros, &accion)
     peloton = Peloton.new accion
 
-    guerreros.each { |un_guerrero|
+    guerreros.each {|un_guerrero|
       peloton.agregar(un_guerrero)
     }
 
@@ -163,8 +163,8 @@ class Peloton
   end
 
   def self.bloque_descansador
-    lambda {|peloton|
-      peloton.guerreros.select {|g| g.lastimado}.each {|g|
+    Proc.new {
+      self.guerreros.select {|g| g.lastimado}.each {|g|
         g.descansar
       }
     }
@@ -175,24 +175,31 @@ class Peloton
   end
 
   def self.bloque_cobarde
-    lambda {|peloton|
-      peloton.retirado = true
+    Proc.new {
+      self.retirado = true
     }
   end
 
   def self.estrategico(*guerreros)
-    crear_con(*guerreros) do |peloton|
-      self.bloque_cobarde.call(peloton)
-      peloton.accion = self.bloque_descansador
+    _bloque_cobarde = self.bloque_cobarde
+    _bloque_descansador = self.bloque_descansador
+
+    crear_con(*guerreros) do
+      self.instance_eval &_bloque_cobarde
+      self.accion = _bloque_descansador
     end
   end
 
   def self.patotero(victima, guerreros)
-    crear_con(*guerreros) do |peloton|
-      peloton.guerreros.each { |un_guerrero|
+    crear_con(*guerreros, &self.bloque_patotero(victima))
+  end
+
+  def self.bloque_patotero(victima)
+    Proc.new {
+      self.guerreros.each {|un_guerrero|
         un_guerrero.atacar(victima)
       }
-    end
+    }
   end
 
   def agregar(un_guerrero)
@@ -201,6 +208,6 @@ class Peloton
   end
 
   def fue_atacado(un_guerrero)
-    self.accion.call(self)
+    self.instance_eval &self.accion
   end
 end
