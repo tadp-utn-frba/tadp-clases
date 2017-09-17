@@ -1,38 +1,27 @@
 require 'rspec'
 require_relative '../src/multimethods'
 
-describe 'Partial Block' do
-  describe 'matches' do
-    it 'matchea cuando cada parametro se corresponde a un tipo' do
-      expect(PartialBlock.new([String]).matches?('parametro')).to be true
+describe 'PartialBlock' do
+
+  it 'reponde matches' do
+    helloBlock = PartialBlock.new([String]) do |who|
+      "Hello #{who}"
     end
 
-    it 'no matchea cuando hay mas parametros que tipos' do
-      expect(PartialBlock.new([String]).matches?('parametro', 42)).to be false
-    end
-
-    it 'no matchea cuando hay menos parametros que tipos' do
-      expect(PartialBlock.new([String, Fixnum]).matches?('parametro')).to be false
-    end
-
-    it 'no matchea cuando algun parametro no se corresponde con algun tipo' do
-      expect(PartialBlock.new([String, String]).matches?('parametro', 42)).to be false
-    end
-
-    it 'matchea cuando los parametros se corresponden con algun subtipo de los tipos' do
-      expect(PartialBlock.new([Object]).matches?('parametro')).to be true
-    end
+    expect(helloBlock.matches("a")).to be true
+    expect(helloBlock.matches(1)).to be false
+    expect(helloBlock.matches("a", "b")).to be false
   end
 
-  describe 'call' do
-    it 'raisea argument error cuando no matchean los parametros' do
-      expect { PartialBlock.new([String, Fixnum]).call('parametro') }.to raise_error ArgumentError
+  it 'call o muere' do
+    helloBlock = PartialBlock.new([String]) do |who|
+      "Hello #{who}"
     end
 
-    it 'llama al bloque cuando matchean los parametros' do
-      expect((PartialBlock.new([String]) { 42 }).call('parametro')).to eq 42
-    end
+    expect(helloBlock.call("a")).to eq "Hello a"
+    expect { helloBlock.call(1) }.to raise_error(ArgumentError, 'No existe un multimethod para este metodo')
   end
+
 end
 
 describe 'Multimethods' do
@@ -41,7 +30,7 @@ describe 'Multimethods' do
       s1 + s2
     end
 
-    partial_def :concat, [String, Integer]  do |s1, n|
+    partial_def :concat, [String, Integer] do |s1, n|
       s1 * n
     end
 
@@ -58,8 +47,9 @@ describe 'Multimethods' do
     end
   end
 
-  it 'si existe algun partial block que matchee para los parametros se usa ese partial block' do
+  it 'puedo usar multimethods' do
     expect(A.new.concat('hello', ' world')).to eq('hello world')
+    expect(A.new.concat(' world')).to eq('A world')
     expect(A.new.concat('hello', 3)).to eq('hellohellohello')
   end
 
@@ -72,52 +62,51 @@ describe 'Multimethods' do
   end
 
   it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos' do
-    expect(A.new.respond_to?(:concat, false, [String, String])).to eq true
+    expect(
+        A.new.respond_to?(:concat, false, [String, String])
+    ).to eq true
   end
 
   it 'un objeto con multimethod no deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos que no coinciden a los de su multimethod' do
-    expect(A.new.respond_to?(:concat, false, [String, BasicObject])).to eq false
+    expect(
+        A.new.respond_to?(:concat, false, [String, BasicObject])
+    ).to eq false
   end
+end
 
-  it 'deberia ejecutarse en el contexto del objeto' do
-    expect(A.new.concat('sd')).to eq 'Asd'
-  end
+describe 'duck typing' do
+  class Pepita
+    attr_accessor :energia
 
-  it 'deberia permitir agregar multimethods una vez que la clase ya fue creada' do
-    class B
-      partial_def :+, [String] { |n| n + 'B' }
+    def initialize
+      @energia = 0
     end
 
-    class B
-      partial_def :+, [Float] { |n| 42 }
+    partial_def :interactuar_con, [[:ser_comida_por]] do |comida|
+      comida.ser_comida_por(self)
     end
 
-    expect(B.new + 'asd').to eq 'asdB'
-    expect(B.new + 3.2).to eq 42
+    partial_def :interactuar_con, [[:entrenar, :alimentar]] do |entrenador|
+      entrenador.entrenar(entrenador.alimentar(self))
+    end
   end
 
-  context 'multimethods con tipado estructural' do
-    class Pepita
-      attr_accessor :energia
+  class Comida
+    def ser_comida_por(comensal)
+      comensal.energia += 30
+      comensal
+    end
+  end
 
-      def initialize
-        @energia = 0
-      end
-
-      partial_def :interactuar_con, [[:ser_comida_por]] do |comida|
-        comida.ser_comida_por(self)
-      end
-
-      partial_def :interactuar_con, [[:entrenar, :alimentar]] do |entrenador|
-        entrenador.entrenar(entrenador.alimentar(self))
-      end
+  class Entrenador
+    def alimentar(golondrina)
+      golondrina.interactuar_con(Comida.new)
+      golondrina
     end
 
-    class Comida; def ser_comida_por(comensal); comensal.energia += 30; comensal; end ; end
-
-    class Entrenador
-      def alimentar(golondrina); golondrina.interactuar_con(Comida.new); golondrina end
-      def entrenar(golondrina); golondrina.energia -= 10; golondrina end
+    def entrenar(golondrina)
+      golondrina.energia -= 10
+      golondrina
     end
   end
 

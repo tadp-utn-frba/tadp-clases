@@ -1,200 +1,132 @@
-class Proc
-  def call_in(object, *args)
-    object.instance_exec(*args, &self)
-  end
-end
-
-class Array
-  def include_all?(elements)
-    elements.all? { |element| include?(element) }
-  end
-end
-
 class PartialBlock
-  attr_reader :types, :block
+  attr_accessor :block
 
   def initialize(types, &block)
     @types = types
     @block = block
   end
 
-  def matches?(*values)
-    matches_types?(values.map(&:class))
-  end
-
-  def matches_types?(parameter_types)
-    return false unless types.length == parameter_types.length
-
-    types.zip(parameter_types).all? do |type, parameter_type|
-      case type
-        when Module; parameter_type <= type
-        when Array; parameter_type.instance_methods.include_all?(type)
+  def matches(*args)
+    matches_types(*args.map { |arg|
+      begin
+        arg.singleton_class
+      rescue
+        # singleton_class no se puede usar para números (1.singleton_class => error)
+        arg.class
       end
+    })
+  end
+
+  def matches_types(*types)
+    if (@types.size == types.size)
+      types.zip(@types).all? do |arg_type, type|
+        if (type.is_a?(Array))
+          type.all? { |sym|
+            arg_type.instance_methods.include?(sym)
+          }
+        else
+          arg_type <= type
+        end
+      end
+    else
+      false
     end
   end
 
-  def call(*values)
-    validate_call(*values)
-
-    block.call(*values)
+  def bind(instance)
+    # BoundPartialBlock.new(self, instance)
   end
 
-  def call_with(receiver, *values)
-    validate_call(*values)
-
-    block.call_in(receiver, *values)
+  def call_with(instance, *args)
+    validate(*args)
+    instance.instance_exec(*args, &@block)
   end
 
-  private
-
-  def validate_call(*values)
-    raise ArgumentError unless matches?(*values)
-  end
-end
-
-class Module
-  def partial_def(name, types, &block)
-    multimethods[name].add_partial_block(PartialBlock.new(types, &block))
-
-    multimethods = self.multimethods
-
-    define_method(name) do |*args|
-      multimethods[name].call(self, *args)
+  def validate(*args)
+    if (!matches(*args))
+      raise ArgumentError.new 'No existe un multimethod para este metodo'
     end
   end
 
-  def multimethods
-    @multimethods ||= Hash.new { |hash, key| hash[key] = Multimethod.new }
-  end
-end
-
-class Multimethod
-  attr_reader :partial_blocks
-  def initialize(partial_blocks = [])
-    @partial_blocks = partial_blocks
-  end
-
-  def add_partial_block(partial_block)
-    partial_blocks << partial_block
-  end
-
-  def call(receiver, *args)
-    partial_block = partial_blocks.find { |partial_block| partial_block.matches?(*args) }
-
-    raise NoMethodError.new('No existe un multimethod para este metodo') if partial_block.nil?
-
-    partial_block.call_with(receiver, *args)
-  end
-
-  def matches?(types)
-    partial_blocks.any? { |partial_block| partial_block.matches_types?(types) }
+  def call(*args)
+    validate(*args)
+    @block.call(*args)
   end
 end
 
 class Object
-  def multimethods
-    self.class.multimethods
-  end
-
-  def respond_to?(name, include_all = true, types = [])
-    return false unless super(name, include_all)
-    types == [] || respond_to_multimethod?(name, include_all, types)
-  end
-
-  def respond_to_multimethod?(name, include_all, types)
-    multimethods.key?(name) && multimethods[name].matches?(types)
+  def respond_to?(sym, all = false, types = [])
+    if (types.empty?)
+      super(sym, all)
+    else
+      multimethod = self.class.multimethod(sym)
+      if (multimethod)
+        multimethod.matches_types(*types)
+      else
+        false
+      end
+    end
   end
 end
 
-# class PartialBlock
-#   attr_accessor :block, :types
-#
-#   def initialize types, &block
-#     self.types = types
-#     self.block = block
-#   end
-#
-#   def distancia_types(*args)
-#     args.map.with_index { |argumento, index| argumento.class.ancestors
-#                                                  .index(self.types[index])*(index+1) }.reduce :+
-#   end
-#
-#   def matches(*values)
-#     unless values.length == types.length
-#       return false
-#     end
-#
-#     values.zip(types).all? { |value, type|
-#       if type.is_a? Array
-#         #duck typing
-#         type.all? {|method| value.respond_to? method}
-#       else
-#         value.is_a? type
-#       end }
-#   end
-#
-#   def matches_types??(types)
-#     unless self.types.length == types.length
-#       return false
-#     end
-#
-#     self.types.zip(types).all? { |ancestor_type, type| type.ancestors.include?
-#     ancestor_type }
-#   end
-# end
-#
-# class Module
-#
-#   attr_accessor :multimethods
-#
-#   def partial_def sym, types, &block
-#     self.multimethods[sym] ||= []
-#     self.multimethods[sym] << (PartialBlock.new types, &block)
-#
-#     current_module = self
-#
-#     self.send :define_method, sym do |*args|
-#       partial_block = current_module.search_multimethods sym, args
-#       self.instance_exec *args, &partial_block.block
-#     end
-#
-#
-#   end
-#
-#   def search_multimethods sym, args
-#     matched_methods = self.multimethods[sym].
-#         select { |method| method.matches args }
-#
-#
-#     raise NoMethodError, 'No se encontro metodo con la cantidad de argumentos pasados' if matched_methods.empty?
-#
-#     matched_methods.min_by { |p_block| p_block.distancia_types args }
-#   end
-#
-#   def multimethods
-#     @multimethods ||= Hash.new
-#   end
-#
-#
-#   def defines_multimethod?(sym, types)
-#     self.multimethods[sym].any? { |m| m.matches_types?? types }
-#   end
-#
-# end
-#
-#
+class Module
+  def partial_def(sym, types, &block)
+    multimethod = multimethod(sym) || Multimethod.new(sym)
+    multimethod.add(PartialBlock.new(types, &block))
+    @multimethods[sym] = multimethod
+    define_method(sym) do |*args|
+      pBlock = multimethod.find_matching(*args)
+      if (pBlock)
+        # instance_exec(*args, &pBlock.block)
+        pBlock.call_with(self, *args)
+      else
+        raise NoMethodError.new 'No existe un multimethod para este metodo'
+      end
+    end
+  end
+
+  def multimethods
+    @multimethods ||= {}
+  end
+
+  def multimethod(sym)
+    multimethods[sym]
+  end
+end
+
+class Multimethod
+  attr_accessor :sym, :pBlocks
+
+  def initialize(sym)
+    @sym = sym
+    @pBlocks = []
+  end
+
+  def add(pBlock)
+    @pBlocks.push pBlock
+  end
+
+  def find_matching(*args)
+    @pBlocks.find do |block|
+      block.matches(*args)
+    end
+  end
+
+  def matches_types(*types)
+    @pBlocks.any? do |block|
+      block.matches_types(*types)
+    end
+  end
+end
+
 # class Object
-#   alias_method :__respond_to?, :respond_to?
+#   partial_def :algo, [Array] do
+#     type.all? { |sym|
+#       arg_type.instance_methods.include?(sym)
+#     }
+#   end
 #
-#   def respond_to?(sym, private=false, types=nil)
-#     if types.nil?
-#       return self.__respond_to? sym, private
-#     end
-#
-#     self.singleton_class.defines_multimethod? sym, types
+#   partial_def :algo, [Module] do
+#     arg_type <= type
 #   end
 # end
-#
-#
-#
-#
