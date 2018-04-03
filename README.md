@@ -102,45 +102,177 @@ interface Alumno {
 ```
 
 ### Tipos Paramétricos y Varianza
-  
-- (K) Generics
-  Varianza (out / in)
+
+Los típos parámetricos (o, como algunos lenguajes los llaman, **Generics**) consisten básicamente en permitir parametrizar la construcción de un tipo, agregando información que puede ser usada por el chequeador para resolver situaciones complejas, donde la interfaz de un objeto depende de factores externos. Si bien la idea general es bastante sencilla, no todos los lenguajes utilizan estas herramientas del mismo modo. En clase cubrimos (casi todo) el uso que el sistema de tipos de *Scala* hace de estos parámetros y la manera en que decide cómo se relacionan los tipos en función a como se relacionan sus parámetros (**Varianza**), pero sería un error pensar que todos los lenguajes llegan así de lejos para mantener la consistencia de sus tipos. Sin ir más lejos *Java*, el punto de referencia muchos lenguajes modernos, no maneja varianza de tipos sino que se conforma con cubrir a medias esas situaciones usando [un mecanismo de wildcards](http://www.angelikalanger.com/GenericsFAQ/FAQSections/TypeArguments.html#Topic2).
+
+*Kotlin*, pese a haber tomado gran parte de sus abstracciones de *Scala* y apuntarlas a usarios de *Java*, decidió que no le gustaba ni un enfoque ni el otro. Del sitio de *Kotlin*:
+
+> One of the most tricky parts of Java's type system is wildcard types (see Java Generics FAQ). And Kotlin doesn't have any.
+
+Me gusta el detalle de que llama a los wildcards *"tricky"*, y no *"difíciles"*, porque abre la puerta a una discusión interesante. **Varianza**, como tantos otros conceptos con un contenido teórico fuerte, es un tema bastante complejo. Para usarlo bien, es necesario aprender los fundamentos y leer a los autores que estudiaron el tema. En ocasiones los lenguajes industriales optan por no seguir el camino que marca la academia (a veces porque creen tener una propuesta mejor, a veces porque no les interesa tanto un tema y prefieren ahorrar complejidad e invertirla en otra cosa y a veces porque abiertamente desconocen la teoría). En estos casos, los mismos problemas pueden resolverse a los ponchazos, con construcciones simplificadas y especializadas para un uso particular, lo cual, a la larga, puede terminar en una pila de herramientas heterogéneas que se solapan o no terminan de cubrir todos los casos de uso. Lo gracioso es que estas herramientas simplificadas muchas veces terminan teniendo tantos casos especiales que resulta más complicado aprenderlos todos que leer la teoría que tratan de evitar.
+
+En fin... *Kotlin*, que no quería los parches de *Java* ni quiso pagar la complejidad de *Scala* apostó por un mecanismo de tipado similar pero más sencillo, que [tomó prestado de .NET](https://docs.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance#DefiningVariantTypeParameters).
+
+Este enfoque permite definir *Covarianza* y *Contravarianza* similar al `-T` y `+T` de *Scala*, pero usando las palabras clave `in` y `out`, respectivamente.
 
 ```kotlin
-class Operacion<in P,out R> {
-  fun ejecutate(parametro: P): R { return null as R }
-}
+class Caja<out T> { }
 
-var f: Operacion<Int,String> = Operacion<Int,String>()
-var g: Operacion<Int,Any> = f
-f = g
+fun main(args: Array<String>) {
+  var a: Caja<Any> = Caja<String>() // Esto funciona
+  var b: Caja<String> = Caja<Any>() // Esto no
 }
 ```
 
-- (T) Generics
-  constraints
-  Bi-variance
-  Optional parameters
+Como nota sobre la expresividad, las palabras clave `in` y `out` son más claras respecto a las restricciones que imponen sobre dónde es posible usar cada tipo (in => parámetros, out => retorno), mientras que los símbolos `+` y `-` resultan cómodos a la hora de pensar cómo se combinan las varianzas ("menos por menos es más" se puede mapear fácilmente a "contravariante de contravariante es covariante"). Esto da lugar a pensar qué va a tener el desarrollador en la cabeza al momento de escribir el código y dónde conviene ayudarlo...
+
+```kotlin
+class X<in T> {}
+
+fun main(args: Array<String>) {
+    var fx : (X<Any>)    -> Unit = {_ -> }
+    var gx : (X<String>) -> Unit = {_ -> }
+
+    // Qué tiene que ver ser "in" con todo de esto???
+    gx = fx // Falla!
+    fx = gx // Funciona: Contravariante de Contravariante.
+}
+```
+
+*Kotlin* complementa su sistema de generics con una sintaxis para definir **Upper Bounds** (Pero no **Lower Bounds**):
+
+```kotlin
+class Corral<T : Animal> {} // T debe ser subtipo de Animal
+```
+
+También, a diferencia de *Scala*, *Kotlin* permite restringir la interfaz de un tipo con tipo paramétrico invariante para forzarlo a restringir su interfaz como si fuera covariante/contravariante. A esto lo denomina **Proyección de Tipo**:
+
+```kotlin
+// Si queremos tener getter y setter de contenido, T debe ser invariante.
+class Caja<T>(var contenido: T) {
+    fun copiar1(otro: Caja<T>){ this.contenido = otro.contenido }
+    fun copiar2(otro: Caja<out T>){ this.contenido = otro.contenido }
+}
+
+fun main(args: Array<String>) {
+    val a: Caja<Any> = Caja(7)
+    val b: Caja<Int> = Caja(5)
+    
+    a.copiar1(b) // Falla porque a y b tienen distinto tipo
+    a.copiar2(b) // Pero si forzamos el parámetro covariante funciona!
+}
+```
+
+En el otro extremo del espectro, [si bien puede configurarse para hacer algunos controles básicos](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-6.html), *Typescript* decide evitarse el problema y hacer todos los generics **Bivariantes**:
+
+```typescript
+class Animal { }
+class Vaca extends Animal { }
+class VacaLoca extends Vaca { }
+
+class Corral<T extends Animal> { f(t: T) { return t } }
+
+let a: Corral<Animal> = new Corral()
+let b: Corral<Vaca> = new Corral()
+let c: Corral<VacaLoca> = new Corral()
+
+b = a // Sep.
+b = c // No veo porqué no...
+```
+
+De más está decir que esto no es lo más seguro, pero *Typescript* elige poner la responsabilidad de evitar esos problemas en el usuario a cambio de permitirle permanecer ignorante sobre teoría de varianza y mantener el tipado suficientemente sencillo para implementar...
+
+
+### Features locos
+
+El razonamiento es simple: Desde el punto de vista del usuario, el sistema de tipos es confiable o no (no importa *porqué*). Si ya sé que tengo que estar atento cuando uso ciertas construcciones y lo acepto como parte del uso cotidiano del lenguaje, entonces es posible agregar herramientas interesantes aunque no pueda hacerlas tipar de forma completamente consistente. Vamos a mencionar un par de ejemplos de esto presentes en *Typescript*.
+
+#### Index Types
+
+With index types, you can get the compiler to check code that uses dynamic property names.
+
+*Typescript* permite el mismo uso de propiedades dinámicas que *EcmaScript*. Esto incluye referenciar el nombre de propiedades con construcciones no-estáticas (Ej.: obj["propiedad"] en lugar de obj.propiedad). Los [Index Types](https://www.typescriptlang.org/docs/handbook/advanced-types.html#index-types) son la construcción sintáctica que permite que el compilador analice código que usa nombres dinámicos de propiedades.
+
+```typescript
+class Alumno {
+    nombre: string
+    legajo: number
+}
+
+let campo: keyof Alumno // Esto tiene tipo "nombre" | "legajo"
+let tipoDeCampoNombre: Alumno["nombre"] // Tiene tipo "string"
+let tipoDeCualquierCampo: Alumno[keyof Alumno] // Tiene tipo "string" | "number"
+```
+
+Parece **Reflection**, no? Pero hay que notar que no usamos ninguna expresión de runtime; esa información está en los tipos y, por lo tanto, es accesible en tiempo de compilación.
+
+Este tipo de sintáxis desdibujan la linea que separa el código cotidiano de la *metaprogramación* y permite hacer esta última de forma (un poco) más segura. Tomemos por ejemplo esta función:
+
+```typescript
+function dameElCampo<T, K extends keyof T>(obj: T, key:K): T[K] {
+  return obj[key]
+}
+
+let pirulo: Alumno
+
+// Funciona y se da cuenta de que tiene tipo "string"
+dameElCampo(pirulo, "nombre")
+
+// Falla! El alumno no tiene el campo pedido.
+dameElCampo(pirulo, "qué pirulo?")
+```
+
+El código de este ejemplo es básicamente un wrapper del acceso con corchetes que recibe dos tipos paramétricos: uno es el tipo del objeto del cual queremos el campo y el otro es **un subtipo de las claves presentes en dicho objeto**. Al momento de aplicar la función, el compilador va a inferir dicho tipo en base al parámetro que pasamos, permitiendole identificar también el tipo más especifico para retornar (en lugar de retornar `"string" | "number"`) y permite detectar en compilación un error tradicionalmente de runtime.
+
+#### Mapped Types
+
+Otra construcción interesante son los [Mapped Types](https://www.typescriptlang.org/docs/handbook/advanced-types.html#mapped-types) que, básicamente, permiten definir un tipo a partir de los campos de otro:
+
+```typescript
+type Opcional<T> = {
+  [K in keyof T]: T[K] | null
+}
+
+let tipoDeNombre: Opcional<Alumno>["nombre"] // Tipa a "string" | "null"
+
+// Falla! legajo es de tipo number y no puede ser null
+let jose: Alumno = { nombre: "jose", legajo: null }
+
+// Ahora sí...
+let joseOpcional: Opcional<Alumno> = { nombre: "jose", legajo: null }
+```
+
+En este ejemplo se define el tipo `Opcional<T>`, que expone todos los campos de `T`, pero cambiando su tipo por la unión entre este y null.
+
+El uso de *mapped types* es sorpresivamente recurrente, al punto en que ya vienen varios predefinidos (Ej: Readonly, Partial, Pick, Record, etc.) e incluso la misma comunidad suele [proponer cosas locas](https://github.com/Microsoft/TypeScript/issues/13257).
+
+Dando un paso atrás, es bastante evidente porqué estas construcciones son más raras en lenguajes con un tipado más estricto. De hecho, en *Scala* sólo sería posible modelar una abstracción como *mapped types* usando [whitebox macros](https://docs.scala-lang.org/overviews/macros/blackbox-whitebox.html) (macros cuyos tipo no puede establecerse en tiempo de compilación y que muchos proponen discontinuar justamente porque al tipador no le gustan) y aun así es difícil...
+
+Combinando estas herramientas con los otros operadores de tipos es posible construir operadores muy avanzados:
+
+```typescript
+// Miembros comunes a T y U.
+type Diff<T extends string, U extends string> = ({ [P in T]: P } & { [P in U]: never } & { [x: string]: never })[T]
+
+// Miembros de T que no están presentes en U.
+type Omit<T, K extends keyof T> = { [P in Diff<keyof T, K>]: T[P] }
+
+// Miembros de T y U donde las definiciones de U prevalecen.
+type Overwrite<T, U> = { [P in Diff<keyof T, keyof U>]: T[P] } & U
+```
+[Acá](https://www.stevefenton.co.uk/2017/11/typescript-mighty-morphing-mapped-types/) hay un artículo lindo que explica un poco esto.
 
 ### Antes y Después del Compilador
-- (T) No runtime types / (K) Erasure
-- (All) Inference
 
-### Cosas Raras
-    Interesting types
-      Readonly
-      optional
+Tanto *Kotlin* como *Typescript* permiten algún grado de **Inferencia de Tipos**. En general, la gran mayoría de los lenguajes con tipado explicito (incluso [C++](https://dgvergel.blogspot.com.ar/2016/04/inferencia-automatica-de-tipos-auto.html)!) tratan de incorporar esto a sus sintáxis, para reducir el boilerplate y hacer más fácil la transición desde otras tecnologías. Es probable que esto se convierta pronto en el standard de la industria.
 
-  Index types
-    ```function pluck<T, K extends keyof T>(o: T, names: K[]): T[K][] {
-      return names.map(n => o[n]);
-    }```
-  Mapped types
-    ```type Readonly<T> = {
-      readonly [P in keyof T]: T[P];
-    }```
+Otro patrón recurrente, un poco menos feliz, es que ambos lenguajes también decidieron descartar la información de tipos en runtime. *Kotlin*, que originalmente se compilaba para la *JVM*, pasa por el mismo proceso de **Erasure** que *Scala*, donde los tipos paramétricos se descartan post compilación.
 
-- (K) (?) Type Nothing
+*Typescript* va un paso más lejos y **elimina toda información sobre los tipos**, compuestos o no, para compilar al código *ES* más similar posible. Esto hace imposible usar esta información para hacer *introspection* en runtime...
+
+Si bien existen lenguajes donde los tipos compuestos están reificados a nivel plataforma ([como .NET](https://en.wikipedia.org/wiki/Generic_programming#Genericity_in_.NET_[C#,_VB.NET])) y otros ([como *Scala*](https://docs.scala-lang.org/overviews/reflection/typetags-manifests.html)) que encontraron alguna forma de dibujarla, en general la postura suele ser que eliminar esta información es lo más rápido y fácil de hacer y evita que los programas "engorden" guardando metadata que no siempre necesitan.
+
+De ahí que existan cosas como el [Projecto Valhalla](https://en.wikipedia.org/wiki/Project_Valhalla_(Java_language)), que aspira a agregar soporte para este y otros features a la *JVM*, lo cual podría cambiar radicalmente el modo como otros lenguajes manejan los generics.
 
 
 ## Definición de Objetos
@@ -226,6 +358,7 @@ f = g
   obj!!.m()
   obj?.let {  } //map
   ?:
+  Impacto en el sistema de tipos: No es sólo un azucar, Any <: Any?, mientras que Maybe[Any] no tiene nada que ver con Any. A su vez, en Kotlin null no es subtipo de todo.
 - (Elm) Maybe, List (pero no monads?)
 
 ## Reflection
