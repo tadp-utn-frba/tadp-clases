@@ -292,6 +292,8 @@ De ahí que existan cosas como el [Projecto Valhalla](https://en.wikipedia.org/w
 
 Mencionamos en clase varias veces que el paradigma de objetos todavía no se decide sobre cuál es la mejor manera de definir, instanciar y asociar comportamiento a los objetos. Esto lleva a que la gran mayoría de los lenguajes prueben sus propias variantes de herramientas y metamodelos; con lo cual, si bien existen algunos patrones comunes, ningún enfoque superador se impuso todavía.
 
+### Kotlin: Entre la Scala y la pared
+
 En muchos sentidos, *Kotlin* toma sobre estos temas un enfoque muy conservador, adoptando la **Herencia Simple con Default Methods (interfaces con código)** de *[Java 8](https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html)* como su mecanismo principal de subtipado.
 
 ```kotlin
@@ -306,7 +308,7 @@ interface Caballo {
 class Centauro : Humano, Caballo { }
 ```
 
-Para el ojo poco entrenado, estas interfaces pueden parecer **Mixins**, pero un alumno de TAdP sabe que hay que hacerse algunas preguntas:
+Para el ojo poco entrenado de un tipo optimista, estas interfaces pueden parecer **Mixins** al estilo de *Scala*, pero cualquier alumno de TAdP sabe que hay que hacerse algunas preguntas antes de adelantar conclusiones:
 
 - **¿Pueden definir estado?**
   No. Las properties de las interfaces son abstractas.
@@ -381,7 +383,7 @@ class X(val a: Int, var b: String = "") {
 
 fun main(args: Array<String>) {
     // Noten que no existe el "new"!
-    val x = X(5)
+    val xa = X(5).a
 }
 ```
 
@@ -399,23 +401,99 @@ fun main(args: Array<String>) {
 }
 ```
 
+Por último, *Kotlin* también reñiega de la ambiguedad entre **atributos** y **accessors**, descartandolos en favor de **properties**, sin embargo, su aproximación a las mismas es mucho más similar a la de *C#* que a la de *Scala*.
 
-- (K) clases
-    properties instead of attributes
-    override de get y set más feliz (field keyword)
+```kotlin
+class X {
+  // Puedo sobreescribir los accessors refiriendome al atributo con una palabra clave.
+  var p: Int = 0
+    get() {
+        println("Me están leyendo el campo")
+        return field
+    }
+    set(value: Int) {
+        println("Me cambiaron el campo de ${field} a ${value}")
+        field = value
+    }
 
-    Data classes (case classes)
-  
+  // También puedo sólo inventar properties calculadas
+  val f
+    get() = 7
+}
+
+fun main(args: Array<String>) {
+    val x = X()
+    x.p += x.f
+}
+```
+
+### Typescript/ES: Ahora con... Clases?
+
+Vayamos ahora al otro extremo del espectro: ¿Qué ideas locas e inovadoras sobre cómo modelar objetos se introdujeron ultimamente en los lenguajes más dinámicos?
+
+Clases.
+![what year is it???](http://i.lvme.me/156wu9.jpg)
+
+Eso. Desde su versión *6*, *EcmaScript* incorpora una reificación del concepto de **Clases con Herencia Simple** y, obviamente, *Typescript* traslada esto a su propio modelo.
+
+Que giles, no? Y... No. En realidad, la cosa es un poco más compleja...
+
+La incorporación de Clases en *ES* es un cambio casi puramente cosmético. La sintáxis nueva incorpora una serie de azucares sintácticos para reducir el boilerplate, pero lo cierto es que el metamodelo de ES basado en **Prototipos** soporta perfectamente "simular" un árbol de clases y, de hecho, [lo vienen haciendolo desde hace tiempo](https://www.webreflection.co.uk/blog/2015/11/07/the-history-of-simulated-classes-in-javascript).
+
+La extensión basicamente implica poder escribir el código así:
+
+```typescript
+class Persona {
+    nombre: string
+
+    constructor(nombre) {
+        this.nombre = nombre
+    }
+
+    id() { return this.nombre }
+}
+
+class Alumno extends Persona {
+    legajo: number
+
+    constructor(nombre, legajo) {
+        super(nombre)
+        this.legajo = legajo
+    }
+
+    id() { return this.legajo + "-" + super.id() }
+}
+
+let pirulo = new Alumno("pirulo", 148)
+```
+
+en lugar de así:
+
+```typescript
+function Persona(nombre) {
+    this.nombre = nombre
+}
+Persona.prototype.id = function() { return this.nombre }
+
+function Alumno(nombre, legajo) {
+    Persona.call(this, nombre)
+    this.legajo = legajo
+}
+Alumno.prototype.prototype = Persona
+Alumno.prototype.id = function() {
+  return this.legajo + "-" + this.prototype.prototype.id.call(this)
+}
+
+let pirulo = new Alumno("pirulo", 148)
+```
+
+- Las funciones constructores son ancestros de pensar "che, las clases parecen funciones que retornan instancias".
 
 - (T) Definición de objetos
-  hashes
+    properties
+      getter/setter
+  las clases son funciones (?)
   Mixins (implementación propuesta)
-  prototype
-  classes
-    this
-    getter/setter
-    super/herencia
-    son funciones
 
 ## Inmutabilidad y Efecto
 
@@ -494,6 +572,8 @@ fun main(args: Array<String>) {
 - (K) Extension functions (extensión no invasiva)
     Extensiones al companion object
 - (K) open classes y methods para poder extender…
+- (K) Data classes (case classes)
+
 
 
 ---------------------------
