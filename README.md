@@ -264,7 +264,20 @@ type Overwrite<T, U> = { [P in Diff<keyof T, keyof U>]: T[P] } & U
 
 ### Antes y Después del Compilador
 
-Tanto *Kotlin* como *Typescript* permiten algún grado de **Inferencia de Tipos**. En general, la gran mayoría de los lenguajes con tipado explicito (incluso [C++](https://dgvergel.blogspot.com.ar/2016/04/inferencia-automatica-de-tipos-auto.html)!) tratan de incorporar esto a sus sintáxis, para reducir el boilerplate y hacer más fácil la transición desde otras tecnologías. Es probable que esto se convierta pronto en el standard de la industria.
+Tanto *Kotlin* como *Typescript* permiten algún grado de **Inferencia de Tipos**. En general, la gran mayoría de los lenguajes con tipado explicito (incluso [C++](https://dgvergel.blogspot.com.ar/2016/04/inferencia-automatica-de-tipos-auto.html)!) tratan de incorporar esto a sus sintáxis, para reducir el boilerplate y hacer más fácil la transición desde tecnologías más dinámicas. Es probable que lo único que previene que esto se convierta en el standard de la industria es que no terminamos de ponernos de acuerdo en si el tipo escrito mejora o empeora la lectura del código.
+
+Sobre esto *Kotlin* es bastante opinionado: fuerza al usuario a explicitar algunos tipos que infiere, porque [considera que el código resultante es más claro](https://discuss.kotlinlang.org/t/type-inference-for-return-types-of-longer-functions/554/2).
+
+```kotlin
+class X {
+  fun m() = "foo" // Obviamente retorna un String.
+  fun n() {
+    return "bar"  // Hey! Hey! Despacio cerebrito!
+  }
+}
+```
+
+De acuerdo o no, es interesante pensar que estás restricciones que parecen de menor importancia en la sintáxis de un lenguaje pueden empujar a la comunidad a adoptar ciertas prácticas (en este caso, usar más métodos definidos como expresiones y menos bloques largos).
 
 Otro patrón recurrente, un poco menos feliz, es que ambos lenguajes también decidieron descartar la información de tipos en runtime. *Kotlin*, que originalmente se compilaba para la *JVM*, pasa por el mismo proceso de **Erasure** que *Scala*, donde los tipos paramétricos se descartan post compilación.
 
@@ -277,6 +290,123 @@ De ahí que existan cosas como el [Projecto Valhalla](https://en.wikipedia.org/w
 
 ## Definición de Objetos
 
+Mencionamos en clase varias veces que el paradigma de objetos todavía no se decide sobre cuál es la mejor manera de definir, instanciar y asociar comportamiento a los objetos. Esto lleva a que la gran mayoría de los lenguajes prueben sus propias variantes de herramientas y metamodelos; con lo cual, si bien existen algunos patrones comunes, ningún enfoque superador se impuso todavía.
+
+En muchos sentidos, *Kotlin* toma sobre estos temas un enfoque muy conservador, adoptando la **Herencia Simple con Default Methods (interfaces con código)** de *[Java 8](https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html)* como su mecanismo principal de subtipado.
+
+```kotlin
+interface Humano {
+    fun cantar() = "Lalalala"
+}
+
+interface Caballo {
+    fun relinchar() = "Ihihihihi"
+}
+
+class Centauro : Humano, Caballo { }
+```
+
+Para el ojo poco entrenado, estas interfaces pueden parecer **Mixins**, pero un alumno de TAdP sabe que hay que hacerse algunas preguntas:
+
+- **¿Pueden definir estado?**
+  No. Las properties de las interfaces son abstractas.
+  ```kotlin
+  interface I {
+    var x: String
+  }
+
+  // Falla: Falta implementar x!
+  class C: I { }
+  ```
+
+- **¿Los conflictos se resuelven automáticamente (por ejemplo, linearizando)?**
+  Nop. Es necesario sobreescribir a mano cada método conflictivo. Las implementaciones heredadas están disponibles con una sintáxis especial.
+  ```kotlin
+  interface I {
+    fun m() = "foo"
+  }
+  interface J {
+    fun m() = "bar"
+  }
+
+  interface IJ: I, J {
+    override fun m(): String {
+        return super<J>.m()
+    }
+  }
+  ```
+
+- **¿El super es dinámico?**
+  A efectos prácticos, no. Justamente porque las interfaces no se linearizan no puedo hacer un llamado a `super` que no refiera a un método concreto.
+  ```kotlin
+  interface I {
+    fun m(): String
+  }
+
+  interface J: I {
+    // Falla: m es abstracto.
+    override fun m() = super<I>.m()
+  }
+  ```
+
+Vemos entonces que estas abstacciones están mucho más cerca de los *Traits* de *Ducasse* que a los *Mixins* de *Bracha*.
+
+Es cierto que esta no es la opción más flexible o limpia pero, en defensa(?) de *Kotlin*, no es descabellado que un lenguaje que aspira a ser el sucesor de *Java* decida no introducir cambios abruptos en las herramientas de diseño Orientado a Objetos en pos de pelear otras batallas. Dicho esto, sí, duele un poco considerar que el mismo *Java* intrudujo estas abstracciones tarde y medio como una solución de compromiso, porque introducir algo más disruptivo comprometería la **retrocompatibilidad**, con lo cual *Kotlin* se ve limitado por decisiones que se tomaron para la primer JVM, hace más de 20 años. ¿Triste? Puede, ser... Pero este tipo de condicionamiento [no es nada nuevo](https://clipset.20minutos.es/como-el-culo-de-un-caballo-condiciona-la-tecnologia-espacial-de-la-nasa/).
+
+En un tono más positivo, *Kotlin* también toma de *Scala* varias de sus ideas más originales sobre cómo obtener objetos.
+
+Un ejemplo de esto es que se pueden definir **Singleton Objects**,tanto anónimos como globales, para cuando sólo se necesita una única instancia.
+
+```Kotlin
+object EstoEsUnObjeto {
+    val estoTambién = object {}
+}
+```
+
+Otra gran decisión fue reemplazar la idea de **constructor** por la de **parametros de clase** (a los que llaman *"constructores"* pero shh...).
+
+```Kotlin
+// Los parámetros por defecto cubren la mayor parte de los casos de sobrecarga.
+class X(val a: Int, var b: String = "") {
+    var c: String
+    
+    // Cualquier efecto que no sea inicializar un campo va en el bloque init (en lugar de estar desperdigado en el cuerpo de la clase).
+    init {
+         c = if (b == "foo") "bar" else "baz"
+    }
+    
+    // En caso de necesitar otra firma, puedo hacer esto (o usar un object como en Scala).
+    constructor(d: Boolean) : this(0, "")
+}
+
+fun main(args: Array<String>) {
+    // Noten que no existe el "new"!
+    val x = X(5)
+}
+```
+
+También incorpora el concepto de **Companion Object** para lidiar con el aspecto estático de las abstracciones, aunque va un paso más lejos y hace que tenga que declararse dentro de la clase misma: 
+
+```kotlin
+class X {
+  companion object {
+      fun m() = 5
+  }
+}
+
+fun main(args: Array<String>) {
+  val n = X.m()
+}
+```
+
+
+- (K) clases
+    properties instead of attributes
+    override de get y set más feliz (field keyword)
+
+    Data classes (case classes)
+  
+
 - (T) Definición de objetos
   hashes
   Mixins (implementación propuesta)
@@ -286,24 +416,6 @@ De ahí que existan cosas como el [Projecto Valhalla](https://en.wikipedia.org/w
     getter/setter
     super/herencia
     son funciones
-
-- (K) clases
-    companion objects <- las clases no son objetos
-  Parámetros de clase
-  Instanciación sin new
-  Init block (similar a tirar código en el cuerpo de la clase)
-  properties instead of attributes
-  override de get y set más feliz (field keyword)
-  open classes y methods para poder extender…
-
-  Data classes (case classes)
-  
-- (K) Interfaces con código
-  solución de conflictos manual
-    super<C>.m
-
-- (K) Objects (dinámicos y nombrados)
-
 
 ## Inmutabilidad y Efecto
 
@@ -322,6 +434,7 @@ De ahí que existan cosas como el [Projecto Valhalla](https://en.wikipedia.org/w
   referencias a funciones y properties (::f)
   referencias a constructores (acá es interesante que el constructor tiene tipo () -> T, es algo que javascript hacía hace mil )
   bound functions: obj::f
+- invoke (apply)
 
 - aplicación parcial y currificación (simulado ~> cambia la firma)
 - composición de funciones (tal vez mostrar lo de Elm?)
@@ -380,6 +493,7 @@ De ahí que existan cosas como el [Projecto Valhalla](https://en.wikipedia.org/w
 - (K) Qualified this (this@A)
 - (K) Extension functions (extensión no invasiva)
     Extensiones al companion object
+- (K) open classes y methods para poder extender…
 
 
 ---------------------------
