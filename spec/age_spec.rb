@@ -53,72 +53,73 @@ describe 'age of empires tests' do
 
   ######################
 
-  # it 'Atacante descansado pega doble' do
-  #   atila = Guerrero.new #(potencial_ofensivo = 20, energia = 100, potencial_defensivo = 10)
-  #   conan = Guerrero.new
-  #
-  #   atila.descansar
-  #   atila.atacar conan
-  #
-  #   # 100 - (20 * 2 - 10)
-  #   expect(conan.energia).to eq(70)
-  # end
-  #
-  # it 'Atacante descansado ataca doble solo una vez por descanso' do
-  #   atila = Guerrero.new
-  #   conan = Guerrero.new
-  #   heman = Guerrero.new
-  #
-  #   atila.descansar
-  #   atila.atacar conan
-  #   atila.atacar heman
-  #
-  #   # 100 - (20 - 10)
-  #   expect(heman.energia).to eq(90)
-  # end
-  #
-  # it 'Defensor descansado suma 10' do
-  #   muralla = Muralla.new
-  #   expect(muralla.energia).to eq(200)
-  #
-  #   muralla.descansar
-  #
-  #   expect(muralla.energia).to eq(210)
-  # end
-  #
-  # it 'Guerrero descansa como Defensor y como Atacante' do
-  #   atila = Guerrero.new #(potencial_ofensivo = 20, energia = 100, potencial_defensivo = 10)
-  #   conan = Guerrero.new
-  #   expect(atila.energia).to eq(100)
-  #
-  #   atila.descansar
-  #   atila.atacar conan
-  #
-  #   expect(conan.energia).to eq(70)
-  #   expect(atila.energia).to eq(110)
-  # end
-  #
-  # it 'kamikaze pierde su energia luego de atacar' do
-  #   kamikaze = Kamikaze.new #(potencial_ofensivo = 250, energia = 100, potencial_defensivo = 10)
-  #   muralla = Muralla.new #(potencial_defensivo = 50, energia = 200)
-  #
-  #   kamikaze.atacar(muralla)
-  #
-  #   expect(muralla.energia).to eq(0)
-  #   expect(kamikaze.energia).to eq(0)
-  # end
-  #
-  # it 'kamikaze descansa solo como atacante' do
-  #   kamikaze = Kamikaze.new
-  #
-  #   expect(kamikaze.potencial_ofensivo).to eq(250)
-  #
-  #   kamikaze.descansar
-  #
-  #   expect(kamikaze.energia).to eq(100)
-  #   expect(kamikaze.potencial_ofensivo).to eq(500)
-  # end
-  #
+  it 'Atacante descansado pega doble' do
+    atila = Guerrero.new #(potencial_ofensivo = 20, energia = 100, potencial_defensivo = 10)
+    conan = Guerrero.new
+
+    atila.descansar
+    atila.atacar conan
+
+    # 100 - (20 * 2 - 10)
+    expect(conan.energia).to eq(70)
+  end
+
+  it 'Atacante descansado ataca doble solo una vez por descanso' do
+    atila = Guerrero.new
+    conan = Guerrero.new
+    heman = Guerrero.new
+
+    atila.descansar
+    atila.atacar conan
+    atila.atacar heman
+
+    # 100 - (20 - 10)
+    expect(heman.energia).to eq(90)
+  end
+
+  it 'Defensor descansado energia maxima' do
+    muralla = Muralla.new
+    expect(muralla.energia).to eq(200)
+
+
+    muralla.descansar
+
+    expect(muralla.energia).to eq(200)
+  end
+
+  it 'Guerrero descansa como Defensor y como Atacante' do
+    atila = Guerrero.new #(potencial_ofensivo = 20, energia = 100, potencial_defensivo = 10)
+    conan = Guerrero.new
+    expect(atila.energia).to eq(100)
+
+    atila.descansar
+    atila.atacar conan
+
+    expect(conan.energia).to eq(70)
+    expect(atila.energia).to eq(100)
+  end
+
+  it 'kamikaze pierde su energia luego de atacar' do
+    kamikaze = Kamikaze.new #(potencial_ofensivo = 250, energia = 100, potencial_defensivo = 10)
+    muralla = Muralla.new #(potencial_defensivo = 50, energia = 200)
+
+    kamikaze.atacar(muralla)
+
+    expect(muralla.energia).to eq(0)
+    expect(kamikaze.energia).to eq(0)
+  end
+
+  it 'kamikaze descansa solo como atacante' do
+    kamikaze = Kamikaze.new
+
+    expect(kamikaze.potencial_ofensivo).to eq(250)
+
+    kamikaze.descansar
+
+    expect(kamikaze.energia).to eq(100)
+    expect(kamikaze.potencial_ofensivo).to eq(500)
+  end
+
   # ######################
   #
   # it('Peloton descansador hace descansar a sus guerreros que no estan descansados') do
