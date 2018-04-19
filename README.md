@@ -10,7 +10,7 @@
 
 ## Tipado
 
-Vamos a empezar planteando algunas variantes interesantes a los sistemas de tipos de los lenguajes que usamos durante la cursada. El tipado de *Scala* es de los más seguros, flexibles y, por lo tanto, complejos de los lenguajes orientados a objetos. *Kotlin* toma muchas de sus ideas y define un tipado algo más rígido y menos preciso pero mucho más simple, al mismo tiempo que agrega bastante boilerplate a su sintáxis para protejerse de (lo que algunos consideran) problemas comunes. Por otro lado, *Typescript* abiertamente acepta su tipado como **unsound** y no ofrece una solución para las situaciones más complejas que otros lenguajes tratan de resolver pagando el costo de una mayor complejidad. Del sitio de *Typescript*:
+Vamos a empezar planteando algunas variantes interesantes a los sistemas de tipos de los lenguajes que usamos durante la cursada. El tipado de *Scala* es de los más seguros, flexibles y, por lo tanto, complejos de los lenguajes orientados a objetos. *Kotlin* toma muchas de sus ideas y define un tipado algo más rígido y menos preciso pero mucho más simple, al mismo tiempo que agrega bastante boilerplate a su sintáxis para protejerse de (lo que algunos consideran) problemas comunes. Por otro lado, *TypeScript* abiertamente acepta su tipado como **unsound** y no ofrece una solución para las situaciones más complejas que otros lenguajes tratan de resolver pagando el costo de una mayor complejidad. Del sitio de *TypeScript*:
 
 > TypeScript’s type system allows certain operations that can’t be known at compile-time to be safe. [...] The places where TypeScript allows unsound behavior were carefully considered, and throughout this document we’ll explain where these happen and the motivating scenarios behind them.
 
@@ -22,7 +22,7 @@ Vamos a mencionar entonces algunos de los aspectos más interesantes (para bien 
 
 ### Typescript: Tipandolo con pinzas
 
-En sí, la filosofía de *Typescript* consiste en ser una versión más segura de *EcmaScript*, manteniendose fiel a sus principios y sin introducir "features" que no puedan mapearse directamente al lenguaje original.
+En sí, la filosofía de *TypeScript* consiste en ser una versión más segura de *EcmaScript*, manteniendose fiel a sus principios y sin introducir "features" que no puedan mapearse directamente al lenguaje original.
 Esto implica no requerir un cambio muy abrupto en la forma de programar y preservar la naturaleza "flexible" de ES, lo cual no es fácil...
 
 Para esto, *TypeScript* basa sus chequeos en un **Tipado Estructural**:
@@ -75,7 +75,7 @@ La consecuencia directa es que el aspecto nominal del tipado aporta más expresi
 
 ¿Entonces, cuál es la moraleja? ¿Nos gusta o no nos gusta este "tipado laxo"? Y... Es distinto. Obviamente tenés menos garantías de que un programa que tipa funcione pero, una vez aceptado esto el lenguaje se puede permitir crecer más rápido o implementar conceptos más atrevidos.
 
-Un ejemplo de esto es la **Conjunción y Disjunción de Tipos** que en *Scala* [llevan varios años discutiendo](https://contributors.scala-lang.org/t/whats-the-status-of-union-intersection-types-singleton-types-in-dotty) y *Typescript* implementa sin ningún tipo de reparo.
+Un ejemplo de esto es la **Conjunción y Disjunción de Tipos** que en *Scala* [llevan varios años discutiendo](https://contributors.scala-lang.org/t/whats-the-status-of-union-intersection-types-singleton-types-in-dotty) y *TypeScript* implementa sin ningún tipo de reparo.
 
 
 ```typescript
@@ -163,7 +163,7 @@ fun main(args: Array<String>) {
 }
 ```
 
-En el otro extremo del espectro, [si bien puede configurarse para hacer algunos controles básicos](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-6.html), *Typescript* decide evitarse el problema y hacer todos los generics **Bivariantes**:
+En el otro extremo del espectro, [si bien puede configurarse para hacer algunos controles básicos](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-6.html), *TypeScript* decide evitarse el problema y hacer todos los generics **Bivariantes**:
 
 ```typescript
 class Animal { }
@@ -180,18 +180,18 @@ b = a // Sep.
 b = c // No veo porqué no...
 ```
 
-De más está decir que esto no es lo más seguro, pero *Typescript* elige poner la responsabilidad de evitar esos problemas en el usuario a cambio de permitirle permanecer ignorante sobre teoría de varianza y mantener el tipado suficientemente sencillo para implementar...
+De más está decir que esto no es lo más seguro, pero *TypeScript* elige poner la responsabilidad de evitar esos problemas en el usuario a cambio de permitirle permanecer ignorante sobre teoría de varianza y mantener el tipado suficientemente sencillo para implementar...
 
 
 ### Features locos
 
-El razonamiento es simple: Desde el punto de vista del usuario, el sistema de tipos es confiable o no (no importa *porqué*). Si ya sé que tengo que estar atento cuando uso ciertas construcciones y lo acepto como parte del uso cotidiano del lenguaje, entonces es posible agregar herramientas interesantes aunque no pueda hacerlas tipar de forma completamente consistente. Vamos a mencionar un par de ejemplos de esto presentes en *Typescript*.
+El razonamiento es simple: Desde el punto de vista del usuario, el sistema de tipos es confiable o no (no importa *porqué*). Si ya sé que tengo que estar atento cuando uso ciertas construcciones y lo acepto como parte del uso cotidiano del lenguaje, entonces es posible agregar herramientas interesantes aunque no pueda hacerlas tipar de forma completamente consistente. Vamos a mencionar un par de ejemplos de esto presentes en *TypeScript*.
 
 #### Index Types
 
 With index types, you can get the compiler to check code that uses dynamic property names.
 
-*Typescript* permite el mismo uso de propiedades dinámicas que *EcmaScript*. Esto incluye referenciar el nombre de propiedades con construcciones no-estáticas (Ej.: obj["propiedad"] en lugar de obj.propiedad). Los [Index Types](https://www.typescriptlang.org/docs/handbook/advanced-types.html#index-types) son la construcción sintáctica que permite que el compilador analice código que usa nombres dinámicos de propiedades.
+*TypeScript* permite el mismo uso de propiedades dinámicas que *EcmaScript*. Esto incluye referenciar el nombre de propiedades con construcciones no-estáticas (Ej.: obj["propiedad"] en lugar de obj.propiedad). Los [Index Types](https://www.typescriptlang.org/docs/handbook/advanced-types.html#index-types) son la construcción sintáctica que permite que el compilador analice código que usa nombres dinámicos de propiedades.
 
 ```typescript
 class Alumno {
@@ -264,7 +264,7 @@ type Overwrite<T, U> = { [P in Diff<keyof T, keyof U>]: T[P] } & U
 
 ### Antes y Después del Compilador
 
-Tanto *Kotlin* como *Typescript* permiten algún grado de **Inferencia de Tipos**. En general, la gran mayoría de los lenguajes con tipado explicito (incluso [C++](https://dgvergel.blogspot.com.ar/2016/04/inferencia-automatica-de-tipos-auto.html)!) tratan de incorporar esto a sus sintáxis, para reducir el boilerplate y hacer más fácil la transición desde tecnologías más dinámicas. Es probable que lo único que previene que esto se convierta en el standard de la industria es que no terminamos de ponernos de acuerdo en si el tipo escrito mejora o empeora la lectura del código.
+Tanto *Kotlin* como *TypeScript* permiten algún grado de **Inferencia de Tipos**. En general, la gran mayoría de los lenguajes con tipado explicito (incluso [C++](https://dgvergel.blogspot.com.ar/2016/04/inferencia-automatica-de-tipos-auto.html)!) tratan de incorporar esto a sus sintáxis, para reducir el boilerplate y hacer más fácil la transición desde tecnologías más dinámicas. Es probable que lo único que previene que esto se convierta en el standard de la industria es que no terminamos de ponernos de acuerdo en si el tipo escrito mejora o empeora la lectura del código.
 
 Sobre esto *Kotlin* es bastante opinionado: fuerza al usuario a explicitar algunos tipos que infiere, porque [considera que el código resultante es más claro](https://discuss.kotlinlang.org/t/type-inference-for-return-types-of-longer-functions/554/2).
 
@@ -281,7 +281,7 @@ De acuerdo o no, es interesante pensar que estás restricciones que parecen de m
 
 Otro patrón recurrente, un poco menos feliz, es que ambos lenguajes también decidieron descartar la información de tipos en runtime. *Kotlin*, que originalmente se compilaba para la *JVM*, pasa por el mismo proceso de **Erasure** que *Scala*, donde los tipos paramétricos se descartan post compilación.
 
-*Typescript* va un paso más lejos y **elimina toda información sobre los tipos**, compuestos o no, para compilar al código *ES* más similar posible. Esto hace imposible usar esta información para hacer *introspection* en runtime...
+*TypeScript* va un paso más lejos y **elimina toda información sobre los tipos**, compuestos o no, para compilar al código *ES* más similar posible. Esto hace imposible usar esta información para hacer *introspection* en runtime...
 
 Si bien existen lenguajes donde los tipos compuestos están reificados a nivel plataforma ([como .NET](https://en.wikipedia.org/wiki/Generic_programming#Genericity_in_.NET_[C#,_VB.NET])) y otros ([como *Scala*](https://docs.scala-lang.org/overviews/reflection/typetags-manifests.html)) que encontraron alguna forma de dibujarla, en general la postura suele ser que eliminar esta información es lo más rápido y fácil de hacer y evita que los programas "engorden" guardando metadata que no siempre necesitan.
 
@@ -434,11 +434,11 @@ Vayamos ahora al otro extremo del espectro: ¿Qué ideas locas e inovadoras sobr
 Clases.
 ![what year is it???](http://i.lvme.me/156wu9.jpg)
 
-Eso. Desde su versión *6*, *EcmaScript* incorpora una reificación del concepto de **Clases con Herencia Simple** y, obviamente, *Typescript* traslada esto a su propio modelo.
+Eso. Desde su versión *6*, *EcmaScript* incorpora una reificación del concepto de **Clases con Herencia Simple** y, obviamente, *TypeScript* traslada esto a su propio modelo.
 
 Que giles, no? Y... No. En realidad, la cosa es un poco más compleja...
 
-La incorporación de Clases en *ES* es un cambio casi puramente cosmético. La sintáxis nueva incorpora una serie de azucares sintácticos para reducir el boilerplate, pero lo cierto es que el metamodelo de ES basado en **Prototipos** soporta perfectamente "simular" un árbol de clases y, de hecho, [lo vienen haciendolo desde hace tiempo](https://www.webreflection.co.uk/blog/2015/11/07/the-history-of-simulated-classes-in-javascript).
+La incorporación de Clases en *ES* es un cambio casi puramente cosmético. La sintáxis nueva incorpora una serie de azucares sintácticos para reducir el boilerplate, pero lo cierto es que el metamodelo de ES basado en **Prototipos** soporta perfectamente "simular" un árbol de clases y, de hecho, [lo vienen haciendo desde hace tiempo](https://www.webreflection.co.uk/blog/2015/11/07/the-history-of-simulated-classes-in-javascript).
 
 La extensión basicamente implica poder escribir el código así:
 
@@ -487,21 +487,302 @@ Alumno.prototype.id = function() {
 let pirulo = new Alumno("pirulo", 148)
 ```
 
-- Las funciones constructores son ancestros de pensar "che, las clases parecen funciones que retornan instancias".
+Una observación interesante sobre este último código es que *ES* trabaja con el concepto de **Constructor Functions** (tal vez un ancestro conceptual de los **Parámetros de Clase**) donde el `new` simplemente crea un nuevo objeto para cumplir el rol the `this` en una función cualquiera, que lo configura a criterio.
 
-- (T) Definición de objetos
-    properties
-      getter/setter
-  las clases son funciones (?)
-  Mixins (implementación propuesta)
+De forma similar podemos también modelar **Mixines** como se explica en [este excelente artículo](http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/):
+
+```typescript
+// Los mixines pueden modelarse como funciones!
+let M1 = (next) => class extends next {
+  m() { return super.m() * 2 }
+}
+
+let M2 = (next) => class extends next {  
+    m() { return super.m() + 10 }
+}
+
+class S {
+    m() { return 5 }
+}
+
+// Al definir la clase, linearizamos de afuera hacia adentro.
+class C extends M1(M2(S)) {
+    m() { return super.m() + 1 }
+}
+
+new C().m() // 31
+
+// Incluso podemos instanciar los mixines!
+new (M1(M2(S)))().m() // 30
+```
+
+No se dejen engañar por la falta de tipos y multithreading, *ES* tiene desde hace años uno de los metamodelos más simples, poderosos y flexibles de la industria. Sí, su sintáxis tiene varias limitaciones y algunas decisiones del modelo base dejan bastante que desear, pero la mayor parte de estos inconvenientes son superficiales y facilmente vadeables, al punto que hoy en día existen [cientos de lenguajes](https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js) que trasladan su sintáxis a lo que *ES* tiene abajo del capot (incluyendo a *Kotlin*).
+
 
 ## Inmutabilidad y Efecto
 
-- (T) const y readonly / (K) val, const y lateinit: no es lazy, evita el checkeo de algo que no puede ser null para hacerlo después)
+Trabajar sin efecto es una de las facetas de la programación funcional más abrazada por los lenguajes nuevos. Lamentablemente, muchas tecnologías se concentran en detalles que solamente rascan la superficie de la idea, o descartan la posibilidad de producir efectos por completo (y con ella, una parte escencial de la programación Orientada a Objetos). Vamos a marcar entonces algunas de las abstracciones más interesantes que los lenguajes modernos encontraron en su busqueda de un mejor control del efecto.
 
-- (K)(E) expression oriented (if, while, etc) [y fingirlo en JS con () => {}/operador ternario]
+### Constantes
+
+Casi todos los lenguajes modernos (y muchos de los clásicos) tienen abstracciones que identifican a una referencia como **constante** (o **final**). Básicamente esto significa que la referencia en cuestión puede ser asignada sólo una vez, durante su inicialización, pero no puede ser reasignada luego.
+
+El empuje que el enfoque funcional tuvo en los últimos años propició un cambio en el rol que estas referencias tienen en el código, pasando de ser usadas por muchos casi exclusivamente para evitar repetir el hardcodeo de valores bien conocidos a ser la manera estandard de separar resultados parciales en el código. Además, el soporte para properties inmutables a nivel sintáxis facilitó la popularización del trabajo sin efecto en la POO y abrió las puertas a nuevas preguntas.
+
+Uno de estos planteos pasa por integrar la inmutabilidad al **ciclo de vida de los objetos**. Muchos lenguajes donde la sintáxis fuerza la separación entre la inicialización de un objeto y la definición de sus variables debieron adecuar su definición de *constante* para permitir que sean inicializadas en su definición o **durante la inicialización** del objeto.
+
+**Kotlin:**
+```kotlin
+class Persona(edad: Int) {
+    val esAdulto: Boolean
+    
+    init {
+      require(edad in 0..100){ "mala edad" }        
+      esAdulto = edad > 18
+    }
+}
+```
+
+
+**Typescript:**
+```typescript
+class Persona {
+    readonly edad: number
+    readonly esAdulto: boolean
+
+    constructor(edad: number) {
+        if (edad < 0 || edad > 100) throw new Error("mala edad")
+
+        this.edad = edad
+
+        // Estos chequeos de compilación no son triviales...
+        this.edad = edad
+
+        // Typescript usa const para las variables y el modificador de tipo readonly para las properties
+        const esAdulto = edad > 18
+        this.esAdulto = esAdulto
+    }
+}
+```
+
+Lo interesante es que, una vez abierta la puerta a la discusión de que tal vez hay más de una forma de variable, rapidamente aparecen propuestas nuevas. *Kotlin*, que fue originalmente pensado como un lenguaje para *Android* donde el espacio de almacenamiento tiene una importancia especial, define una sintáxis para un tipo de constantes estáticas que son embebidas en el lugar donde se referencian en tiempo de compilación (permitiendo potencialmente que la clase donde están definidas sea removida por el optimizador).
+
+```kotlin
+// Los const son embebidos en compilación y sólo pueden ser de tipos primitivos o strings.
+const val FOO = "BAR"
+
+// Estas dos funciones se compilan a lo mismo
+fun f() = FOO
+fun g() = "BAR"
+```
+
+También incorpora una sintáxis que permite postergar la inicialización de variables sin comprometer su tipo.
+
+```kotlin
+class Docente
+
+class Curso {
+    // Las referencias (vars o vals) deben ser inicializadas siempre...
+    var docente: Docente
+    
+    // ...salvo los var marcados como lateinit, que pueden inicializarse después.
+    lateinit var jtp: Docente
+}
+
+fun main(args: Array<String>){
+    // Si un lateinit no se inicializa antes de leerse, rompe en runtime.
+    println(Curso().jtp)
+}
+```
+
+*TypeScript* también viene con abstracciones interesantes para las constantes, de la mano de los **Mapped Types**.
+
+```typescript
+type Readonly<T> = {
+    readonly [P in keyof T]: T[P];
+}
+
+type DeepReadonly<T> = {
+    readonly [P in keyof T]: DeepReadonly<T[P]>;
+}
+
+class Docente {
+    nombre: string
+}
+
+class Curso {
+    docente: Docente
+    jtp: Docente
+
+    tieneDocente() { return this.docente != null }
+}
+
+// Como readonly es sólo un modificador de tipo no necesito cambiar código
+// puedo usar un curso cualquiera y sólo lo "veo" distinto. 
+let curso: Curso
+let cursoRO: Readonly<Curso> = curso
+let cursoDRO: DeepReadonly<Curso> = curso
+
+
+curso.docente = new Docente()    // Que mal! Si retorno mi curso pueden cambiarmelo.
+cursoRO.docente = new Docente()  // Que bien! Puedo hacer sus campos readonly!
+cursoRO.docente.nombre = "Toto"  // Que mal! Sigue siendo mutable...
+cursoDRO.docente.nombre = "Toto" // Que bien! Cascadeo el readonly!
+cursoDRO.tieneDocente() // Pero el DeepReadonly no tiene la operación para evaluarse... Que mal!
+```
+
+Todo esto está muy bien pero, como se trató en clase, trabajar sin efecto requiere más que solamente tener variables que no pueden ser reasignadas, es necesario también contar con buenas herramientas para transformar estructuras, definir interfaces que no requieran de mantener un estado y provean alternativas limpias al lanzado de excepciones como mecanismo de control de flujo.
+
+
+### Expresiones Vs. Sentencias
+
+Podemos pensar en las **Expresiones** como **Sentencias** que retornan un **Valor**, en contraposición a aquellas que sólo producen un efecto. Los lenguajes con fundamentos funcionales (como *Kotlin*) hacen hincapié en que todas (o al menos la mayoría) de sus sentencias son expresiones. Esto permite escribir cualquier sentencia donde se espera un valor, favoreciendo un estilo de escritura menos procedural.
+
+*TypeScript* no tiene tanta suerte, ya que varias de sus construcciones y **Clausulas de Control de Flujo** no son expresiones:
+
+```typescript
+let condicion: boolean
+
+// El if no retorna un valor, así que no puedo asignarlo.
+const n1 = if (condicion) 1; else 2;
+
+// Esto nos fuerza a separar la definición de la inicialización
+// y nos impide usar const...
+let n2
+if (condicion)
+    n2 = 1
+else
+    n2 = 2
+
+// Existe un operador ternario (sólo para el if) que SÍ es una expresión.
+const n3 = condicion ? 1 : 2
+
+// Sin embargo, sólo admite expresiones como parámetro.
+// El throw no es una expresión, así que puede usarse acá.
+const n4 = condicion ? 1 : throw "ufa"
+// Ni tampoco usar más de una sentencia.
+const n5 = condicion ? 1 : {
+    console.log("la condición fue falsa")
+    2
+}
+```
+
+Un truco recurrente para lidiar con esto es envolver las sentencias con **Lambdas** o **Funciones** (aunque la expresividad sufe un poco...):
+```typescript
+let condicion: boolean
+
+// Noten que definimos si y no como funciones, para mantener la evaluación diferida.
+function ifThenElse(cond, si, no) {
+    if (cond) return si()
+    else return no()
+}
+
+const n1 = ifThenElse(condicion, () => 1, () => 2)
+
+const n2 = condicion ? 1 : (() => { throw "ufa" })()
+```
+
+
+### Transformación de datos inmutables
+
+Al trabajar sin efecto es habitual simular un cambio sobre una estructura creando una copia de la misma que cuente con la diferencia deseada. Lamentablemente, esto suele ser más fácil de decir que de hacer, ya que generar copias con cambios complejos y anidados tiende a ser una tarea incomoda y verbosa.
+Como vimos en la cursada, *Scala* ofrece algunas facilidades superficiales para esto en sus **Case Classes**, las cuales cuentan con mecanismos para destructurarse y copiarse. Estos mecanismos, si bien útiles para cosas sencillas, carecen de una integración más profunda al metamodelo y no pueden en general ser heredados, extendidos o utilizados polimorficamente; lo cual hace que desde hace tiempo [la comunidad los quiera mejorar](http://www.scala-lang.org/old/node/5364).
+
+*Kotlin* (un poco desperdiciando la oportunidad de plantear algo más interesante) tomó la idea de Case Class (renombrándola a **Data Class**) casi al pie de la letra, con la diferencia de que no basan sus mecanismos de deconstrucción en [un contrato de mensajes como el de *Scala*](https://docs.scala-lang.org/tour/extractor-objects.html), haciendolo un poco menos poderoso.
+
+```kotlin
+data class Alumno(val nombre: String, val nota: Int)
+
+fun main(args: Array<String>) {
+    val pepe = Alumno("Pepe", 7)
+    val (_, notaDePepe) = pepe
+    val pipo = pepe.copy(nombre = "pipo", nota = notaDePepe + 1)
+}
+```
+
+En contraste, no es raro que *ES* (y, por transición, *TypeScript*), que desde sus origines es utilizado de forma exhaustiva para consumir y manipular datos tontos, haya invertido mucho tiempo y esfuerzo a mejorar la sintaxis y herramientas con las que transforma estructuras.
+
+```typescript
+interface Alumno {nombre: string, nota: number}
+interface Materia { nombre: string }
+interface Curso { materia: Materia, alumnos: Alumno[] }
+
+const unAlumno = { nombre: "pepe", nota: 7 }
+// Podemos definir variables siguiendo un patrón basado en la estructura.
+// A esto le llamamos destructurar un objeto.
+// En caso de que el campo no exista podemos darle un default.
+const {nombre, nota = 0} = unAlumno
+
+// Podemos extraer sólo los campos que nos interesan.
+const aprobo = ({ nota }: Alumno) => nota > 6
+
+// Podemos deconstruir multiples niveles (e incluso inferir el tipo estructural).
+const necesitaUnApodo = ({ nombre: { length } }) => length > 10
+    
+// Podemos copiar un objeto "untandolo" en otra definición.
+// Noten que el campo alumnos es pisado... Este es nuestro copy.
+const desdoblar = (curso: Curso) => ({...curso, alumnos: []})
+
+function mejorNota(curso: Curso) {
+    // La destructuración no sólo funciona con hashes.
+    const [{ nota }, ...otros] =
+        // Podemos poner alias a las referencias obtenidas.
+        curso.alumnos.sort(({ nota: notaA }, { nota: notaB }) => notaA - notaB)
+
+    // Podemos insertar un campo que se llama igual que su variable sin usar el nombre.
+    return { curso, mejorNota: nota }
+}
+```
+
+Es importante notar cómo trabajar sobre estructuras mucho menos complejas y eficientes que otros lenguajes abre las puertas a una manipulación más dinámica y menos verbosa. También es interesante tomar esta interfaz como ejemplo de un lenguaje de propósito general evolucionando para adaptarse mejor al propósito específico para el que se lo usa. Si lo que vamos a hacer con *ES* es manipular *JSON*, porqué no darle las mejores herramientas posibles para eso (sacrificando otras cosas).
+
+Por último, cabe mencionar que ninguno de los dos enfoques es especialmente bueno para realizar transformaciones anidadas o complejas, con lo que no es raro que existan librerías para ambos lenguajes que implementan **[Lenses](http://www.haskellforall.com/2012/01/haskell-for-mainstream-programmers_28.html)** (un patrón de diseño funcionaloso que apunta justamente a eso).
+
+En esto, *Typescript* y sus *Mapped Types* son especialmente simpáticos ya que permiten tipar un contrato dinámico en lugar de tener que basarlo en strings como suele hacerse (aunque no pudimos encontrar una implementación que lo haga y así que tubimos que hacer la nuestra...):
+
+```typescript
+type Lens<T, U> = { [K in keyof U]: Lens<T, U[K]> } & { (t: T, u: U): T, (t: T): U }
+
+// Más adelante explicamos esta implementación. Por ahora no importa...
+function lens<T,U>(path:string[]): Lens<T, U> {
+    const f = ((t: T, u: U) => t) as Lens<T, U>
+    
+    return new Proxy(f, {
+        get<K extends keyof U>(_, k: K) { return lens<T, U[K]>([k, ...path]) },
+        apply(_, self, args): T {
+            if (args[1]) {
+                const [k, ...ks] = path
+                const clone: T = { ...args[0] }
+                let current: any = clone
+                ks.reverse().forEach(k => {
+                    current[k] = { ...current[k] }
+                    current = current[k]
+                })
+                current[k] = args[1]
+                return clone
+
+            } else return path.reverse().reduce((e, k) => e[k], args[0]) as T
+        }
+    })
+}
+
+function $<T>() { return lens<T, T>([]) } 
+
+
+const $curso = $<Curso>()
+// Noten que tipa bien y hasta funciona el autocompletar!
+const $nombreDeCurso = $curso.materia.nombre
+
+const unCurso: Curso = { materia: { nombre: "tadp"} }
+const otroCurso = $nombreDeCurso(unCurso, "taDEp")
+
+console.log($nombreDeCurso(unCurso))
+```
+
 
 ## Funciones como elementos de primer órden
+
+Como ya deslizamos antes, ambos lenguajes permiten definir tanto **Closures** (**Bloques**, **Lambdas**, etc.) como **Funciones Nombradas** independientes a cualquier objeto.
 
 - (T) arrows
 - (T) los objetos no pueden ser funciones
@@ -520,19 +801,16 @@ let pirulo = new Alumno("pirulo", 148)
   - comparar con lo que hace Java y con lo de scala (básado en un contrato)
   (T) interfaz del array (map, filter, reduce)
 
+- (T) propuestas para bind y pipe:
+  https://github.com/Microsoft/TypeScript/issues/17718
+https://github.com/Microsoft/TypeScript/issues/3508
+
 ## Pattern Matching y Control de Flujo
 
 - para pensar: cómo subsanaron algunos lenguajes el conflicto entre polimorfismo y pattern matching? Bueno, algunos lo descartaron como control de flujo, pero se quedaron con la idea de patrón y deconstrucción.
 
-- (T) deconstruction / (K) Destructuring
-  arrays
-  hashes
-  objetos
-  parametros de funciones:  function f({g: h}){ return h}
-  default para valores no encontrados: var { a, b = 2 } = obj
-  spread
 - (T) Type guards, aftercheck y user defined guards / (K) Smart-cast, is, !is, as, as? <- es interesante pensar que acá el "fallo silencioso" básicamente retorna una mónada.
-- (K) when operator for pattern matching like thinguies
+- (K) when operator for pattern matching like thinguies (kotlin no tiene PM)
 - (K) brake y return con labels (GOTO!?)
 
 
