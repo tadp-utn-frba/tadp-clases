@@ -1017,25 +1017,7 @@ function haceRuido(animal: Lobo | Vaca): String {
 
 ### Control de flujo basado en valores
 
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-- (K) when operator for pattern matching like thinguies (kotlin no tiene PM)
-muy complejo -> https://discuss.kotlinlang.org/t/destructuring-in-when/2391/2
-
+*Kotlin* lleva estas herramientas un paso más lejos desarrollando una construcción sintáctica que, sin ser del todo *Pattern Matching* (ya que lo considera [demasiado complejo](https://discuss.kotlinlang.org/t/destructuring-in-when/2391/2)), permite analizar no solamente tipos, sino también consultar por valores específicos.
 
 ```kotlin
 interface Animal
@@ -1064,8 +1046,18 @@ fun haceRuido(animal: Animal) =
     }
 ```
 
-- (K) brake y return con labels (GOTO!?)
+El `when` puede usarse también sin parámetros, como una alternativa idiomática de otras construcciones (como el `if-then-else`):
 
+```kotlin
+fun haceRuido(animal: Animal) =
+	when {
+        animal is Lobo -> animal.aulla()
+        animal is Vaca -> animal.muji()
+        // El when sin parámetro admite cualquier expresión booleana como clave
+        animal is Camelus && animal.jorobas > 2 -> "Tengo ${animal.jorobas} jorobas, soy un Monstruo!"
+        else -> "Soy otra cosa."
+    }
+```
 
 ## Mónadas y Secuenciamiento
 
@@ -1092,8 +1084,6 @@ fun haceRuido(animal: Animal) =
 
 
 ## Expresividad (no es un buen nombre para esta sección)
-
-- (T) atributos en base al nombre de la variable
 - (T) nombres computados
 - (T)(K) Type Alias
 - (K) Delegation
@@ -1104,7 +1094,8 @@ fun haceRuido(animal: Animal) =
 - (K) Extension functions (extensión no invasiva)
     Extensiones al companion object
 - (K) open classes y methods para poder extender…
-- (K) Data classes (case classes)
+- (K) brake y return con labels (GOTO!?)
+
 
 
 
