@@ -902,8 +902,8 @@ Uno de los usos más comunes de *Pattern Matching* está asociado a distinguir e
 ```scala
 trait Animal
 
+    def aullar() = "Auuuuuu"
 class Lobo() extends Animal {
-    def ahuya() = "Auuuuuu"
 }
 
 class Vaca() extends Animal {
@@ -913,8 +913,8 @@ class Vaca() extends Animal {
 def haceRuido(animal: Animal): String = {
     if(animal.isInstanceOf[Lobo]) {
         // Independientemente de mi chequeo, animal debe ser casteado
-        // return animal.ahuya() // Esto no funciona
-        return animal.asInstanceOf[Lobo].ahuya()
+        // return animal.aullar() // Esto no funciona
+        return animal.asInstanceOf[Lobo].aullar()
     }
     
     if(animal.isInstanceOf[Vaca]) {
@@ -932,7 +932,7 @@ Algunos lenguajes modernos que reconocen la utilidad de trabajar con *polimorfis
 interface Animal
 
 class Lobo(): Animal {
-    fun ahuya() = "Auuuuuu"
+    fun aullar() = "Auuuuuu"
 }
 
 class Vaca(): Animal {
@@ -943,7 +943,7 @@ fun haceRuido(animal: Animal): String {
     // Los chequeos de is y !is son considerados por el compilador.
     if(animal is Lobo) {
         // El bloque del if entiende que animal referencia algo de tipo Lobo.
-        return animal.ahuya()
+        return animal.aullar()
     }
     
     // No sólo funciona con el if...
@@ -959,7 +959,7 @@ fun haceRuido(animal: Animal): String {
 **TypeScript**
 ```typescript
 class Lobo {
-    ahuya() { return "Auuuuuu" }
+    aullar() { return "Auuuuuu" }
 }
 
 class Vaca {
@@ -969,7 +969,7 @@ class Vaca {
 // La disjunción de tipos va a funcionar mejor que una interfaz Animal
 function haceRuido(animal: Lobo | Vaca) {
     // Dentro del if sabe que es un lobo
-    if (animal instanceof Lobo) return animal.ahuya()
+    if (animal instanceof Lobo) return animal.aullar()
 
     // No hace falta chequear, si no es Lobo es Vaca...
     return animal.muji()
@@ -983,54 +983,87 @@ En *TypeScript* el chequeo inteligente no está limitado al `instanceof`. Es pos
 
 ```typescript
 function esLobo(animal: any): animal is Lobo {
-    return !!(<Lobo>animal).ahuya
+    return !!(<Lobo>animal).aullar
 }
 
 function haceRuido(animal: Lobo | Vaca) {
-    if (esLobo(animal)) return animal.ahuya()
+    if (esLobo(animal)) return animal.aullar()
     return animal.muji()
 }
 ```
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
+Y eso no es todo; varios casos de uso comunes ya vienen soportados incluyendo lo que *TypeScript* llama **[Discriminated Unions](http://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions)**:
 
-- Decir que esto anda:
 ```typescript
-interface Square {
-    kind: "square"
-    size: number
-}
-interface Rectangle {
-    kind: "rectangle"
-    width: number
-    height: number
-}
-interface Circle {
-    kind: "circle"
-    radius: number
+class Lobo {
+    especie: "lobo"
+    aullar() { return "Auuuuuu" }
 }
 
-type Shape = Square | Rectangle | Circle
+class Vaca {
+    especie: "vaca"
+    muji() { return "Muuuuuuuu" }
+}
 
-function area(s: Shape) {
-    switch (s.kind) {
-        case "square": return s.size * s.size
-        case "rectangle": return s.height * s.width
-        case "circle": return Math.PI * s.radius ** 2
+function haceRuido(animal: Lobo | Vaca): String {
+    switch (animal.especie) {
+        case "lobo": return animal.aullar()
+            // Si comentamos este caso (y usamos chequeo de null estricto)
+            // el compilador va a avisarnos que no cubrimos todos los casos.
+        case "vaca": return animal.muji()
+}
     }
-}
 ```
 
+### Control de flujo basado en valores
+
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 - (K) when operator for pattern matching like thinguies (kotlin no tiene PM)
 muy complejo -> https://discuss.kotlinlang.org/t/destructuring-in-when/2391/2
-   - Qué no se puede hacer con esto?
+
+
+```kotlin
+interface Animal
+
+class Lobo(): Animal {
+    fun aulla() = "Auuuuuu"
+}
+
+class Vaca(): Animal {
+    fun muji() = "Muuuuuuuu"
+}
+
+class Camelus(val jorobas: Int): Animal
+
+fun haceRuido(animal: Animal) =
+	when(animal) {
+        is Lobo -> animal.aulla()
+        is Vaca -> animal.muji()
+        Camelus(1) -> "Tengo 1 joroba, soy un Dromedario"
+        Camelus(2) -> "Tengo 2 jorobas, soy un Camello"
+        // Ojo, esto no me permite más que chequear valores específicos.
+        // No tiene todo el poder del Pattern Matching!
+        // Camelus(n) -> "Tengo ${n} jorobas, soy un Monstruo!" // Esto no anda!
+        is Camelus -> "Tengo ${animal.jorobas} jorobas, soy un Monstruo!"
+        else -> throw Error("No hace ruido")
+    }
+```
+
 - (K) brake y return con labels (GOTO!?)
 
 
