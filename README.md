@@ -782,35 +782,255 @@ console.log($nombreDeCurso(unCurso))
 
 ## Funciones como elementos de primer órden
 
-Como ya deslizamos antes, ambos lenguajes permiten definir tanto **Closures** (**Bloques**, **Lambdas**, etc.) como **Funciones Nombradas** independientes a cualquier objeto.
+Como ya deslizamos antes, ambos lenguajes permiten definir tanto **Closures** (**Bloques**, **Lambdas**, etc.) como **Funciones Nombradas** independientes a cualquier objeto. Esto abre las puertas para trabajar al estilo de funcional (separando los datos de la lógica) sin necesidad de boilerplate o estructuras auxiliares.
 
-- (T) arrows
-- (T) los objetos no pueden ser funciones
+**Kotlin**
+```kotlin
+fun main(args: Array<String>) {
+// Las llaves son parte de la lambda...
+val siguiente: (Int)->Int = { x -> x + 1 }
 
-- (K) Funciones sueltas
-  it (nombre implicito del primer parámetro)
-  lambdas / closures / funciones anónimas
-  referencias a funciones y properties (::f)
-  referencias a constructores (acá es interesante que el constructor tiene tipo () -> T, es algo que javascript hacía hace mil )
-  bound functions: obj::f
-- invoke (apply)
+//...esto hace que la sintaxis tenga que manejar casos especiales
+//para evitar parentesis redundantes.
+(1..10).map{x -> x + 1}
+    
+//Una lambda que espera un único parámetro puede referirlo con la palabra clave "it".
+val doble: (Int)->Int = { it * it }
+}
+```
 
-- aplicación parcial y currificación (simulado ~> cambia la firma)
-- composición de funciones (tal vez mostrar lo de Elm?)
-- orden superior en los contratos
-  - comparar con lo que hace Java y con lo de scala (básado en un contrato)
-  (T) interfaz del array (map, filter, reduce)
+**Typescript**
+```typescript
+// Puedo definir una lambda básica usando sólo el (=>).
+const siguiente = n => n + 1
 
-- (T) propuestas para bind y pipe:
-  https://github.com/Microsoft/TypeScript/issues/17718
-https://github.com/Microsoft/TypeScript/issues/3508
+// La deconstrucción de parámetros funciona igual que en otras funciones.
+const nota = ({nota}) => nota
+
+// Esta sintáxis hace fácil currificar una función para aplicarla parcialmente. 
+const sumar = x => y => x + y
+const sumatoria = ns => ns.map(sumar(1))
+
+// Pero esto no tiene soporte a nivel lenguaje como en Haskell... La firma cambia.
+const f: (x:number, y:number) => number = sumar // Falla!
+```
+
+*Kotlin*, habiendo sido pensado originalmente para correr en *Android*, define también [algunas herramientas para usar *orden superior* de forma más eficiente](https://kotlinlang.org/docs/reference/inline-functions.html).
+
+Además de esto, en ambos lenguajes es posible referenciar **métodos** y **properties** definidos en objetos para utilizarlos como funciones (bindeadas o no):
+
+**Kotlin**
+```kotlin
+class Alumno(val nota:Int) {
+    fun aprobo() = nota > 6
+}
+
+fun main(args: Array<String>) {
+	val jose = Alumno(7)
+	val tito = Alumno(2)
+    
+    val aprobo = Alumno::aprobo
+    val aproboJose = jose::aprobo
+    
+    aproboJose() // true
+    aprobo(tito) // false
+    Alumno::nota.get(jose) // 7
+}
+```
+
+**Typescript**
+```typescript
+class Alumno {
+    nota: number
+    constructor(nota) { this.nota = nota }
+    aprobo() { return this.nota > 6 }
+}
+
+const jose = new Alumno(7)
+const tito = new Alumno(2)
+
+const aproboJose = jose.aprobo
+const aprobo = Alumno.prototype.aprobo
+
+aproboJose()             // true
+aprobo.call(tito)        // false
+aprobo.bind(tito).call() // false
+```
+
+Como se puede ver, en *Kotlin* el código es bastante directo (gracias al operador `::`) mientras que en *Typescript* se hace con construcciones más artesanales y asociadas a reflection.
+
+Pese a estas facilidades, las funciones en estos lenguajes suelen quedar relegadas a usarse mayormente para parametrizar operaciones de orden superior, ya que curiosamente, al momento de escribir este documento ninguno de los dos lenguajes tiene soporte a nivel sintaxis para componer o combinar funciones, lo cual dificulta hacer construcciones complejas con ellas. Por otro lado, es cierto que en *Kotlin* esto puede modelarse fácilmente con una sintáxis muy fluida gracias a la **Sobrecarga de Operadores** y que *TypeScript* tiene [librerías que cubren esto](https://lodash.com/docs/4.17.5#flow) y algunas propuestas abiertas para incorporar **[piping](https://github.com/Microsoft/TypeScript/issues/17718)** y **[binding](https://github.com/Microsoft/TypeScript/issues/3508)**.
+
+Finalmente, la discusión no estaría completa sin analizar el polimorfismo entre objetos y funciones. En este terreno el modelo de *Kotlin*, que define la aplición basandola en una interfaz, es ampliamente mejor que el de *TypeScript*, donde, si bien las funciones pueden tener propiedades como los objetos, son construcciones completamente diferentes y es imposible aplicar un objeto.
+
+**Kotlin**
+```kotlin
+fun f(n: Int) = n + 1
+
+object g {
+    operator fun invoke(n: Int): Int = n + 1
+}
+
+fun main(args: Array<String>) {
+    var aplicable: (Int) -> Int
+    
+    aplicable = ::f
+    aplicable = g    // Esto no funciona... g no es una función como en Scala.
+    
+    // Pero puedo hacerlo así.
+    aplicable = object : (Int) -> Int {
+    	override operator fun invoke(n: Int): Int = n + 1
+	}
+    
+    aplicable(5)
+}
+```
 
 ## Pattern Matching y Control de Flujo
 
-- para pensar: cómo subsanaron algunos lenguajes el conflicto entre polimorfismo y pattern matching? Bueno, algunos lo descartaron como control de flujo, pero se quedaron con la idea de patrón y deconstrucción.
+**Patter Matching** es una construcción central del *Paradigma Funcional* pero, como tratamos en clase, favorece enfoques de diseño que abiertamente se contradicen con aquellos preferidos por el *Paradigma Orientado a Objetos*. Siendo ese el caso, no es de extrañar que varios lenguajes que pretenden soportar ambos paradigmas optan por ahorrarse la complejidad de integrar esta herramienta y proponen un desarrollo puramente basado en polimorfismo.
 
-- (T) Type guards, aftercheck y user defined guards / (K) Smart-cast, is, !is, as, as? <- es interesante pensar que acá el "fallo silencioso" básicamente retorna una mónada.
+Si bien en la cátedra somos amigos del Pattern Matching como herramienta de diseño, hay que reconocer que, en las técnologías con *Objetos* (donde los datos son capaces de exponer su propio contenido), el matcheo de patrones sólo ofrece una ventaja sintáctica, dado que es posible obtener resultados similares con un [switch statement](https://en.wikipedia.org/wiki/Switch_statement). ¿Va a ser más feo? Sí. Pero tengan en cuenta que no es nada fácil integrar de forma consistente y robusta un mecanismo de PM a una sintáxis basada en POO. Ni siquiera *Scala*, probablemente el mejor exponente de programación hibrida *Objeto-Funcional* a la fecha, tiene una integración perfecta, ya que los patrones no están representados como **Entidades de Primer Orden**, lo cual impide utilizarlos de muchas formas interesantes (pasarlos por parámetro, retornarlos como resultado de una función, etc.).
+
+Independientemente de si las tecnologías lo incorporan o no, es interesante analizar la discusión que instala: Hay muchas situaciones en donde puede resultar conveniente tomar una decisión basandose en la forma de una estructura y el envio de mensajes puede no ser la mejor herramienta para esto. Vamos entonces a analizar algunas variantes de herramientas que proveen los lenguajes modernos que, sin proveer un *Pattern Matching* completo, facilitan el analisis estructural para ciertas situaciones especificas.
+
+### Decisiones basadas en el tipo
+
+Uno de los usos más comunes de *Pattern Matching* está asociado a distinguir el tipo (en runtime) de un objeto. Este es uno de los aspectos más difíciles de emular en los lenguajes OO puros (especialmente los estáticamente tipados) dado que, sin soporte del lenguaje, incluso si averiguamos el tipo del objeto a mano, todavía tenemos que convencer al compilador de que conocemos el contenido de la variable utilizando alguna forma de casteo. Tomemos por ejemplo el siguiente código Scala, hecho sin utilizar PM:
+
+**Scala**
+```scala
+trait Animal
+
+class Lobo() extends Animal {
+    def ahuya() = "Auuuuuu"
+}
+
+class Vaca() extends Animal {
+    def muji() = "Muuuuuuuu"
+}
+
+def haceRuido(animal: Animal): String = {
+    if(animal.isInstanceOf[Lobo]) {
+        // Independientemente de mi chequeo, animal debe ser casteado
+        // return animal.ahuya() // Esto no funciona
+        return animal.asInstanceOf[Lobo].ahuya()
+    }
+    
+    if(animal.isInstanceOf[Vaca]) {
+    	return animal.asInstanceOf[Vaca].muji()    
+    }
+
+    throw new Error("No hace ruido")
+}
+```
+
+Algunos lenguajes modernos que reconocen la utilidad de trabajar con *polimorfismo ad-hoc* pero no soportan Pattern Matching optaron por refinar sus chequeadores de tipos para ser más sensibles al contexto. En *Kotlin* esta variante se denomina **Smart-Cast**, mientras que en *Typescript* se conocen como **Type-Guards**.
+
+**Kotlin**
+```kotlin
+interface Animal
+
+class Lobo(): Animal {
+    fun ahuya() = "Auuuuuu"
+}
+
+class Vaca(): Animal {
+    fun muji() = "Muuuuuuuu"
+}
+
+fun haceRuido(animal: Animal): String {
+    // Los chequeos de is y !is son considerados por el compilador.
+    if(animal is Lobo) {
+        // El bloque del if entiende que animal referencia algo de tipo Lobo.
+        return animal.ahuya()
+    }
+    
+    // No sólo funciona con el if...
+    animal is Vaca && return animal.muji()
+    
+    // Ninguno de esos mensajes puede enviarse fuera del if
+    //animal.muji()
+    
+    throw Error("No hace ruido")
+}
+```
+
+**TypeScript**
+```typescript
+class Lobo {
+    ahuya() { return "Auuuuuu" }
+}
+
+class Vaca {
+    muji() { return "Muuuuuuuu" }
+}
+
+// La disjunción de tipos va a funcionar mejor que una interfaz Animal
+function haceRuido(animal: Lobo | Vaca) {
+    // Dentro del if sabe que es un lobo
+    if (animal instanceof Lobo) return animal.ahuya()
+
+    // No hace falta chequear, si no es Lobo es Vaca...
+    return animal.muji()
+
+    // Tampoco es necesario lanzar error, sabe que no puede llegar.
+    // throw new Error("No hace ruido")
+}
+```
+
+En *TypeScript* el chequeo inteligente no está limitado al `instanceof`. Es posible definir nuestras propias **Type Guards** utilizando una sintaxis especial:
+
+```typescript
+function esLobo(animal: any): animal is Lobo {
+    return !!(<Lobo>animal).ahuya
+}
+
+function haceRuido(animal: Lobo | Vaca) {
+    if (esLobo(animal)) return animal.ahuya()
+    return animal.muji()
+}
+```
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!![[TODO]]
+
+- Decir que esto anda:
+```typescript
+interface Square {
+    kind: "square"
+    size: number
+}
+interface Rectangle {
+    kind: "rectangle"
+    width: number
+    height: number
+}
+interface Circle {
+    kind: "circle"
+    radius: number
+}
+
+type Shape = Square | Rectangle | Circle
+
+function area(s: Shape) {
+    switch (s.kind) {
+        case "square": return s.size * s.size
+        case "rectangle": return s.height * s.width
+        case "circle": return Math.PI * s.radius ** 2
+    }
+}
+```
+
+
 - (K) when operator for pattern matching like thinguies (kotlin no tiene PM)
+muy complejo -> https://discuss.kotlinlang.org/t/destructuring-in-when/2391/2
+   - Qué no se puede hacer con esto?
 - (K) brake y return con labels (GOTO!?)
 
 
@@ -827,6 +1047,7 @@ https://github.com/Microsoft/TypeScript/issues/3508
   obj!!.m()
   obj?.let {  } //map
   ?:
+  as, as? <- es interesante pensar que acá el "fallo silencioso" básicamente retorna una mónada.
   Impacto en el sistema de tipos: No es sólo un azucar, Any <: Any?, mientras que Maybe[Any] no tiene nada que ver con Any. A su vez, en Kotlin null no es subtipo de todo.
 - (Elm) Maybe, List (pero no monads?)
 
