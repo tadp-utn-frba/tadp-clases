@@ -1061,20 +1061,76 @@ fun haceRuido(animal: Animal) =
 
 ## Mónadas y Secuenciamiento
 
+Durante la cursada aprendimos qué son las **Mónadas**, para qué sirven, y cómo algunas de ellas (como **List**, **Option** y **Error**) contribuyen a resolver ciertos problemas recurrentes en *POO* de manera más funcional. Entonces... ¿Alguno de estos lenguajes tiene *Mónadas*?
+
+No.
+
+Bueno, más o menos... Si vamos a ser estrictos, una mónada no es más que un contrato que se cumple para cierta estructura y permite una forma genérica de trabajar. Desde este punto de vista, es posible implementar todas nuestras mónadas favoritas sin necesidad de soporte del lenguaje (y de hecho, ambos lenguajes tienen librerías de mónadas creadas por la comunidad).
+
+Sin embargo, lo cierto es que si los contratos principales del lenguaje no utilizan estas mónadas de forma homogénea, es probable que su uso se haga cuesta arriba y conlleve una gran cantidad de boilerplate. Por ejemplo, el `find` en *TypeScript* retorna `null` si ningún elemento cumple la condición. Por supuesto, puedo envolver cada llamada a `find`... Pero no es lo mismo. :/
+
+Además, hay una ventaja obvia en una sintáxis que reconoce la importancia de estas nociones (un ejemplo claro son herramientas como el **For-Comprehension** de *Scala*). El razonamiento es simple: vas a usar *mucho* esto, porqué no hacerlo lo más fácil posible? Esto es tán así que, en la práctica, es a veces más habitual encontrarse con situaciones donde es posible aprovechar los azucares sintácticos (aun sin entender del todo la teoría de fondo) que el trabajo mónadico genérico.
+
+Y acá es dónde conviene entonces hacer una pausa y reflexionar lo siguiente: las *mónadas* pueden resultarnos interesantes por dos razones, la forma genérica de trabajar sobre ellas y las ventajas sintácticas y usos que se paran sobre esto para resolver problemas comúnes; pero no son la única forma de resolver estos problemas. Es más, pueden haber situaciones tan recurrentes o importantes que sería deseable que el lenguaje las maneje de forma especial en lugar de limitarse a aplicarles el contrato monádico.
+
+Un buen ejemplo de esto es la posibilidad de que un valor no exista. A estas alturas de la cursada deberíamos tener este escenario asociado a la mónada **Optional** o **[Maybe](https://en.wikibooks.org/wiki/Haskell/Understanding_monads/Maybe)**), pero lo cierto es que hay otra construcción en la mayoría de los lenguajes *OO* que cumple este rol: el infame **null**. Incluso *Scala*, donde las mónadas son la propuesta por defecto para manejar esto, [hace cosas raras con sus tipos](https://stackoverflow.com/a/35848356/3871239) para darle soporte a este concepto. ¿Porqué? Bueno, por muy útil que sean los *Options*, no pueden ser usados para representar que una variable todavía no fue inicializada. Además, sin *null*, escribir código compatible con *Java* sería imposible.
+
+Y acá es donde *Kotlin* hace algo genial a lo que llama **Null Safety**.
+
+Básicamente, cualquier tipo `T` en *Kotlin* puede marcarse  con un `?` para indicar que la referencia apunta, o bien a un `T` o bien a `null`.
+
+```kotlin
+    // val curso: Curso = null // Falla! null no puede asignarse a Curso
+    val curso: Curso? = null
+```
+
+En principio esto podría parecer similar a una *conjunción de tipos* `T || null`de *TypeScript*, pero no! En [el sistema de tipos de *Kotlin*](http://natpryce.com/articles/000818.html) el `T?` (o **Nullable Type**) **es supertipo de** `T`. Esto tiene implicaciones enormes, siendo la más obvia y directa que cualquier tipo puede ser usado donde se espera su versión *nullable*.
+
+```kotlin
+    class Curso(val docente: Docente)
+
+    fun ojalaMeDenUnDocente(docente: Docente?) { }
+
+    val curso: Curso = ...
+    ojalaMeDenUnDocente(null) // Esto vale...
+    ojalaMeDenUnDocente(curso.docente) // Esto también! No es necesario envolver al docente con un Some
+```
+
+Lo más interesante de estos tipos es que vienen con su propia sintáxis para trabajarlos:
+
+```kotlin
+    // val curso: Curso = null // Falla! null no puede asignarse a Curso
+    val curso: Curso? = null
+
+    // El uso más habitual del map en un Option es enviarle un mensaje al contenido.
+    // La sintaxis ?. sirve básicamente para esto.
+   	curso?.docente
+    
+    // Este tipo de acceso puede encadenarse sin problemas.
+    // Dado que no estamos envolviendo los valores en otras estructuras, T? === T??.
+    // Esto quiere decir que ?. puede usarse como equivalente de map Y flatMap.
+    val noEsDr: Boolean? = curso?.docente?.titulo?.startsWith("Dr")?.not()
+
+    // Si quiero hacer algo más que mandar un mensaje al posible null puedo usar ?.let.
+    // let es un mensaje que entienden todos los nullables, equivalente a map y flatMap.
+    val esIncreible: Boolean? = curso?.let{ it.docente.nombre == "Marcelo" }
+    
+    // El ?: (operador elvis) funciona como un getOrElse.
+    val esIncreiblePosta: Boolean = esIncreible ?: false
+    
+    // En el peor de los casos, los nullables también son considerados en el Smart-Cast.
+    if(curso == null) throw Error("es null")
+    // Si llega acá sabe que no puede ser null.
+    curso.docente
+```
+
+Recordemos que el problema principal del `null` era que me obligaba a preguntar por él a cada paso. Esta nueva sintáxis para operar con nullables es tan buena como el map monádico (e incluso un poco menos verboso).
+
+
+
 - (T) generators
   cosas locas del yield
   yield + promises?
-- (T) Promise
-  async / await
-- (K) Null Safety
-  T?
-  obj?.m()
-  obj!!.m()
-  obj?.let {  } //map
-  ?:
-  as, as? <- es interesante pensar que acá el "fallo silencioso" básicamente retorna una mónada.
-  Impacto en el sistema de tipos: No es sólo un azucar, Any <: Any?, mientras que Maybe[Any] no tiene nada que ver con Any. A su vez, en Kotlin null no es subtipo de todo.
-- (Elm) Maybe, List (pero no monads?)
 
 ## Reflection
 
@@ -1095,6 +1151,9 @@ fun haceRuido(animal: Animal) =
     Extensiones al companion object
 - (K) open classes y methods para poder extender…
 - (K) brake y return con labels (GOTO!?)
+- (T) Promise
+  async / await
+
 
 
 
