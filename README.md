@@ -1,6 +1,7 @@
 # Objeto-Funcional en otros Lenguajes
 
 ##[[TODO]]
+- Generar indice
  "porqué estos lenguajes (breve descripción)"
     - Kotlin tomó mucho de Scala. Intermedio entre Java y Scala.
     - ES y qué es.
@@ -432,6 +433,7 @@ fun main(args: Array<String>) {
 Vayamos ahora al otro extremo del espectro: ¿Qué ideas locas e inovadoras sobre cómo modelar objetos se introdujeron ultimamente en los lenguajes más dinámicos?
 
 Clases.
+
 ![what year is it???](http://i.lvme.me/156wu9.jpg)
 
 Eso. Desde su versión *6*, *EcmaScript* incorpora una reificación del concepto de **Clases con Herencia Simple** y, obviamente, *TypeScript* traslada esto a su propio modelo.
@@ -1096,7 +1098,7 @@ En principio esto podría parecer similar a una *conjunción de tipos* `T || nul
     ojalaMeDenUnDocente(curso.docente) // Esto también! No es necesario envolver al docente con un Some
 ```
 
-Lo más interesante de estos tipos es que vienen con su propia sintáxis para trabajarlos:
+Hasta acá todo muy lindo, pero no serviría de mucho si el `null` fuera la misma construcción tonta que en otros lenguajes. La parte más interesante de estos tipos es que vienen con su propia sintáxis para trabajarlos:
 
 ```kotlin
     // val curso: Curso = null // Falla! null no puede asignarse a Curso
@@ -1126,35 +1128,172 @@ Lo más interesante de estos tipos es que vienen con su propia sintáxis para tr
 
 Recordemos que el problema principal del `null` era que me obligaba a preguntar por él a cada paso. Esta nueva sintáxis para operar con nullables es tan buena como el map monádico (e incluso un poco menos verboso).
 
+## Metaprogramación
+
+No vamos a profundizar demasiado en los frameworks de **Metaprogramación** de estos lenguajes porque, en general, son bastante sencillos gracias a sus metamodelos simples y porque no distan demasiado de las formas de trabajar de otras herramientas que cubrimos en clase. Esto es especialmente cierto para [el framework de *Kotlin*](https://kotlinlang.org/docs/reference/reflection.html), que es muy similar en capacidad y diseño al de *Java*, ofreciendo una interfaz concisa y limplia de **Reflection** pero no dando casi ningún soporte para **Self Modification**. Por otro lado, en *Typescript*, como en casi todos los lenguajes dinámicos, la linea que separa el uso habitual de la *Metaprogramación* es borrosa ya que las entidades tienden a cambiar y redefinirse constantemente.
+
+Dicho eso, podemos mencionar dos construcciones muy interesantes asociadas a la *Metaprogramación* presentes en estos lenguajes que no cubrimos durante la cursada.
+
+### Metadata
+
+Conocidas como **[Decorators](http://www.typescriptlang.org/docs/handbook/decorators.html)** en *TypeScript*, **Pragmas** en *Smalltalk*, **Attributes** en *.NET*, **[Annotations](https://kotlinlang.org/docs/reference/annotations.html)** en Kotlin y demas lenguajes de la *JVM* y quién sabe cuantos nombres más, estas herramientas llevan varios años siendo el standard para incorporar *Metadata* en el código (si se le puede llamar "standard" a un concepto sobre el que no nos ponemos de acuerdo ni en cómo se llama).
+
+A grandes razgos, podemos pensar en las *Annotations* como etiquetas estáticas,generalmente parametrizables, con las que podemos marcar las abstracciones del lenguaje (properties, métodos, clases, etc.). Estas etiquetas puede ser luego consultadas a travez de una API de *Reflection* y son comunmente usadas para definir contratos que no dependan de una interfaz de mensajes.
+
+**Kotlin**
+```kotlin
+annotation class Groso
+
+class MiClase(
+  @Groso val unCampoGroso: Int,
+  @Groso val otroCampoGroso: String,
+  val esteNo: Boolean
+)
+
+fun main(args: Array<String>){
+    val atributosGrosos = MiClase::class.members
+      .filter{it.annotations.any{a -> a is Groso}}
+      .map{it.name}
+}
+```
 
 
-- (T) generators
-  cosas locas del yield
-  yield + promises?
+**Typescript**
+```typescript
+class MiClase {
+  @Groso unCampoGroso: any
+  @Groso otroCampoGroso: any
+  esteNo: boolean
+}
 
-## Reflection
+function Groso<T>(target: T, key: keyof T) { 
+    if(!target['camposGrosos']) target['camposGrosos'] = []
+    target['camposGrosos'].push(key)
+}
 
-- (T) Reflect
-- (T) Proxy
-- (T) Decorators / (K) annotations
+const camposGrosos = MiClase.prototype['camposGrosos']
+```
 
+Como se ve en los ejemplos, las *Annotations* de *Kotlin* mantienen el enfoque declarativo de *Java*, mientras que los *Decorators* de *TypeScript* son básicamente funciones destructivas que se ejecutan durante la definición. Esto los hace mucho más poderosos, permitiendo que cambien completamente la definición en la que los incluyo, pero también hace que sean más peligrosos y requiere entender exactamente qué hace cada *Decorator* que uso.
 
-## Expresividad (no es un buen nombre para esta sección)
-- (T) nombres computados
-- (T)(K) Type Alias
-- (K) Delegation
-  Class delegation
-  Delegated properties (para lazyness, observers y otras yerbas (decorator?) )
-  Lazy & Observable (standard delegate)
-- (K) Qualified this (this@A)
-- (K) Extension functions (extensión no invasiva)
-    Extensiones al companion object
-- (K) open classes y methods para poder extender…
-- (K) brake y return con labels (GOTO!?)
-- (T) Promise
-  async / await
+### Extensiones de Interfaz
 
+Durante la cursada analizamos construcciones como los **Implicits** de *Scala* que permiten extender la interfaz de un objeto con nuevos mensajes sin modificarlo e incluso algunas como el **method_missing** de *Ruby* que permite que un objeto responda a mensajes cuyos nombres desconozco en tiempo estático.
 
+Estas operaciones sólo permiten agregar métodos, pero no sobreescribirlos. Esto es así en la mayoría de las tecnologías orientadas a objetos, porque suele implementarse como un *hook* cuando falla el *method lookup* (tratar de capturar cada envío de mensaje, falle o no, es en general muy costoso).
+
+*EcmaScript* propone una variante interesante para la extensión de los objetos: [los **Proxies**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy). Estas abstracciones no sólo permiten interceptar cualquier acceso o envío de mensaje (definido o no), sino que lo hacen de forma no-destructiva.
+
+La mécanica es simple. Cuando quiero extender un objeto lo envuelvo con una instancia de `Proxy`, que recibe al objeto en cuestión y una configuración que le indica cómo manejar los accesos (el *proxy* redireccionará cualquier acceso al objeto interno, salvo que su configuración diga lo contrario).
+
+```typescript
+const loritoTonto = {
+  decimeChau() { return 'wraaaaak' },
+  cantidadDePatas: 2
+}
+
+const loritoInteligente: any = new Proxy(loritoTonto, {
+  get(target, key) {
+    return (key.toString().startsWith('decime'))
+      ? () => key.toString().slice(6)
+      : target[key]
+  }
+})
+
+loritoInteligente.cantidadDePatas // retorna 2
+loritoInteligente.decimeHola() // retorna Hola
+loritoInteligente.decimeChau() // retorna Chau! Esto no es un method_missing!
+```
+
+Este enfoque permite capturar cualquier envío de mensaje, ya que no afecta el *method lookup* de todos los objetos, solo de los pocos proxiados (?).
+**Nota:** Ya podemos volver a ver [el código de *Lenses*](###Transformación-de-datos-inmutables).
+
+Del otro lado del espectro, en lo referente a extensiones de interfaces, *Kotlin* mantiene posiciones extrañas. Por un lado se presenta muy restrictivo, debido a [la desafortunada decisión de hacer todas las abstracciones *final* por defecto](https://discuss.kotlinlang.org/t/classes-final-by-default/166/4) que impide, entre otras cosas, extender clases que no hayan sido explicitamente marcadas como `open`; mientras que, por el otro, define unas herramientas a las que llama **Extensions**, muy similares a las **Implicit Classes** de *Scala*, que permiten extender (pero no sobreescribir) cualquier clase, abierta o no, con *métodos* y *properties*.
+
+```kotlin
+class Inutil(val nombre: String)
+
+// No puedo extender la clase, porque no es open
+class MenosInutil(nombre: String) : Inutil(nombre) {
+    fun saludar() = "Hola, soy ${this.nombre}"
+}
+
+// Pero puedo "agregarle" el método...
+fun Inutil.saludar() = "Hola, soy ${this.nombre}... Creo."
+
+fun main(args: Array<String>) {
+	Inutil("Ezequiel").saludar()
+}
+```
+
+### Auto-Delegación
+
+Si vamos a ser justos, esto no tiene mucho que ver con *Reflection*, pero queremos mencionarlo en esta sección porque la única forma de hacer algo parecido en la mayoría de los lenguajes requeriría de *Metaprogramación* de algún tipo.
+
+Básicamente, *Kotlin* identifica dos situaciones comunes cuya solución suele ser trivial, pero engorrosa y plagada de boilerplate y las resuelve implementando unas construcciones sintácticas que hacen toda la mágia por atrás.
+
+#### Class Delegation
+
+Cualquiera que haya implementado un *[Strategy](https://en.wikipedia.org/wiki/Strategy_pattern)* sabe lo tedioso que puede resultar delegar una y otra vez mensajes en una estratégia. No es para nada infrecuente tener interfaces que consisten casi exclusivamente en reenviar mensajes al objeto correcto simplemente para ganar la flexibilidad de la composición. La **Delegación de Clases** permite hacer esto mismo sin requerir de ningún tipo de boilerplate.
+
+```kotlin
+interface Saludador {
+    fun saludar(): String
+}
+
+object Formal: Saludador {
+    override fun saludar() = "Tenga usted un gran día, mi buen señor."
+}
+
+object Informal: Saludador {
+    override fun saludar() = "Qui hace', pa?"
+}
+
+// Persona implementa Saludador a travez de su estratégia.
+data class Persona(var estrategia: Saludador): Saludador by estrategia
+
+fun main(args: Array<String>) {
+	val pepe = Persona(Informal)
+    // Persona responde a la interfaz de Saludador delegando en su estratégia.
+    pepe.saludar() // "Qui hace', pa?"
+    
+    // Ojo! El bindeo no es completamente dinámico!
+    // Cambiar el atributo no cambia la delegación.
+    pepe.estrategia = Formal
+    pepe.saludar()  // "Qui hace', pa?"
+    
+    // Sin embargo, eso no es un problema si trabajamos de forma inmutable.
+    val lordPepe = pepe.copy(Formal)
+    lordPepe.saludar() // "Tenga usted un gran día, mi buen señor."
+}
+```
+
+#### Property Delegation
+
+De forma similar, es posible delegar la implementación de una *property* en otro objeto. Esta mecánica no se basa en extender ninguna `interface`, sino en un contrato estructural que sólo pide implementar los métodos `getValue` y `setValue`.
+
+```kotlin
+import kotlin.reflect.KProperty
+
+class MiClase() {
+    val propiedadPeresoza : String by Peresozo { "foo" }
+}
+
+class Peresozo<T>(val getter:(()->T)) {
+    var valor: T? = null
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        if(valor == null) { valor = getter() }
+        return valor!!
+    }
+}
+
+fun main(args: Array<String>) {
+    MiClase().propiedadPeresoza // Retorna "foo"
+}
+```
+
+Esto tiene muchos usos prácticos, varios de los cuales ya vienen predefinidos (Ej.: [inicialización diferida](https://kotlinlang.org/docs/reference/delegated-properties.html#lazy), [propiedades observables](https://kotlinlang.org/docs/reference/delegated-properties.html#observable), [estado compartido](https://kotlinlang.org/docs/reference/delegated-properties.html#storing-properties-in-a-map)).
 
 
 
@@ -1168,10 +1307,6 @@ Cosas piolas para pensar:
 Los lenguajes se ajustan al nivel de abstracción de los problemas que trabajan.
 Cómo afecta cuando trasladas un poblema del código a un dsl. O al lenguaje. O al compilador (onda puerta abierta a macros).
 
-```diff
-- esto no está bueno
-+ esto sí
-```
 
 ## Otros lenguajes interesantes
 
