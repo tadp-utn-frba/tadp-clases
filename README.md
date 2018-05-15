@@ -1,6 +1,6 @@
 ## Introducción a chequeo estático de tipos
 
-######Primero vamos a comparar con lo que hacíamos anteriormente en Ruby
+##### Primero vamos a comparar con lo que hacíamos anteriormente en Ruby
 
 ~~~ruby
 class Persona
@@ -34,7 +34,7 @@ Si el saludador no puede interactuar con las operaciones que yo espero que inter
 En objetos, el tipo de uno de ellos (valores) está definido por el conjunto de métodos que entiende. Si hay dos elementos que entienden
 un mismo mensaje, entonces comparten un tipo, pero no quiere decir que sean del mismo.
 
-####Tipado
+#### Tipado
 
 - Operacional: aplica a todo lo que uno hace, sea computacional o no. Trato de llevar a cabo una operacion sobre un 
 elemento. 
@@ -43,7 +43,7 @@ elemento.
 
 No pasa por qué tecnología tengo para extender el tipo o no, ni tampoco por si va a saltar cuando lo ejecute o antes, porque eso es parte del chequeo.
 
-####Chequeo
+#### Chequeo
 
 - Dinámico: Lo hace cuando yo le mando el mensaje al objeto. Ej: Ruby.
 - Estático: Decide si un programa es válido o no, analiza estáticamente el programa antes de que lo ejecutemos.
@@ -72,17 +72,17 @@ en el código, y cualquier cosa que le pase no entiende nombre.
 
 !! Puedo tener polimorfismo sólo entre dos cosas que yo establecí **explícitamente** que comparten un tipo !!
 
-####Notación
+### Notación
 - Explícita: Se escribe el tipo. Puede existir un mecanismo de inferencia de tipos que facilite el trabajo de escribir los tipos explícitamente.
 La inferencia sale de la notación explícita y el tipado estático y permite implicitar algo que de otra forma tendrías que haber explicitado. 
 Haskell tiene tipado explícito **inferido**. Scala tiene inferencia, pero no puede inferir todo.
 - Implícita
 
-####Conformación
+#### Conformación
 - Estructural (duck-typing, pattern matching): Un tipo se referencia por su forma. Ej: f (_,_,a) = a
 - Nominal: Un tipo se referencia por su nombre. Ej: String, Int
 
-####Errores
+### Errores
 - Errores de tipo: siempre está en el programa, esté en ejecución o no, no importa cómo hago el chequeo.
 - Errores detectados
 
@@ -91,7 +91,7 @@ Haskell tiene tipado explícito **inferido**. Scala tiene inferencia, pero no pu
 - Programas que puedo hacer con un tipado estático: Un chequeo estático de tipos me permite detectar los programas válidos en compilación. El compilador es el que determina si funciona o no.
 - Programas que puedo hacer sólo con tipado dinámico
 
-######Errores que creemos que deberían ser de tipo pero en teoría no lo son
+###### Errores que creemos que deberían ser de tipo pero en teoría no lo son
 
 ~~~scala
 val x = 5
