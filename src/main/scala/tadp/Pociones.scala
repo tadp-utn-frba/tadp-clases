@@ -1,7 +1,5 @@
 package tadp
 
-import scala.math._
-
 object Pociones {
 
   /**
@@ -44,7 +42,12 @@ object Pociones {
 
   def niveles(persona: Persona) = persona._2
 
+  val nivelesF: Persona => Niveles = _._2
+
   val sumaNivelesPersona: Persona => Int = sumaNiveles.compose(niveles)
+  val sumaNivelesPersonaDef: Persona => Int = (niveles _).andThen(sumaNiveles)
+  val sumaNivelesPersonaF: Persona => Int = nivelesF.andThen(sumaNiveles)
+  val sumaNivelesPersonaGuacala: Persona => Int = p => sumaNiveles(niveles(p))
 
   /**
     * nombre, cantidad, efectos
@@ -87,7 +90,7 @@ object Pociones {
     case (nombre, ingredientes) if todosLosEfectos(ingredientes).size >= 2 => nombre
   }
 
-  val nombreDePocionConFallback = nombreDePocionHeavy.orElse {
+  val nombreDePocionConFallback: PartialFunction[(String, List[(String, Int, List[Efecto])]), String] = nombreDePocionHeavy.orElse {
     case (nombre, _) => s"$nombre no es heavy"
   }
 
@@ -96,6 +99,10 @@ object Pociones {
   val invierte1: Efecto = niveles => (niveles._3, niveles._2, niveles._1)
   val invierte2: Efecto = {
     case (a, b, c) => (c, b, a)
+  }
+
+  object PocionHeavy {
+    def unapply(arg: Pocion): Option[Pocion] = Option(arg).filter(esHeavy)
   }
 
 }

@@ -1,6 +1,6 @@
 import tadp.Pociones._
 
-object Worksheet {
+object Main extends App {
 
   pocionesHeavies(pociones)
 
@@ -16,7 +16,11 @@ object Worksheet {
   nombreDePocionConFallback(felixFelices)
   nombreDePocionConFallback(floresDeBach)
 
-  nombreDePocionHeavy(floresDeBach)
+//  nombreDePocionHeavy(floresDeBach)
+  val nuevasPocionesHeavies: List[Pocion] => List[String] = _.collect {
+    case PocionHeavy(nombre, _) => nombre
+  }
 
+  println(nuevasPocionesHeavies(pociones))
 
 }
