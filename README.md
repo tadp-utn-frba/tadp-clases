@@ -1,13 +1,43 @@
 # Objeto-Funcional en otros Lenguajes
 
-##[[TODO]]
-- Generar indice
- "porqué estos lenguajes (breve descripción)"
-    - Kotlin tomó mucho de Scala. Intermedio entre Java y Scala.
-    - ES y qué es.
-    - TS es ES tipado con cuidado de no cruzar la linea.
- "links importantes a los lenguajes"
- "La idea es plantear cómo se están encarando los issues que presentamos en otras técnologías y ver de paso algunas herramientas y nociones nuevas que giran alrededor de problemas similares"
+La idea de esta clase es plantear cómo se están encarando los enfoques que presentamos en clase en otras técnologías y ver de paso algunas herramientas y nociones nuevas que giran alrededor de problemas similares. En particular vamos a presentar 2 lenguajes que son, a nuestro entender, los exponentes más interesantes de esta segunda generación de tecnologías Objeto-Funcionales: **[Kotlin](https://kotlinlang.org/)**, que tomó muchas ideas de *Scala* y las acomodó al mundo de Android y **[TypeScript](https://www.typescriptlang.org/)** que es hoy por hoy una de las mejores versiones tipadas de [EcmaScript](https://es.wikipedia.org/wiki/ECMAScript) (el contrato sobre el que se definen los *JavaScripts*).
+
+Estos lenguajes van a ser importantes para nosotros no sólo por las buenas ideas a las que llegaron, sino también por sus imperfecciones, los problemas a los que están sujetos, las limitaciones que sus diferentes contextos les imponen y la manera (mala o buena) como decidieron sobrellevarlas. Va a ser interesante también analisar que herramientas copiaron (aunque sea como un indicador de popularidad de ciertos conceptos) y el impacto de algunas aproximaciones innovadoras que presentan a problemas viejos.
+
+En definitiva, estos lenguajes nos importan porque no son más de lo mismo, sino que tratan (en mayor o menor medida) de darle otra vuelta de rosca a la integración de paradigmas.
+
+-------------------------------------------------------------
+
+## Tabla de Contenido
+
+- [Tipado](#tipado)
+- [Typescript: Tipandolo con pinzas](#typescript-tipandolo-con-pinzas)
+- [Tipos Paramétricos y Varianza](#tipos-paramétricos-y-varianza)
+- [Features locos](#features-locos)
+    - [Tipos Condicionales](#tipos-condicionales)
+    - [Index Types](#index-types)
+    - [Mapped Types](#mapped-types)
+- [Antes y Después del Compilador](#antes-y-después-del-compilador)
+- [Definición de Objetos](#definición-de-objetos)
+- [Kotlin: Entre la Scala y la pared](#kotlin-entre-la-scala-y-la-pared)
+- [Typescript/ES: Ahora con... Clases?](#typescriptes-ahora-con-clases)
+- [Inmutabilidad y Efecto](#inmutabilidad-y-efecto)
+- [Constantes](#constantes)
+- [Expresiones Vs. Sentencias](#expresiones-vs-sentencias)
+- [Transformación de datos inmutables](#transformación-de-datos-inmutables)
+- [Funciones como elementos de primer órden](#funciones-como-elementos-de-primer-órden)
+- [Pattern Matching y Control de Flujo](#pattern-matching-y-control-de-flujo)
+- [Decisiones basadas en el tipo](#decisiones-basadas-en-el-tipo)
+- [Control de flujo basado en valores](#control-de-flujo-basado-en-valores)
+- [Mónadas y Secuenciamiento](#mónadas-y-secuenciamiento)
+- [Metaprogramación](#metaprogramación)
+- [Metadata](#metadata)
+- [Extensiones de Interfaz](#extensiones-de-interfaz)
+- [Auto-Delegación](#auto-delegación)
+    - [Class Delegation](#class-delegation)
+    - [Property Delegation](#property-delegation)
+
+-------------------------------------------------------------
 
 ## Tipado
 
@@ -77,7 +107,6 @@ La consecuencia directa es que el aspecto nominal del tipado aporta más expresi
 ¿Entonces, cuál es la moraleja? ¿Nos gusta o no nos gusta este "tipado laxo"? Y... Es distinto. Obviamente tenés menos garantías de que un programa que tipa funcione pero, una vez aceptado esto el lenguaje se puede permitir crecer más rápido o implementar conceptos más atrevidos.
 
 Un ejemplo de esto es la **Conjunción y Disjunción de Tipos** que en *Scala* [llevan varios años discutiendo](https://contributors.scala-lang.org/t/whats-the-status-of-union-intersection-types-singleton-types-in-dotty) y *TypeScript* implementa sin ningún tipo de reparo.
-
 
 ```typescript
 interface Alumno {
@@ -187,6 +216,25 @@ De más está decir que esto no es lo más seguro, pero *TypeScript* elige poner
 ### Features locos
 
 El razonamiento es simple: Desde el punto de vista del usuario, el sistema de tipos es confiable o no (no importa *porqué*). Si ya sé que tengo que estar atento cuando uso ciertas construcciones y lo acepto como parte del uso cotidiano del lenguaje, entonces es posible agregar herramientas interesantes aunque no pueda hacerlas tipar de forma completamente consistente. Vamos a mencionar un par de ejemplos de esto presentes en *TypeScript*.
+
+#### Tipos Condicionales
+
+En typescript es posible definir un tipo en función de un chequeo de tipos:
+
+```typescript
+type Nodo = NodoNum | NodoStr
+interface NodoNum { valor: number }
+interface NodoStr { valor: string }
+
+function valor<N extends Nodo>(nodo: N): N extends NodoStr ? string :
+                                         N extends NodoNum ? number :
+                                         never {
+    return nodo.valor as any
+}
+
+const x = valor({ valor: "foo" })
+const y = valor({ valor: 95 })
+```
 
 #### Index Types
 
@@ -1294,45 +1342,3 @@ fun main(args: Array<String>) {
 ```
 
 Esto tiene muchos usos prácticos, varios de los cuales ya vienen predefinidos (Ej.: [inicialización diferida](https://kotlinlang.org/docs/reference/delegated-properties.html#lazy), [propiedades observables](https://kotlinlang.org/docs/reference/delegated-properties.html#observable), [estado compartido](https://kotlinlang.org/docs/reference/delegated-properties.html#storing-properties-in-a-map)).
-
-
-
----------------------------
----------------------------
-COSAS SUELTAS
----------------------------
----------------------------
-
-Cosas piolas para pensar:
-Los lenguajes se ajustan al nivel de abstracción de los problemas que trabajan.
-Cómo afecta cuando trasladas un poblema del código a un dsl. O al lenguaje. O al compilador (onda puerta abierta a macros).
-
-
-## Otros lenguajes interesantes
-
-ELM ( http://elm-lang.org/docs/syntax, https://guide.elm-lang.org/, http://elm-lang.org/examples/pipes)
-Haskell cagon.
-orientado al frontend (domain-specific)
-Basado en JS. pero NO TIENE OBJETOS (records sin "this")
-enforced semantic versioning
-Pipes ( |> ): combinadores de funciones (como composición)
-No user-defined type classes / no polimorfism ad-hoc (http://faq.elm-community.org/#does-elm-have-ad-hoc-polymorphism-or-typeclasses)
-Referenciar accessors como funciones ```points.map(function(p) { return p.x })``` es ```List.map .x points```
-
-
-Julia (https://docs.julialang.org/en/stable/)
-sin objetos?
-Vectorized operators (lifteado de operadores para el array)
-promotion and convertion
-
-
-Rust (https://www.rust-lang.org/en-US/documentation.html)
-Bajo nivel (punteros y memoria)
-pattern matching
-mutabilidad controlada
-“simula” objetos con una sintáxis para fn en los struct
-
-
-Earlang(https://www.erlang.org/)
-Más de lo mismo. Estructurado funcionaloso
-Patter matching, estructuras basicas
