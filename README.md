@@ -4,6 +4,26 @@ Los implicits son una de las herramientas más novedosas y mágicas de Scala. Vi
 lo que todos ellos tienen en común es que permiten poner cosas en un contexto para luego poder usarlas sin
 una referencia explicita en el código (o sea, implicitamente :P).
 
+### Orden de los temas
+1. Parameters
+   1. Mensajes
+   1. MensajesTest
+1. Theorems
+   1. Teoremas
+   1. TeoremasTest
+1. Conversions
+   1. Conversions
+   1. ConversionsTest
+1. Extension methods
+   1. Conversions
+   1. ConversionsTest
+1. Type Classes
+   1. OrderingTest
+   1. ContextBoundTest
+   1. NumericTest
+   
+### TODO: Rearmar el script de clase con los nuevos ejemplos
+
 ### Implicit Class
 
 Una *Clase Implicita* es una forma declarativa y no-invasiva de extender una clase.

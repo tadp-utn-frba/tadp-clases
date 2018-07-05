@@ -1,10 +1,38 @@
-package tadp
+package typeclasses
 
 import org.scalatest.{Matchers, WordSpec}
 
 class OrderingTest extends WordSpec with Matchers {
 
   "Ordering" should {
+
+    "lista ordenada" in {
+      case class ListaOrdenada[A <: Ordered[A]](as: A*) {
+        def insertar(a: A): ListaOrdenada[A] = {
+          as.map(_.compare(a))
+          this
+        }
+      }
+
+      case class User(id: Long, name: String) extends Ordered[User] {
+        override def compare(that: User): Int = id.compare(that.id)
+      }
+
+      ListaOrdenada(User(1, "Pepe"))
+        .insertar(User(2, "Jose"))
+    }
+
+    "lista ordenable" in {
+      case class Lista[A](as: A*) {
+        def ordernar(orden: Ordering[A]): Lista[A] = {
+          val a: A = as(0)
+          orden.compare(a, a)
+          this
+        }
+      }
+
+      Lista(1).ordernar(Ordering.Int)
+    }
 
     "sort users using Ordered" in {
       case class User(id: Long, name: String) extends Ordered[User] {
@@ -41,14 +69,15 @@ class OrderingTest extends WordSpec with Matchers {
 
       implicit def messageOrdering[T](implicit contentOrdering: Ordering[T]) =
         new Ordering[Message[T]] {
-        import Ordered.orderingToOrdered
 
-        override def compare(x: Message[T], y: Message[T]): Int = {
-//          implicitly[Ordering[T]]
-          //contentOrdering.compare(x.content, y.content)
-          x.content.compare(y.content)
+          import Ordered.orderingToOrdered
+
+          override def compare(x: Message[T], y: Message[T]): Int = {
+            //          implicitly[Ordering[T]]
+            //contentOrdering.compare(x.content, y.content)
+            x.content.compare(y.content)
+          }
         }
-      }
 
       implicit val userIdOrder = new Ordering[User] {
         override def compare(x: User, y: User): Int = x.id.compare(y.id)

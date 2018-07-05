@@ -1,10 +1,8 @@
-package tadp
+package parameters
 
 import org.scalatest.{Matchers, WordSpec}
-import tadp.clase.Mensajes
-import tadp.clase.ImplicitParametersImports._
 
-class FormateadorTest extends WordSpec with Matchers {
+class MensajesTest extends WordSpec with Matchers {
 
   "Mensajes" should {
 
