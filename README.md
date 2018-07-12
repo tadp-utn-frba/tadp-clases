@@ -708,7 +708,7 @@ else
 const n3 = condicion ? 1 : 2
 
 // Sin embargo, sólo admite expresiones como parámetro.
-// El throw no es una expresión, así que puede usarse acá.
+// El throw no es una expresión, así que NO puede usarse acá.
 const n4 = condicion ? 1 : throw "ufa"
 // Ni tampoco usar más de una sentencia.
 const n5 = condicion ? 1 : {
