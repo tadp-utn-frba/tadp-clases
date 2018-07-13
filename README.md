@@ -2,7 +2,7 @@
 
 La idea de esta clase es plantear cómo se están encarando los enfoques que presentamos en clase en otras técnologías y ver de paso algunas herramientas y nociones nuevas que giran alrededor de problemas similares. En particular vamos a presentar 2 lenguajes que son, a nuestro entender, los exponentes más interesantes de esta segunda generación de tecnologías Objeto-Funcionales: **[Kotlin](https://kotlinlang.org/)**, que tomó muchas ideas de *Scala* y las acomodó al mundo de Android y **[TypeScript](https://www.typescriptlang.org/)** que es hoy por hoy una de las mejores versiones tipadas de [EcmaScript](https://es.wikipedia.org/wiki/ECMAScript) (el contrato sobre el que se definen los *JavaScripts*).
 
-Estos lenguajes van a ser importantes para nosotros no sólo por las buenas ideas a las que llegaron, sino también por sus imperfecciones, los problemas a los que están sujetos, las limitaciones que sus diferentes contextos les imponen y la manera (mala o buena) como decidieron sobrellevarlas. Va a ser interesante también analisar que herramientas copiaron (aunque sea como un indicador de popularidad de ciertos conceptos) y el impacto de algunas aproximaciones innovadoras que presentan a problemas viejos.
+Estos lenguajes van a ser importantes para nosotros no sólo por las buenas ideas a las que llegaron, sino también por sus imperfecciones, los problemas a los que están sujetos, las limitaciones que sus diferentes contextos les imponen y la manera (mala o buena) como decidieron sobrellevarlas. Va a ser interesante también analizar que herramientas copiaron (aunque sea como un indicador de popularidad de ciertos conceptos) y el impacto de algunas aproximaciones innovadoras que presentan a problemas viejos.
 
 En definitiva, estos lenguajes nos importan porque no son más de lo mismo, sino que tratan (en mayor o menor medida) de darle otra vuelta de rosca a la integración de paradigmas.
 
@@ -133,7 +133,7 @@ interface Alumno {
 
 ### Tipos Paramétricos y Varianza
 
-Los típos parámetricos (o, como algunos lenguajes los llaman, **Generics**) consisten básicamente en permitir parametrizar la construcción de un tipo, agregando información que puede ser usada por el chequeador para resolver situaciones complejas, donde la interfaz de un objeto depende de factores externos. Si bien la idea general es bastante sencilla, no todos los lenguajes utilizan estas herramientas del mismo modo. En clase cubrimos (casi todo) el uso que el sistema de tipos de *Scala* hace de estos parámetros y la manera en que decide cómo se relacionan los tipos en función a como se relacionan sus parámetros (**Varianza**), pero sería un error pensar que todos los lenguajes llegan así de lejos para mantener la consistencia de sus tipos. Sin ir más lejos *Java*, el punto de referencia muchos lenguajes modernos, no maneja varianza de tipos sino que se conforma con cubrir a medias esas situaciones usando [un mecanismo de wildcards](http://www.angelikalanger.com/GenericsFAQ/FAQSections/TypeArguments.html#Topic2).
+Los típos parámetricos (o, como algunos lenguajes los llaman, **Generics**) consisten básicamente en permitir parametrizar la construcción de un tipo, agregando información que puede ser usada por el chequeador para resolver situaciones complejas, donde la interfaz de un objeto depende de factores externos. Si bien la idea general es bastante sencilla, no todos los lenguajes utilizan estas herramientas del mismo modo. En clase cubrimos (casi todo) el uso que el sistema de tipos de *Scala* hace de estos parámetros y la manera en que decide cómo se relacionan los tipos en función a como se relacionan sus parámetros (**Varianza**), pero sería un error pensar que todos los lenguajes llegan así de lejos para mantener la consistencia de sus tipos. Sin ir más lejos *Java*, el punto de referencia para muchos lenguajes modernos, no maneja varianza de tipos sino que se conforma con cubrir a medias esas situaciones usando [un mecanismo de wildcards](http://www.angelikalanger.com/GenericsFAQ/FAQSections/TypeArguments.html#Topic2).
 
 *Kotlin*, pese a haber tomado gran parte de sus abstracciones de *Scala* y apuntarlas a usarios de *Java*, decidió que no le gustaba ni un enfoque ni el otro. Del sitio de *Kotlin*:
 
@@ -708,7 +708,7 @@ else
 const n3 = condicion ? 1 : 2
 
 // Sin embargo, sólo admite expresiones como parámetro.
-// El throw no es una expresión, así que puede usarse acá.
+// El throw no es una expresión, así que NO puede usarse acá.
 const n4 = condicion ? 1 : throw "ufa"
 // Ni tampoco usar más de una sentencia.
 const n5 = condicion ? 1 : {
