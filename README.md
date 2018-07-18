@@ -27,3 +27,4 @@ git checkout <nombre del branch>
 | Clase 12 - Objetos + Funcional                                          |   scala-pociones                |
 | Clase 13 - Reflection en Scala                                          |   scala-reflection              |
 | Clase 14 - Macros en Scala                                              |   scala-macros                  |
+| Clase 15 - Objeto-Funcional en otros Lenguajes                          |   otros-lenguajes               |
