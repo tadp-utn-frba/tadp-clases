@@ -1,4 +1,3 @@
-Clase 2 TADP 2C2016
 
 ## **Traits vs Mixins**
 Flattening: 
