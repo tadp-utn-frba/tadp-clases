@@ -16,7 +16,7 @@ Dado que los frameworks van a resolver cierta problemática de las aplicaciones,
 Ejemplos:
 
 - ORM's (como hibernate): Que van a encargarse de persistir las instancias de nuestras clases sin siquiera conocerlas de antemano.
-- Frameworks de UI: Que deberán saber mostras / bindear cualquier objeto.
+- Frameworks de UI: Que deberán saber mostrar / bindear cualquier objeto.
 - Frameworks de Testing (como JUnit): suelen usar metaprogramación para analizar la clase de Test y encontrar los tests que se deben correr.
 - Documentadores de Código: Son herramientas que leen el código fuente y genera documentación (por ejemplo: JavaDoc).
 - Code Coverage: Herramientas que miden cuánto de nuestro código es realmente ejecutado al correr los tests, y cuales lineas no.
