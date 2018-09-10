@@ -125,7 +125,7 @@ describe 'age of empires tests' do
     atila = Guerrero.new
     vikingo = Guerrero.new 70
     don_quijote = Espadachin.new(Espada.new(50))
-    Peloton.descansador([atila, vikingo])
+    Peloton.estrategia_descansar([atila, vikingo])
 
     don_quijote.atacar(vikingo)
     #Al ser atacado, el vikingo le avisa al ejercito. El vikingo no esta descansado luego de recibir el ataque
@@ -137,10 +137,11 @@ describe 'age of empires tests' do
   it 'Peloton cobarde se retira cuando sufre danio uno de sus guerreros' do
     atila = Guerrero.new
     vikingo = Guerrero.new 70
-    peloton = Peloton.cobarde([atila])
+    peloton = Peloton.estrategia_retirate([atila])
 
     vikingo.atacar(atila)
 
     expect(peloton.retirado).to be(true)
   end
+
 end

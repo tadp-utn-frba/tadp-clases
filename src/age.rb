@@ -131,16 +131,27 @@ class Peloton
 
   attr_accessor :integrantes, :estrategia, :retirado
 
-  def self.cobarde(integrantes)
-    self.new(integrantes) { |peloton|
-      peloton.retirate
-    }
+  def self.method_missing(sym, *args, &b)
+    prefix = 'estrategia_'
+    if (sym.to_s.start_with?(prefix))
+      if (args.length == 1)
+        integrantes = args[0]
+        mensaje = sym.to_s.gsub(prefix, '')
+        if (Peloton.instance_methods.include?(mensaje.to_sym))
+          new(integrantes) { send(mensaje.to_sym) }
+        else
+          super
+        end
+      else
+        raise 'Argumentos malos'
+      end
+    else
+      super
+    end
   end
 
-  def self.descansador(integrantes)
-    self.new(integrantes) { |peloton|
-      peloton.descansar
-    }
+  def self.respond_to_missing?(sym, priv = false)
+    sym.to_s.start_with?('estrategia_')
   end
 
   def initialize(integrantes, &estrategia)
@@ -152,7 +163,7 @@ class Peloton
   end
 
   def lastimado
-    self.estrategia.call(self)
+    instance_eval(&estrategia)
   end
 
   def descansar
