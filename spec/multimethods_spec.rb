@@ -1,5 +1,5 @@
+require_relative '../src/multimethods'
 require 'rspec'
-require_relative '../src/tadp_multimethods'
 
 describe 'Partial Block' do
   describe 'matches' do
@@ -22,6 +22,20 @@ describe 'Partial Block' do
     it 'matchea cuando los parametros se corresponden con algun subtipo de los tipos' do
       expect(PartialBlock.new([Object]).matches?('parametro')).to be true
     end
+
+    it 'foo' do
+      class Pepita
+        def m
+          partial = PartialBlock.new([Object]) { |x| m2(x) }
+          partial.call("tres")
+        end
+
+        def m2(x)
+          x
+        end
+      end
+      expect(Pepita.new.m).to eq "tres"
+    end
   end
 
   describe 'call' do
@@ -36,7 +50,13 @@ describe 'Partial Block' do
 end
 
 describe 'Multimethods' do
-  class A
+  class B
+    partial_def :concat, [Array, Array, Array] do |x, y, z|
+      x + y + z
+    end
+  end
+
+  class A < B
     partial_def :concat, [String, String] do |s1, s2|
       s1 + s2
     end
@@ -58,13 +78,30 @@ describe 'Multimethods' do
     end
   end
 
-  it 'si existe algun partial block que matchee para los parametros se usa ese partial block' do
+  it 'si existe alguna definicion que matchee para los parametros se usa esa definicion del metodo' do
     expect(A.new.concat('hello', ' world')).to eq('hello world')
     expect(A.new.concat('hello', 3)).to eq('hellohellohello')
   end
 
   it 'si no existe ningún partial block que matchee dados los parametros explota con no method error' do
-    expect { A.new.concat(['hello', ' world', '!']) }.to raise_error(NoMethodError, 'No existe un multimethod para este metodo')
+    expect { A.new.concat(['hello', ' world', '!']) }.to raise_error(NoMethodError)
+  end
+
+  it 'si no existe ninguna definicion que matchee en la clase pero si en la super clase, deberia usar la de la superclase' do
+    expect(A.new.concat([1,2,3], [4,5,6], [])).to eq [1,2,3,4,5,6]
+  end
+
+  it 'si no existe pero tiene definido el method_missing se manda method_missing' do
+    class C < B
+      def method_missing(*)
+        "No lo encontre"
+      end
+    end
+    expect(C.new.concat(nil,nil,nil,nil)).to eq "No lo encontre"
+  end
+
+  it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod' do
+    expect(A.new.respond_to?(:concat)).to eq true
   end
 
   it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod' do
@@ -73,6 +110,10 @@ describe 'Multimethods' do
 
   it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos' do
     expect(A.new.respond_to?(:concat, false, [String, String])).to eq true
+  end
+
+  it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod si acepta una firma que es mas general que la firma pedida' do
+    expect(A.new.respond_to?(:concat, false, [Integer, Integer])).to eq true
   end
 
   it 'un objeto con multimethod no deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos que no coinciden a los de su multimethod' do
@@ -100,7 +141,7 @@ describe 'Multimethods' do
 
 end
 
-=begin
+
   context 'multimethods con tipado estructural' do
     class Pepita
       attr_accessor :energia
@@ -124,7 +165,6 @@ end
       def alimentar(golondrina); golondrina.interactuar_con(Comida.new); golondrina end
       def entrenar(golondrina); golondrina.energia -= 10; golondrina end
     end
-  end
 
   it 'un objeto deberia poder responder que sabe contestar metodos con tipado estructural' do
     expect(Pepita.new.respond_to?(:interactuar_con, false, [Comida])).to eq true
@@ -138,4 +178,3 @@ end
   end
 end
 
-=end
