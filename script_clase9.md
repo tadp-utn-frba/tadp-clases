@@ -25,7 +25,7 @@ Esto no quiere decir que el patrón esté mal. Al contrario, la recurrencia del 
 
 Para ilustrar este punto podemos ver el siguiente ejercicio, cuyo enunciado pueden encontrar [acá](https://docs.google.com/document/d/1z_sAMk2xXMiQkuaXY6tohXCQ5eZMlsp8NaA8jX2WOx0/edit?usp=sharing), en el cual se presenta para el mismo problema una implementación "pura" y una basada en el patrón visitor:
 
-[repo objetos-puro](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/objetos-puro)
+[repo objetos-puro](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador-tuneado/objetos-puro)
 
 Se puede apreciar que la solución con el visitor desacopla la lógica (operaciones como ejecutar un programa, imprimirlo o simplificarlo) de la estructura (las instrucciones del lenguaje), con lo cual es posible agregar nuevas operaciones relativamente fácil sin tener que cambiar en absoluto las instrucciones. Esto es especialmente conveniente, dado que, por la naturaleza de este problema puntual, es más probable que haya que cambiar o agregar operaciones que instrucciones.
 
@@ -44,7 +44,7 @@ Si prestamos atención, podemos ver que el Visitor termina haciendo esto tambié
 
 Probamos entonces una nueva solución que reemplaza el *double-dispatch* del Visitor por Pattern Matching:
 
-[repo funcional-mutable](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/funcional-mutable)
+[repo funcional-mutable](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador-tuneado/funcional-mutable)
 
 Aprovechamos para contar cómo trabaja Scala y sus *case-classes*.
 
@@ -67,7 +67,7 @@ Podríamos hacer lo mismo con el *run*? Y... No. Cada paso de ejecución modific
 
 En el siguiente ejemplo nos paramos en el código anterior para ir gradualmente eliminando el uso de efecto colateral y mutabilidad y acercarnos de a poco a la *Transparencia Referencial*.
 
-[repo funcional-inmutable](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/funcional-inmutable)
+[repo funcional-inmutable](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador-tuneado/funcional-inmutable)
 
 Una consecuencia feliz de esta nueva aproximación es que ahora que nuestra ejecución es una función (o sea, va de un dominio a una imagen) su tipo es mucho más representativo de lo que hace:
 
