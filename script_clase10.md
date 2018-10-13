@@ -76,4 +76,4 @@ El compilador va a tomar la expresión del segundo bloque de código y a convert
 
 Por último, en el siguiente ejemplo vamos a tratar de aprovechar estas nuevas ideas para mejorar la ejecución en nuestro Micro; primero convirtiendo los resultados de ejecución en Monoides y luego descartandolos en favor de utilizar un Try.
 
-[repo funcional-monadas](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador/funcional-monadas)
+[repo funcional-monadas](https://github.com/tadp-utn-frba/tadp-clases/tree/scala-microprocesador-tuneado/funcional-monadas)
