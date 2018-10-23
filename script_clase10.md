@@ -49,11 +49,11 @@ En precompilación se transforman las for-comprehensions en una combinación de 
 Por ejemplo, una sentencia compleja como la siguiente:
 
 ~~~scala
-caja.flatmap { e1 ->
-  tx1(e1).flatmap { e2 ->
-    tx2(e2).filter { e3 ->
+caja.flatMap { e1 =>
+  tx1(e1).flatMap { e2 =>
+    tx2(e2).filter { e3 =>
       crit(e3)
-    }.map { e4 ->
+    }.map { e4 =>
       tx3(e4)
     }
   }
@@ -65,8 +65,10 @@ Puede escribirse así:
 ~~~scala
 for {
   e1 <- caja
-  e2 <- tx1(e1) if crit(e2)
-} yield tx(e2)
+  e2 <- tx1(e1)
+  e3 <- tx2(e2)
+  if crit(e3)
+} yield tx3(e3)
 ~~~
 
 El compilador va a tomar la expresión del segundo bloque de código y a convertirla en lo que se ve en el primero.
