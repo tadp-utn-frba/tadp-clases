@@ -4,21 +4,35 @@ import scala.annotation.implicitNotFound
 
 object Teoremas {
 
-  def miIgual[A, B](a: A, b: B)(implicit n: A =:= B): Boolean = {
+  def miIgual[A, B](a: A, b: B)(implicit ev: =:=[A, B]): Boolean = {
     a == b
-    //    1.equals("hola")
-    //    1 == "hola"
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   @implicitNotFound(msg = "${A} no es magico!")
   trait Magico[A]
 
-  implicit val singleton: Magico[Unit] = new Magico[Unit] {}
+  implicit val intEsMagico: Magico[Int] =
+    new Magico[Int] {}
 
-  implicit def estoEsString[A <: String]: Magico[A] =
-    singleton.asInstanceOf[Magico[A]]
+  implicit val stringEsMagico: Magico[String] =
+    new Magico[String] {}
 
-  def esMagico[B](algo: B)(implicit x: Magico[B]): B =
+  def esMagico[B](algo: B)(implicit ev: Magico[B]): B =
     algo
 
 }

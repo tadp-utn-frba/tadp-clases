@@ -1,36 +1,36 @@
 package parameters
 
 import org.scalatest.{Matchers, WordSpec}
-import parameters.Teoremas.esMagico
+import parameters.Teoremas.{esMagico, miIgual}
 
 class TeoremasTest extends WordSpec with Matchers {
 
   "Option" should {
 
     "flatten Option Option Int" in {
-      val optionNumero = Option(123)
-      optionNumero.map(_ + 1)
+      val optionNumero: Option[Int] = Some(123)
       // optionNumero.flatten
 
-      val optionOptionInt = Option(Option(123))
-      optionOptionInt.flatten shouldEqual Option(123)
+      val optionOptionInt: Option[Some[Int]] = Some(Some(123))
+      optionOptionInt.flatten shouldEqual Some(123)
     }
 
     "typesafe equals" in {
-      Teoremas.miIgual(1, 1) shouldEqual true
-      Teoremas.miIgual(1, 2) shouldEqual false
+      miIgual(1, 1) shouldEqual true
+      miIgual(1, 2) shouldEqual false
 
-      // val f: Float = 1
-      // val x: String = "hola"
-      // Teoremas.miIgual(f, x) shouldEqual false
+      // miIgual(1, "hola")
     }
 
     "teorema magico" in {
-      val noMagico = 123
-      val magico = "hola!"
-      val unitMagico = ()
+      // los strings son magicos
+      esMagico("hola!")
 
-      esMagico(magico)
+      // los ints son magicos
+      esMagico(123)
+
+      // los doubles no son magicos
+      // esMagico(1.3)
     }
 
   }

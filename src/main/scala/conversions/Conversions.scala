@@ -6,9 +6,28 @@ object Conversions {
 
   case class FacebookUser(id: String, name: String)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   object Implicits {
     implicit def twitterToFacebook(user: TwitterUser): FacebookUser =
       FacebookUser(user.id.toString, user.name)
   }
+
+  // mostrar companion obj lookup
 
 }
