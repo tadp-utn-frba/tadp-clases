@@ -1,16 +1,16 @@
-# Clase 1 TADP 1C2016
+# Clase 1 TADP
 
 ## Aspectos administrativos:
-
-- Se van a usar 2 lenguajes (Ruby y Scala)
-
-- Van a haber 2 TPs(uno de metaprogramación y el otro de híbrido objetos-funcional), cada uno con una entrega grupal y una individual. Tienen que darnos una hoja por grupo con legajo, nombre, apellido y email.
 
 - Página de la materia: [http://tadp-utn-frba.github.io/](http://tadp-utn-frba.github.io/)
 
 - Es muy importante que se anoten a la lista de emails de la cursada: [https://groups.google.com/forum/#!forum/tadp-cursada](https://groups.google.com/forum/#!forum/tadp-cursada)
 
-- La idea es hacer una evaluación a lo largo de todo el año. El final no es que no se toma, sino que se evalúa a lo largo de la cursada.
+- Va a haber 2 TPs (uno de metaprogramación y el otro de híbrido objetos-funcional), cada uno con una entrega grupal y una individual. Les vamos a pedir una hoja por grupo con legajo, nombre, apellido y email.
+
+- Se van a usar 2 lenguajes (Ruby y Scala)
+
+- La idea es hacer una evaluación a lo largo de todo el año. El final se evalúa a lo largo de la cursada.
 
 ## Repaso Objetos
 
@@ -41,23 +41,19 @@ end
 
 Sobre los detalles de la implementación de Ruby no las trataremos con mucho detalle en clase, pero en este script podemos dedicarle algunas líneas a explicar brevemente un poco sobre su sintaxis.
 
-En Ruby vemos que para declarar una clase se lo hace mediante Class x …. end. En este lenguaje veremos que en vez de que haya curly braces o indentación para delimitar el contexto de una clase, método, etc., en Ruby se lo hace mediante end para finalizar el scope y ni bien se define una estructura su contexto empieza desde ahí.
+En Ruby vemos que para declarar una clase se lo hace mediante class X …. end. En este lenguaje veremos que en lugar de que haya llaves o indentación para delimitar el contexto de una clase, método, etc., en Ruby se lo hace mediante end para finalizar el scope y ni bien se define una estructura su contexto empieza desde ahí.
 
-Otro tema es la sentencia attr_accesor, por ahora solamente lo que nos interesa es que nos permite definir los accessors (getter y setter) para una variable de instancia. El nombre de las variables de instancia no se definen como strings sino con un : antes del identificador. Esto es porque lo que sea la sintaxis :<lo que sea> se lo conoce como símbolo en Ruby, esto es simplemente un string, no es un objeto o una clase. La propiedad que lo diferencia es que es inmutable, no se pueden hacer declaraciones del tipo
-
-~~~ruby
-:algo = ‘algo mas’
-~~~
+Otro tema es la sentencia attr_accesor, por ahora solamente lo que nos interesa es que nos permite definir los accessors (getter y setter) para una variable de instancia. El nombre de las variables de instancia no se definen como strings sino con un : antes del identificador. Esto es porque lo que sea la sintaxis :<lo que sea> se lo conoce como símbolo en Ruby, es un tipo de objeto que se usa como identificador porque tiene la propiedad de ser único el sistema. Por ejemplo: cuando se usa :bleh siempre va a ser el mismo.
 
 Pero si se pueden hacer asignaciones o comparaciones usando símbolos.
 
 ~~~ruby
-	A = :bleh
+	a = :bleh
 
-	A == :bleh
+	a == :bleh #retorna true
 ~~~
 
-Para más información sobre símbolos en Ruby ver: [http://rubylearning.com/blog/2007/11/26/akitaonrails-on-ruby-symbols/](http://rubylearning.com/blog/2007/11/26/akitaonrails-on-ruby-symbols/)
+Para más información sobre símbolos en Ruby ver: [https://www.rubyguides.com/2018/02/ruby-symbols/](https://www.rubyguides.com/2018/02/ruby-symbols/)
 
 Volviendo al modelo y al problema del Age of Empires:
 
@@ -96,11 +92,11 @@ Los misiles tienen un potencial ofensivo fijo de 1000, por lo tanto esa implemen
 
 ## Mixins
 
-Finalmente, agregamos Murallas, que pueden defenderse, pero no atacar. Acá llegamos a un punto crítico en términos de diseño, porque la herencia simple no nos permite modelar esto de forma elegante. O sea no podemos extender una clase abstracta de otra, ya que si por ejemplo tenemos una clase que defina solamente el comportamiento y estado de defensor, que es energía y sufri_danio, y que esta extienda de atacante, la muralla aún tendrá el comportamiento heredado de atacante. Lo mismo sucede si invertimos el orden, en ese caso, los misiles podrán tener el comportamiento de defensor. Una solución es la de usar herencia múltiple, solo que muy pocos lenguajes lo soportan (C++ por ejemplo), e introduce varios problemas de resolución de conflixtos como el del problema del rombo o diamante ([https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem](https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem)). Entonces si solo disponemos de herencia simple en Ruby como resolvemos esto?  
+Finalmente, agregamos Murallas, que pueden defenderse, pero no atacar. Acá llegamos a un punto crítico en términos de diseño, porque la herencia simple no nos permite modelar esto de forma elegante. O sea no podemos extender una clase abstracta de otra, ya que si por ejemplo tenemos una clase que defina solamente el comportamiento y estado de defensor, que es energía y sufri_danio, y que esta extienda de atacante, la muralla aún tendrá el comportamiento heredado de atacante. Lo mismo sucede si invertimos el orden, en ese caso, los misiles podrán tener el comportamiento de defensor. Una solución es la de usar herencia múltiple, solo que muy pocos lenguajes lo soportan (C++ por ejemplo), e introduce varios problemas de resolución de conflictos como el problema del rombo o diamante ([https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem](https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem)). Entonces si solo disponemos de herencia simple en Ruby como resolvemos esto?  
 
 Para solucionar esto incorporamos una herramienta nueva: los Mixins.
 
-Un mixin es similar a una clase, en el sentido de que permite definir un conjunto de métodos dentro de él, pero con la diferencia de que, en lugar de ser instanciable, otras clases pueden incorporarlos como parte de sus métodos (otro enfoque sería pensar en los mixins como interfaces con código). En este caso podemos definir Defensor como un mixin, que provee el método #sufri_danio:.
+Un mixin es similar a una clase, en el sentido de que permite definir un conjunto de métodos dentro de él, pero con la diferencia que, en lugar de ser instanciable, otras clases pueden incorporarlos como parte de sus métodos (otro enfoque sería pensar en los mixins como interfaces con código, o clases abstractas combinables). En este caso podemos definir Defensor como un mixin, que provee el método #sufri_danio:.
 
 Para crear el Mixin debemos escribir, en el lugar donde normalmente definimos las clases:
 
@@ -146,7 +142,7 @@ Hay gente que opina que sí, porque son unidades más reutilizables que las clas
 
 Código de la clase:
 
-[https://github.com/uqbar-paco/tadp-ruby-age-of-empires/tree/introMixins](https://github.com/uqbar-paco/tadp-ruby-age-of-empires/tree/introMixins)
+[https://github.com/tadp-utn-frba/tadp-clases/blob/ruby-age/src/age.rb](https://github.com/tadp-utn-frba/tadp-clases/blob/ruby-age/src/age.rb)
 
 ### Para la clase que viene:
 
@@ -160,4 +156,4 @@ Leer la idea de Traits:
 
 [http://scg.unibe.ch/archive/papers/Berg07aStatefulTraits.pdf](http://scg.unibe.ch/archive/papers/Berg07aStatefulTraits.pdf)
 
-Hacer especial foco cómo se resuelven los conflictos, cómo se implementan variables y en la diferencia entre flattening y linearization (y que implican para el programador)
+Hacer especial foco en cómo se resuelven los conflictos, cómo se implementan variables y en la diferencia entre flattening y linearization (y que implican para el programador)
