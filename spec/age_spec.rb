@@ -100,24 +100,24 @@ describe 'age of empires tests' do
   end
 
   it 'kamikaze pierde su energia luego de atacar' do
-    kamikaze = Kamikaze.new #(potencial_ofensivo = 250, energia = 100, potencial_defensivo = 10)
+    kamikaze = Kamikaze.new(potencial_ofensivo = 150, energia = 100, potencial_defensivo = 10)
     muralla = Muralla.new #(potencial_defensivo = 50, energia = 200)
 
     kamikaze.atacar(muralla)
 
-    expect(muralla.energia).to eq(0)
+    expect(muralla.energia).to eq(100)
     expect(kamikaze.energia).to eq(0)
   end
 
   it 'kamikaze descansa solo como atacante' do
-    kamikaze = Kamikaze.new
-
-    expect(kamikaze.potencial_ofensivo).to eq(250)
+    kamikaze = Kamikaze.new(potencial_ofensivo = 100, energia = 100, potencial_defensivo = 10)
+    muralla = Muralla.new
 
     kamikaze.descansar
-
     expect(kamikaze.energia).to eq(100)
-    expect(kamikaze.potencial_ofensivo).to eq(500)
+
+    kamikaze.atacar(muralla)
+    expect(muralla.energia).to eq(50)
   end
 
   # ######################
