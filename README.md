@@ -308,3 +308,37 @@ end
 
 Bla::T # "T no encontrada"
 ```
+
+## Anexo 2: method_added
+
+Ruby provee un mecanismo para "avisar" cuando se agrega un método en una clase:
+```ruby
+class A
+  def self.method_added(method_name)
+    puts "Se agregó el método #{method_name}"
+  end
+end
+
+class A
+  def un_metodo
+    # ...  
+  end
+end
+# 'Se agregó el método un_metodo'
+```
+
+También se puede saber si se agregó un singleton method:
+```ruby
+class A
+  def singleton_method_added(name)
+    puts "Singleton added #{name}"
+  end
+end
+
+a = A.new
+
+def a.m
+  puts 'Soy un a'
+end
+# 'Singleton added m'
+```
