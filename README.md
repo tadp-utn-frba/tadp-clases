@@ -1,8 +1,62 @@
 # TADP Clase 4: instance_eval, method_missing
 
+### Contexto (scope)
+Consideremos el siguiente ejemplo
+```ruby
+x = 10
+class A
+  puts x
+end
+# NameError: undefined local variable or method `x' for A:Class
+
+def m
+  puts x
+end
+m # NameError: undefined local variable or method `x' for main:Object
+```
+
+Esto pasa porque la variable 'x' solo puede ser accedida desde el contexto donde se creó.
+El contexto cambia en tres casos (se los suele llamar _scope gates_): 
+- Cuando se define una clase con class
+- Cuando se define un módulo con module
+- Cuando se define un método con def
+
+### Flat scope
+
+Como ya vimos, los bloques, lambdas y procs son distintos porque "recuerdan" el contexto donde fueron creados (son _clojures_)
+```ruby
+x = 10
+una_lambda = lambda do
+  x + 2
+end
+una_lambda.call # 12
+```
+
+Podemos usar esta característica de los clojures para superar los límites de los scope gates
+
+Para hacer que una variable esté en el contexto de la definición de un método, podemos reemplazar def con define_method.
+```ruby
+x = 10
+define_method(:m) do
+  x + 5
+end
+m # 15
+```
+
+De la misma manera, podemos superar el scope gate que define class reemplazandolo con Class.new
+```ruby
+x = 10
+una_clase = Class.new do
+  x += 5
+end
+x # 15
+```
+
+A esta técnica que permite mantener el mismo contexto se la llama flat scope (contexto aplanado).
+
 ### Contexto y receptor implícito: instance_eval
 Estamos acostumbrados a que, dentro de un método de una clase, podemos mandar un mensaje al objeto actual sin definir ningún receptor.
-
+    
 Por ejemplo: 
 ```ruby
 class Usuario
