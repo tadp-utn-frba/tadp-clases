@@ -147,25 +147,22 @@ describe 'Multimethods' do
     expect(A.new.respond_to?(:concat, false, [String, String])).to eq true
   end
 
-  it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod si acepta una firma que es mas general que la firma pedida' do
-    expect(A.new.respond_to?(:concat, false, [Integer, Integer])).to eq true
+  it 'un objeto no deberia responder al metodo asociado a ese multimethod al no existir un selector con esos mismos tipos' do
+    expect(A.new.respond_to?(:concat, false, [Integer, Integer])).to eq false
   end
 
   it 'un objeto con multimethod no deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos que no coinciden a los de su multimethod' do
-    puts A.new.respond_to?(:concat, false, [String, BasicObject])
     expect(A.new.respond_to?(:concat, false, [String, BasicObject])).to eq false
   end
 
   it 'un Integer con valor 3 con multimethod no deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos que no coinciden a los de su multimethod' do
     expect(3.respond_to?(:concat, false, [String, BasicObject])).to eq false
   end
-#
-#   it 'deberia ejecutarse en el contexto del objeto' do
-#     expect(A.new.concat('sd')).to eq 'Asd'
-#     end
-#
-#
-#
+
+  it 'deberia ejecutarse en el contexto del objeto' do
+    expect(A.new.concat('A','sd')).to eq 'Asd'
+  end
+
 #   it 'deberia permitir agregar multimethods una vez que la clase ya fue creada' do
 #     class B
 #       partial_def :+, [String] { |n| n + 'B' }

@@ -49,9 +49,12 @@ class Module
 end
 
 class Object
-  def respond_to?(name, include_all = true, types=[])
-    return super(name, include_all) if types.empty?
+  def respond_to?(name, include_all = true, types = [])
+    return false unless super(name, include_all)
+    types == [] || respond_to_multimethod?(name, include_all, types)
+  end
 
+  def respond_to_multimethod?(name, include_all, types)
     self.class.multimethod(name).any? do |pb|
       pb.lista_de_tipos == types
     end
