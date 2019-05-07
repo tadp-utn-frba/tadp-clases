@@ -23,74 +23,109 @@ describe 'Partial Block' do
       expect(PartialBlock.new([Object]).matches?('parametro')).to be true
     end
 
-    it 'foo' do
-      class Pepita
-        def m
-          partial = PartialBlock.new([Object]) { |x| m2(x) }
-          partial.call("tres")
-        end
-
-        def m2(x)
-          x
-        end
-      end
-      expect(Pepita.new.m).to eq "tres"
-    end
   end
 
   describe 'call' do
+    # it 'foo' do
+    #   class Pepita
+    #     def m
+    #       partial = PartialBlock.new([Object]) { |x| m2(x) }
+    #       partial.call("tres")
+    #     end
+    #
+    #     def m2(x)
+    #       x
+    #     end
+    #   end
+    #   expect(Pepita.new.m).to eq "tres"
+    # end
+
     it 'raisea argument error cuando no matchean los parametros' do
       expect { PartialBlock.new([String, Fixnum]).call('parametro') }.to raise_error ArgumentError
     end
 
+    it 'raisea argument error cuando no matchean los parametros' do
+      expect { PartialBlock.new([String]).call(3) }.to raise_error ArgumentError
+    end
+
     it 'llama al bloque cuando matchean los parametros' do
-      expect((PartialBlock.new([String]) { 42 }).call('parametro')).to eq 42
+      expect((PartialBlock.new([String]) do |a| 42 end).call('parametro')).to eq 42
+    end
+
+    it 'llama al bloque cuando matchean los parametros' do
+      expect((PartialBlock.new([Object]) do |a| 42 end).call('parametro')).to eq 42
+    end
+
+    it 'llama al bloque cuando matchean los parametros' do
+      expect((PartialBlock.new([Integer, Integer]) do |a, b| a + b end).call(1,2)).to eq 3
     end
   end
 end
 
-# describe 'Multimethods' do
-#   class B
-#     partial_def :concat, [Array, Array, Array] do |x, y, z|
-#       x + y + z
-#     end
-#   end
-#
-#   class A < B
-#     partial_def :concat, [String, String] do |s1, s2|
-#       s1 + s2
-#     end
-#
-#     partial_def :concat, [String, Integer]  do |s1, n|
-#       s1 * n
-#     end
-#
-#     partial_def :concat, [Object, Object] do |o1, o2|
-#       'Objetos Concatenados'
-#     end
-#
-#     partial_def :concat, [String] do |s1|
-#       self.my_name + s1
-#     end
-#
-#     def my_name
-#       'A'
-#     end
-#   end
-#
-#   it 'si existe alguna definicion que matchee para los parametros se usa esa definicion del metodo' do
-#     expect(A.new.concat('hello', ' world')).to eq('hello world')
-#     expect(A.new.concat('hello', 3)).to eq('hellohellohello')
-#   end
-#
-#   it 'si no existe ningún partial block que matchee dados los parametros explota con no method error' do
-#     expect { A.new.concat(['hello', ' world', '!']) }.to raise_error(NoMethodError)
-#   end
-#
-#   it 'si no existe ninguna definicion que matchee en la clase pero si en la super clase, deberia usar la de la superclase' do
-#     expect(A.new.concat([1,2,3], [4,5,6], [])).to eq [1,2,3,4,5,6]
-#   end
-#
+describe 'Multimethods' do
+
+  class B
+    partial_def :concat, [Array, Array, Array] do |x, y, z|
+      x + y + z
+    end
+  end
+
+  class A < B
+    partial_def :concat, [String, String] do |s1, s2|
+      s1 + s2
+    end
+
+    partial_def :concat, [String, Integer]  do |s1, n|
+      s1 * n
+    end
+
+    partial_def :concat, [Array] do |a|
+      a.join
+    end
+
+    partial_def :concat, [Object, Object] do |o1, o2|
+      'Objetos Concatenados'
+    end
+
+    partial_def :concat, [String] do |s1|
+      self.my_name + s1
+    end
+
+    def my_name
+      'A'
+    end
+  end
+
+  it 'caso base' do
+    expect(B.new.concat(['hello'], ['world'], ['!'])).to eq(['hello','world','!'])
+  end
+
+  it 'fallo del caso base' do
+    expect { B.new.concat(1, ['world'], ['!'])}.to raise_error ArgumentError
+  end
+
+  it 'fallo 2 del caso base' do
+    expect { B.new.concat(['world'], ['!'])}.to raise_error ArgumentError
+  end
+
+  it 'si existe alguna definicion que matchee para los parametros se usa esa definicion del metodo' do
+    expect(A.new.concat('hello', ' world')).to eq('hello world')
+    expect(A.new.concat('hello', 3)).to eq('hellohellohello')
+  end
+
+  it 'si no existe ningún partial block que matchee dados los parametros explota con no method error' do
+    expect(A.new.concat(3, 4)).to eq('Objetos Concatenados')
+  end
+
+
+  it 'si no existe ningún partial block que matchee dados los parametros explota con no method error' do
+    expect(A.new.concat(['hello', ' world', '!'])).to eq('hello world!')
+  end
+
+  # it 'si no existe ninguna definicion que matchee en la clase pero si en la super clase, deberia usar la de la superclase' do
+  #   expect(A.new.concat([1,2,3], [4,5,6], [])).to eq [1,2,3,4,5,6]
+  # end
+  #
 #   it 'si no existe pero tiene definido el method_missing se manda method_missing' do
 #     class C < B
 #       def method_missing(*)
@@ -100,25 +135,30 @@ end
 #     expect(C.new.concat(nil,nil,nil,nil)).to eq "No lo encontre"
 #   end
 #
-#   it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod' do
-#     expect(A.new.respond_to?(:concat)).to eq true
-#   end
-#
-#   it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod' do
-#     expect(A.new.respond_to?(:concat)).to eq true
-#   end
-#
-#   it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos' do
-#     expect(A.new.respond_to?(:concat, false, [String, String])).to eq true
-#   end
-#
-#   it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod si acepta una firma que es mas general que la firma pedida' do
-#     expect(A.new.respond_to?(:concat, false, [Integer, Integer])).to eq true
-#   end
-#
-#   it 'un objeto con multimethod no deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos que no coinciden a los de su multimethod' do
-#     expect(A.new.respond_to?(:concat, false, [String, BasicObject])).to eq false
-#   end
+  it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod' do
+    expect(A.new.respond_to?(:concat)).to eq true
+  end
+
+  it 'un objeto con otro multimethod deberia saber responder al metodo asociado a ese multimethod' do
+    expect(A.new.respond_to?(:saraza)).to eq false
+  end
+
+  it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos' do
+    expect(A.new.respond_to?(:concat, false, [String, String])).to eq true
+  end
+
+  it 'un objeto con multimethod deberia saber responder al metodo asociado a ese multimethod si acepta una firma que es mas general que la firma pedida' do
+    expect(A.new.respond_to?(:concat, false, [Integer, Integer])).to eq true
+  end
+
+  it 'un objeto con multimethod no deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos que no coinciden a los de su multimethod' do
+    puts A.new.respond_to?(:concat, false, [String, BasicObject])
+    expect(A.new.respond_to?(:concat, false, [String, BasicObject])).to eq false
+  end
+
+  it 'un Integer con valor 3 con multimethod no deberia saber responder al metodo asociado a ese multimethod dados ciertos tipos que no coinciden a los de su multimethod' do
+    expect(3.respond_to?(:concat, false, [String, BasicObject])).to eq false
+  end
 #
 #   it 'deberia ejecutarse en el contexto del objeto' do
 #     expect(A.new.concat('sd')).to eq 'Asd'
@@ -176,5 +216,5 @@ end
 #     expect(Pepita.new.interactuar_con(Comida.new).energia).to eq 30
 #     expect(Pepita.new.interactuar_con(Entrenador.new).energia).to eq 20
 #   end
-# end
+end
 
