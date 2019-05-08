@@ -1,12 +1,11 @@
 package tadp.clase
 
-class Guerrero {
+class Guerrero(val potencialOfensivo: Int = 20) {
 
   var energia: Int = 100
-  var potencialOfensivo: Int = 20
   var potencialDefensivo: Int = 10
 
-  def atacarA(otro: Guerrero): Unit = {
+  def atacaA(otro: Guerrero): Unit = {
     ???
   }
 
