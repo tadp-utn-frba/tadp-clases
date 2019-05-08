@@ -62,7 +62,7 @@ object Saludador extends App {
       "hola" + alguien.nombre
   }
   
-  new Saludador().saludar(Persona.new("asdds"))
+  new Saludador().saludar(new Persona("asdds"))
 }
 ~~~
 
