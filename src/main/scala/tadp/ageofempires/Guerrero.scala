@@ -1,6 +1,6 @@
 package tadp.ageofempires
 
-class Guerrero(val potencialOfensivo:Int = 20) extends Defensor with Atacante {
+class Guerrero(val potencialOfensivo: Int = 20) extends Defensor with Atacante {
   val potencialDefensivo = 10
 
   def recibeDanio(danio: Int) = {
