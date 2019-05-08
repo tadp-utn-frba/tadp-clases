@@ -79,7 +79,7 @@ Haskell tiene tipado explícito **inferido**. Scala tiene inferencia, pero no pu
 - Implícita
 
 #### Conformación
-- Estructural (duck-typing, pattern matching): Un tipo se referencia por su forma. Ej: f (_,_,a) = a
+- Estructural (duck-typing, pattern matching): Un tipo se referencia por su forma. Ej: `f (_,_,a) = a`
 - Nominal: Un tipo se referencia por su nombre. Ej: String, Int
 
 ### Errores
