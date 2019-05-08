@@ -1,3 +1,10 @@
 /bin/
 .settings
 .cache*
+.classpath
+.project
+.idea/
+project/project
+target/
+tadp-clases.iml
+
