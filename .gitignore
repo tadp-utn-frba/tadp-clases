@@ -33,3 +33,6 @@ app/worksheet
 sass/.sass-cache
 .cache-main
 .cache-tests
+
+.idea/
+tadp-clases.iml
