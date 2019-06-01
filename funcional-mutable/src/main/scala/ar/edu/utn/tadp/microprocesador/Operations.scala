@@ -50,7 +50,7 @@ package object Operations {
     case (s1: Store) :: (s2: Store) :: otherInstructions if s1.address == s2.address => simplify(s2 :: otherInstructions)
     case If(subInstructions) :: otherInstructions =>
       val simplifiedSubInstructions = simplify(subInstructions)
-      if (simplifiedSubInstructions.isEmpty) otherInstructions else If(simplifiedSubInstructions) :: otherInstructions
+      if (simplifiedSubInstructions.isEmpty) simplify(otherInstructions) else If(simplifiedSubInstructions) :: simplify(otherInstructions)
     case Halt :: _ => Halt :: Nil
     case i :: is   => i :: simplify(is)
   }
