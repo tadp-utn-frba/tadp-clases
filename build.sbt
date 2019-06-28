@@ -7,3 +7,10 @@ scalaVersion := "2.12.2"
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
+
+scalacOptions ++= Seq(
+  "-unchecked",
+  "-deprecation",
+  "-feature",
+  "-Xfatal-warnings"
+)

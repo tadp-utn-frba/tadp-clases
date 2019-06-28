@@ -2,29 +2,10 @@ package conversions
 
 object Extensions {
 
-  class Importanteador(s: String) {
-    def importante: String = s + "!"
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  implicit class StringImportante(val s: String) extends AnyVal {
-    def pregunta: String = s + "?"
+  implicit class PullRequestExtensions(val hash: String) extends AnyVal {
+    def pullRequestUrl: String =
+      "https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/pull/" +
+        hash.stripPrefix("#")
   }
 
 }

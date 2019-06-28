@@ -1,5 +1,7 @@
 package conversions
 
+import scala.language.implicitConversions
+
 object Conversions {
 
   case class TwitterUser(id: Long, name: String)

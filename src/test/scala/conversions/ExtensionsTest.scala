@@ -2,28 +2,48 @@ package conversions
 
 import java.util.concurrent.TimeUnit
 
-import conversions.Extensions._
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.concurrent.duration._
+import scala.language.{implicitConversions, postfixOps}
 
 class ExtensionsTest extends WordSpec with Matchers {
 
   "Extensions" should {
 
-    "puedo wrappear un objeto" in {
-      new Importanteador("Hola").importante shouldEqual "Hola!"
+    def hashToUrl(hash: String): String =
+      "https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/pull/" + hash.stripPrefix("#")
+
+    "puedo convertir un hash de pull request a una URL" in {
+      hashToUrl("#34") shouldEqual
+        "https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/pull/34"
     }
 
-    "puedo agregar importante a String" in {
-      implicit def stringToImportanteador(string: String): Importanteador =
-        new Importanteador(string)
+    // Quisiera agregarle ese método a todos los strings:
+    // "#34".hashToUrl
 
-      "Hola".importante shouldEqual "Hola!"
+    class PullRequestHash(s: String) {
+      def pullRequestUrl: String = hashToUrl(s)
     }
 
-    "puedo agregar pregunta a String" in {
-      "Hola".pregunta shouldEqual "Hola?"
+    "puedo wrappear un string con hash" in {
+      new PullRequestHash("#34").pullRequestUrl shouldEqual
+        "https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/pull/34"
+    }
+
+    "puedo convertir un strings a un PullRequestHash" in {
+      implicit def convertirAConHash(s: String): PullRequestHash =
+        new PullRequestHash(s)
+
+      "#34".pullRequestUrl shouldEqual
+        "https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/pull/34"
+    }
+
+    "puedo agregar hashToUrl a los strings" in {
+      import Extensions._
+
+      "#34".pullRequestUrl shouldEqual
+        "https://github.com/tadp-utn-frba/tadp-utn-frba.github.io/pull/34"
     }
 
     "duration" in {
