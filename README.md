@@ -788,7 +788,7 @@ Es importante notar cómo trabajar sobre estructuras mucho menos complejas y efi
 
 Por último, cabe mencionar que ninguno de los dos enfoques es especialmente bueno para realizar transformaciones anidadas o complejas, con lo que no es raro que existan librerías para ambos lenguajes que implementan **[Lenses](http://www.haskellforall.com/2012/01/haskell-for-mainstream-programmers_28.html)** (un patrón de diseño funcionaloso que apunta justamente a eso).
 
-En esto, *Typescript* y sus *Mapped Types* son especialmente simpáticos ya que permiten tipar un contrato dinámico en lugar de tener que basarlo en strings como suele hacerse (aunque no pudimos encontrar una implementación que lo haga y así que tubimos que hacer la nuestra...):
+En esto, *Typescript* y sus *Mapped Types* son especialmente simpáticos ya que permiten tipar un contrato dinámico en lugar de tener que basarlo en strings como suele hacerse (aunque no pudimos encontrar una implementación que lo haga y así que tuvimos que hacer la nuestra...):
 
 ```typescript
 type Lens<T, U> = { [K in keyof U]: Lens<T, U[K]> } & { (t: T, u: U): T, (t: T): U }
