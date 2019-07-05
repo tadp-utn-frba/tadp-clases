@@ -911,7 +911,7 @@ Como se puede ver, en *Kotlin* el código es bastante directo (gracias al operad
 
 Pese a estas facilidades, las funciones en estos lenguajes suelen quedar relegadas a usarse mayormente para parametrizar operaciones de orden superior, ya que curiosamente, al momento de escribir este documento ninguno de los dos lenguajes tiene soporte a nivel sintaxis para componer o combinar funciones, lo cual dificulta hacer construcciones complejas con ellas. Por otro lado, es cierto que en *Kotlin* esto puede modelarse fácilmente con una sintáxis muy fluida gracias a la **Sobrecarga de Operadores** y que *TypeScript* tiene [librerías que cubren esto](https://lodash.com/docs/4.17.5#flow) y algunas propuestas abiertas para incorporar **[piping](https://github.com/Microsoft/TypeScript/issues/17718)** y **[binding](https://github.com/Microsoft/TypeScript/issues/3508)**.
 
-Finalmente, la discusión no estaría completa sin analizar el polimorfismo entre objetos y funciones. En este terreno el modelo de *Kotlin*, que define la aplición basandola en una interfaz, es ampliamente mejor que el de *TypeScript*, donde, si bien las funciones pueden tener propiedades como los objetos, son construcciones completamente diferentes y es imposible aplicar un objeto.
+Finalmente, la discusión no estaría completa sin analizar el polimorfismo entre objetos y funciones. En este terreno el modelo de *Kotlin*, que define la aplicación basandola en una interfaz, es ampliamente mejor que el de *TypeScript*, donde, si bien las funciones pueden tener propiedades como los objetos, son construcciones completamente diferentes y es imposible aplicar un objeto.
 
 **Kotlin**
 ```kotlin
