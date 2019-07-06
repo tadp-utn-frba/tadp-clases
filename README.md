@@ -952,8 +952,8 @@ Uno de los usos más comunes de *Pattern Matching* está asociado a distinguir e
 ```scala
 trait Animal
 
-    def aullar() = "Auuuuuu"
 class Lobo() extends Animal {
+    def aullar() = "Auuuuuu"
 }
 
 class Vaca() extends Animal {
@@ -1186,7 +1186,7 @@ Dicho eso, podemos mencionar dos construcciones muy interesantes asociadas a la 
 
 Conocidas como **[Decorators](http://www.typescriptlang.org/docs/handbook/decorators.html)** en *TypeScript*, **Pragmas** en *Smalltalk*, **Attributes** en *.NET*, **[Annotations](https://kotlinlang.org/docs/reference/annotations.html)** en Kotlin y demas lenguajes de la *JVM* y quién sabe cuantos nombres más, estas herramientas llevan varios años siendo el standard para incorporar *Metadata* en el código (si se le puede llamar "standard" a un concepto sobre el que no nos ponemos de acuerdo ni en cómo se llama).
 
-A grandes razgos, podemos pensar en las *Annotations* como etiquetas estáticas,generalmente parametrizables, con las que podemos marcar las abstracciones del lenguaje (properties, métodos, clases, etc.). Estas etiquetas puede ser luego consultadas a travez de una API de *Reflection* y son comunmente usadas para definir contratos que no dependan de una interfaz de mensajes.
+A grandes rasgos, podemos pensar en las *Annotations* como etiquetas estáticas, generalmente parametrizables, con las que podemos marcar las abstracciones del lenguaje (properties, métodos, clases, etc.). Estas etiquetas puede ser luego consultadas a través de una API de *Reflection* y son comunmente usadas para definir contratos que no dependan de una interfaz de mensajes.
 
 **Kotlin**
 ```kotlin
