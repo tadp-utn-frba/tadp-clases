@@ -23,16 +23,16 @@ El contexto cambia en tres casos (se los suele llamar _scope gates_):
 
 ### Flat scope
 
-Como ya vimos, los bloques, lambdas y procs son distintos porque "recuerdan" el contexto donde fueron creados (son _clojures_)
+Una forma de saltear la restricción de los cambios de contexto, es usar closures.
+Ruby tiene tres tipos de closures: los bloques, lambdas y procs. Su principal característica es que "recuerdan" el contexto donde fueron creados.
 ```ruby
-x = 10
-una_lambda = lambda do
-  x + 2
-end
-una_lambda.call # 12
-```
+a = 5
+p = lambda {a = a + 1}
+p.call # 6
+p.call # 7
 
-Podemos usar esta característica de los clojures para superar los límites de los scope gates
+a   # 7
+```
 
 Para hacer que una variable esté en el contexto de la definición de un método, podemos reemplazar def con define_method.
 ```ruby
@@ -54,9 +54,65 @@ x # 15
 
 A esta técnica que permite mantener el mismo contexto se la llama flat scope (contexto aplanado).
 
+### Bloques / lambdas / procs
+Las lambdas y los procs son objetos que reifican comportamiento y pueden ser ejecutados diferidamente.
+Tienen dos diferencias fundamentales:
+* Cómo manejan los parámetros
+* Cómo se comportan con el return
+```ruby
+lam = lambda { |x| puts x }    # creates a lambda that takes 1 argument
+lam.call(2)                    # prints out 2
+lam.call                       # ArgumentError: wrong number of arguments (0 for 1)
+lam.call(1,2,3)                # ArgumentError: wrong number of arguments (3 for 1)
+
+proc = Proc.new { |x| puts x } # creates a proc that takes 1 argument
+proc.call(2)                   # prints out 2
+proc.call                      # returns nil
+proc.call(1,2,3)               # prints out 1 and forgets about the extra arguments
+---------------------------------------------------------------------------------------------
+def lambda_test
+  lam = lambda { return }
+  lam.call
+  puts "Hello world"
+end
+
+lambda_test                 # calling lambda_test prints 'Hello World'
+
+
+def proc_test
+  proc = Proc.new { return }
+  proc.call
+  puts "Hello world"
+end
+
+proc_test                 # calling proc_test prints nothing
+```
+
+Los bloques (tanto si los escribimos con llaves como con do y end) no son objetos y sólo se puede pasar un bloque como último parámetro del método.
+
+```ruby   
+def bloque_test
+  yield(3)
+end
+
+bloque_test do |x|
+  x + 2
+end
+```
+
+Cuando sea necesario, se puede pasar un proc en lugar de un bloque usando &
+```ruby   
+def bloque_proc_test(&bloque)
+  bloque.call(3)
+end
+
+bloque_test do |x|
+  x + 2
+end
+```
+
 ### Contexto y receptor implícito: instance_eval
 Estamos acostumbrados a que, dentro de un método de una clase, podemos mandar un mensaje al objeto actual sin definir ningún receptor.
-    
 Por ejemplo: 
 ```ruby
 class Usuario
@@ -118,7 +174,7 @@ Usuario.new(19).edad_de.call(Usuario.new(15))
 ```
 
 #### Cambiar el contexto
-Si pudiera cambiar el receptor default de los bloques, podría evitar para por parámetros el destino de mis mensajes!
+Si pudiera cambiar el receptor default de los bloques, podría evitar pasar por parámetros el destino de mis mensajes!
 
 ```ruby
 class Usuario
