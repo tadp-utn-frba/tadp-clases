@@ -59,7 +59,8 @@ Las lambdas y los procs son objetos que reifican comportamiento y pueden ser eje
 Tienen dos diferencias fundamentales:
 * Cómo manejan los parámetros
 * Cómo se comportan con el return
-```ruby
+
+```ruby 
 lam = lambda { |x| puts x }    # creates a lambda that takes 1 argument
 lam.call(2)                    # prints out 2
 lam.call                       # ArgumentError: wrong number of arguments (0 for 1)
@@ -89,7 +90,6 @@ proc_test                 # calling proc_test prints nothing
 ```
 
 Los bloques (tanto si los escribimos con llaves como con do y end) no son objetos y sólo se puede pasar un bloque como último parámetro del método.
-
 ```ruby   
 def bloque_test
   yield(3)
