@@ -13129,7 +13129,7 @@ div#notebook {
 <span class="k">class</span> <span class="nc">A</span>
   <span class="nb">puts</span> <span class="n">x</span>
 <span class="k">end</span>
-<span class="c1"># NameError: undefined local variable or method `x&#39; for A:Class</span>
+<span class="n">b</span><span class="c1"># NameError: undefined local variable or method `x&#39; for A:Class</span>
 
 <span class="k">def</span> <span class="nf">m</span>
   <span class="nb">puts</span> <span class="n">x</span>
@@ -13583,9 +13583,81 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
+<div class=" highlight hl-ruby"><pre><span></span><span class="n">mayor_a_2</span> <span class="o">=</span> <span class="nb">lambda</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span>
+  <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">2</span>
+<span class="p">}</span>
+<span class="o">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">].</span><span class="n">select</span> <span class="o">&amp;</span><span class="n">mayor_a_2</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[12]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[3]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ruby"><pre><span></span><span class="o">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">].</span><span class="n">select</span> <span class="p">{</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span>
+  <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[13]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[2, 3]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="c1"># Cuando sea necesario, se puede pasar un proc en lugar de un bloque usando &amp;</span>
 <span class="k">def</span> <span class="nf">bloque_proc_test</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bloque</span><span class="p">)</span>
   <span class="n">bloque</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+  <span class="vi">@bloque</span> <span class="o">=</span> <span class="n">bloque</span>
 <span class="k">end</span>
 
 <span class="n">bloque_test</span> <span class="k">do</span> <span class="o">|</span><span class="n">x</span><span class="o">|</span>
@@ -13603,7 +13675,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[12]:</div>
+    <div class="prompt output_prompt">Out[14]:</div>
 
 
 
@@ -13627,7 +13699,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="k">class</span> <span class="nc">Usuario</span>
@@ -13655,7 +13727,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[13]:</div>
+    <div class="prompt output_prompt">Out[15]:</div>
 
 
 
@@ -13679,7 +13751,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="k">class</span> <span class="nc">Usuario</span>
@@ -13701,7 +13773,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[14]:</div>
+    <div class="prompt output_prompt">Out[16]:</div>
 
 
 
@@ -13718,18 +13790,18 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="k">class</span> <span class="nc">Usuario</span>
-  <span class="k">def</span> <span class="nf">con_bloque</span><span class="p">(</span><span class="n">bloque</span><span class="p">)</span>
-    <span class="n">bloque</span><span class="o">.</span><span class="n">call</span>
+  <span class="k">def</span> <span class="nf">con_proc</span><span class="p">(</span><span class="n">un_proc</span><span class="p">)</span>
+    <span class="n">un_proc</span><span class="o">.</span><span class="n">call</span>
   <span class="k">end</span>
 <span class="k">end</span>
 
 <span class="n">mayor</span> <span class="o">=</span> <span class="no">Usuario</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">19</span><span class="p">)</span>
 <span class="n">menor</span> <span class="o">=</span> <span class="no">Usuario</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">menor</span><span class="o">.</span><span class="n">con_bloque</span><span class="p">(</span><span class="n">mayor</span><span class="o">.</span><span class="n">lazy_edad</span><span class="p">)</span>
+<span class="n">menor</span><span class="o">.</span><span class="n">con_proc</span><span class="p">(</span><span class="n">mayor</span><span class="o">.</span><span class="n">lazy_edad</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13742,7 +13814,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[15]:</div>
+    <div class="prompt output_prompt">Out[17]:</div>
 
 
 
@@ -13759,7 +13831,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="c1"># Si necesito que el bloque mande mensajes a otro usuario, voy a tener que pasarlo por parámetro</span>
@@ -13782,7 +13854,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[16]:</div>
+    <div class="prompt output_prompt">Out[18]:</div>
 
 
 
@@ -13806,7 +13878,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="k">class</span> <span class="nc">Usuario</span>
@@ -13814,7 +13886,7 @@ div#notebook {
     <span class="nb">proc</span> <span class="p">{</span> <span class="n">edad</span> <span class="p">}</span>
   <span class="k">end</span>
 <span class="k">end</span>
-
+  
 <span class="n">bloque</span> <span class="o">=</span> <span class="n">menor</span><span class="o">.</span><span class="n">edad_de</span>
 </pre></div>
 
@@ -13828,13 +13900,13 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[17]:</div>
+    <div class="prompt output_prompt">Out[19]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>#&lt;Proc:0x000055ecde125068@(pry):103&gt;</pre>
+<pre>#&lt;Proc:0x0000561e2c52c498@(pry):111&gt;</pre>
 </div>
 
 </div>
@@ -13845,7 +13917,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="n">mayor</span><span class="o">.</span><span class="n">instance_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bloque</span><span class="p">)</span>
@@ -13861,7 +13933,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[18]:</div>
+    <div class="prompt output_prompt">Out[20]:</div>
 
 
 
@@ -13878,7 +13950,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="n">menor</span><span class="o">.</span><span class="n">instance_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bloque</span><span class="p">)</span>
@@ -13894,7 +13966,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[19]:</div>
+    <div class="prompt output_prompt">Out[21]:</div>
 
 
 
@@ -13918,7 +13990,98 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ruby"><pre><span></span><span class="nb">puts</span> <span class="nb">self</span>
+<span class="nb">puts</span> <span class="nb">self</span><span class="o">.</span><span class="n">class</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>main
+Object
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ruby"><pre><span></span><span class="n">maiu</span> <span class="o">=</span> <span class="no">Cocinero</span><span class="o">.</span><span class="n">new</span>
+<span class="n">maiu</span><span class="o">.</span><span class="n">preparar_empanadas</span> <span class="k">do</span>
+  <span class="n">saltear_cebolla</span>
+  <span class="n">cocinar_carne</span>
+  <span class="n">agregar</span> <span class="s1">&#39;huevo&#39;</span>
+  <span class="n">agregar</span> <span class="s1">&#39;aceitunas&#39;</span>
+  <span class="n">rellenar_tapas</span>
+  <span class="n">hornear</span>
+<span class="k">end</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">NameError</span>: uninitialized constant Cocinero
+(pry):120:in `&lt;main&gt;&#39;
+/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:355:in `eval&#39;
+/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:355:in `evaluate_ruby&#39;
+/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:323:in `handle_line&#39;
+/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:243:in `block (2 levels) in eval&#39;
+/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:242:in `catch&#39;
+/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:242:in `block in eval&#39;
+/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:241:in `catch&#39;
+/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:241:in `eval&#39;
+/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/backend.rb:66:in `eval&#39;
+/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/backend.rb:12:in `eval&#39;
+/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/kernel.rb:91:in `execute_request&#39;
+/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/kernel.rb:49:in `dispatch&#39;
+/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/kernel.rb:38:in `run&#39;
+/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/command.rb:110:in `run_kernel&#39;
+/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/command.rb:40:in `run&#39;
+/var/lib/gems/2.5.0/gems/iruby-0.4.0/bin/iruby:5:in `&lt;top (required)&gt;&#39;
+/usr/local/bin/iruby:23:in `load&#39;
+/usr/local/bin/iruby:23:in `&lt;main&gt;&#39;</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="k">class</span> <span class="nc">Cocinero</span>
@@ -13965,7 +14128,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[20]:</div>
+    <div class="prompt output_prompt">Out[24]:</div>
 
 
 
@@ -13982,7 +14145,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="k">class</span> <span class="nc">Empanada</span>
@@ -14005,8 +14168,8 @@ div#notebook {
       <span class="n">cocinar_carne</span>
       <span class="n">agregar</span> <span class="s1">&#39;huevo&#39;</span>
       <span class="n">agregar</span> <span class="s1">&#39;aceitunas&#39;</span>
+      <span class="n">agregar</span> <span class="s1">&#39;papa&#39;</span>
       <span class="n">rellenar_tapas</span>
-      <span class="n">agregar_papa</span>
       <span class="n">hornear</span>
     <span class="p">}</span>
   <span class="k">end</span>
@@ -14031,7 +14194,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[21]:</div>
+    <div class="prompt output_prompt">Out[25]:</div>
 
 
 
@@ -14048,7 +14211,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="n">maiu</span> <span class="o">=</span> <span class="no">Cocinero</span><span class="o">.</span><span class="n">new</span>
@@ -14065,13 +14228,13 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[22]:</div>
+    <div class="prompt output_prompt">Out[26]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>#&lt;Empanada:0x000055ecddfb8400 @ingredientes=[&#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;, &#34;aceitunas&#34;], @horneada=true&gt;</pre>
+<pre>#&lt;Empanada:0x0000561e2cb21038 @ingredientes=[&#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;, &#34;aceitunas&#34;], @horneada=true&gt;</pre>
 </div>
 
 </div>
@@ -14082,7 +14245,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="n">axel</span> <span class="o">=</span> <span class="no">Cocinero</span><span class="o">.</span><span class="n">new</span>
@@ -14104,13 +14267,13 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[23]:</div>
+    <div class="prompt output_prompt">Out[27]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>#&lt;Empanada:0x000055ecddf60548 @ingredientes=[&#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;], @horneada=true&gt;</pre>
+<pre>#&lt;Empanada:0x0000561e2cb482c8 @ingredientes=[&#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;], @horneada=true&gt;</pre>
 </div>
 
 </div>
@@ -14121,7 +14284,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="c1"># tucumanas</span>
@@ -14138,36 +14301,15 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt"></div>
+    <div class="prompt output_prompt">Out[28]:</div>
 
 
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-fg">NameError</span>: undefined local variable or method `agregar_papa&#39; for #&lt;Cocinero:0x000055ecddfb86f8&gt;
-Did you mean?  agregar
-(pry):163:in `block in tucumana&#39;
-(pry):118:in `instance_eval&#39;
-(pry):118:in `preparar_empanadas&#39;
-(pry):186:in `&lt;main&gt;&#39;
-/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:355:in `eval&#39;
-/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:355:in `evaluate_ruby&#39;
-/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:323:in `handle_line&#39;
-/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:243:in `block (2 levels) in eval&#39;
-/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:242:in `catch&#39;
-/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:242:in `block in eval&#39;
-/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:241:in `catch&#39;
-/usr/lib/ruby/vendor_ruby/pry/pry_instance.rb:241:in `eval&#39;
-/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/backend.rb:66:in `eval&#39;
-/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/backend.rb:12:in `eval&#39;
-/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/kernel.rb:91:in `execute_request&#39;
-/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/kernel.rb:49:in `dispatch&#39;
-/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/kernel.rb:38:in `run&#39;
-/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/command.rb:110:in `run_kernel&#39;
-/var/lib/gems/2.5.0/gems/iruby-0.4.0/lib/iruby/command.rb:40:in `run&#39;
-/var/lib/gems/2.5.0/gems/iruby-0.4.0/bin/iruby:5:in `&lt;top (required)&gt;&#39;
-/usr/local/bin/iruby:23:in `load&#39;
-/usr/local/bin/iruby:23:in `&lt;main&gt;&#39;</pre>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>#&lt;Empanada:0x0000561e2cb838a0 @ingredientes=[&#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;, &#34;aceitunas&#34;, &#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;, &#34;aceitunas&#34;, &#34;papa&#34;], @horneada=true&gt;</pre>
 </div>
+
 </div>
 
 </div>
@@ -14183,7 +14325,7 @@ Did you mean?  agregar
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="k">class</span> <span class="nc">Cocinero</span>
@@ -14195,9 +14337,9 @@ Did you mean?  agregar
       <span class="k">super</span>
     <span class="k">end</span>
   <span class="k">end</span>
-
-  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">respond_to_missing?</span><span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="n">priv</span> <span class="o">=</span> <span class="kp">false</span><span class="p">)</span>
-    <span class="n">sym</span><span class="o">.</span><span class="n">to_s</span><span class="o">.</span><span class="n">start_with?</span><span class="p">(</span><span class="s1">&#39;agregar_&#39;</span><span class="p">)</span>
+  
+  <span class="k">def</span> <span class="nf">respond_to_missing?</span><span class="p">(</span><span class="n">sym</span><span class="p">,</span> <span class="n">priv</span> <span class="o">=</span> <span class="kp">false</span><span class="p">)</span>
+    <span class="n">sym</span><span class="o">.</span><span class="n">to_s</span><span class="o">.</span><span class="n">start_with?</span><span class="p">(</span><span class="s1">&#39;agregar_&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="k">super</span>
   <span class="k">end</span>
 <span class="k">end</span>
 </pre></div>
@@ -14212,7 +14354,7 @@ Did you mean?  agregar
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[25]:</div>
+    <div class="prompt output_prompt">Out[29]:</div>
 
 
 
@@ -14229,7 +14371,100 @@ Did you mean?  agregar
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ruby"><pre><span></span><span class="n">coc</span> <span class="o">=</span> <span class="no">Cocinero</span><span class="o">.</span><span class="n">new</span>
+<span class="nb">puts</span> <span class="s2">&quot;responde?: </span><span class="si">#{</span><span class="n">coc</span><span class="o">.</span><span class="n">respond_to?</span><span class="p">(</span><span class="ss">:agregar_papa</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nb">puts</span> <span class="s2">&quot;Metodos&quot;</span>
+<span class="nb">puts</span> <span class="no">Cocinero</span><span class="o">.</span><span class="n">instance_methods</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span>
+<span class="n">coc</span><span class="o">.</span><span class="n">agregar_papa</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>responde?: true
+Metodos
+preparar_empanadas
+saltear_cebolla
+cocinar_carne
+agregar
+rellenar_tapas
+hornear
+ingredientes
+empanada
+ingredientes=
+method_missing
+empanada=
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[30]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;papa&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ruby"><pre><span></span><span class="n">coc</span><span class="o">.</span><span class="n">method</span><span class="p">(</span><span class="ss">:agregar_papa</span><span class="p">)</span><span class="o">.</span><span class="n">call</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[31]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#34;papa&#34;, &#34;papa&#34;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[32]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ruby"><pre><span></span><span class="n">maiu</span><span class="o">.</span><span class="n">preparar_empanadas</span><span class="p">(</span><span class="o">&amp;</span><span class="no">Empanada</span><span class="o">.</span><span class="n">tucumana</span><span class="p">)</span> <span class="c1"># ahora si</span>
@@ -14245,13 +14480,13 @@ Did you mean?  agregar
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[26]:</div>
+    <div class="prompt output_prompt">Out[32]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>#&lt;Empanada:0x000055ecdda92638 @ingredientes=[&#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;, &#34;aceitunas&#34;, &#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;, &#34;aceitunas&#34;, &#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;, &#34;aceitunas&#34;, &#34;papa&#34;], @horneada=true&gt;</pre>
+<pre>#&lt;Empanada:0x0000561e2cc29b38 @ingredientes=[&#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;, &#34;aceitunas&#34;, &#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;, &#34;aceitunas&#34;, &#34;papa&#34;, &#34;cebolla salteada&#34;, &#34;carne cocida&#34;, &#34;huevo&#34;, &#34;aceitunas&#34;, &#34;papa&#34;], @horneada=true&gt;</pre>
 </div>
 
 </div>
