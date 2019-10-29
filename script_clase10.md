@@ -7,7 +7,7 @@ Recordamos las Listas de Haskell, cómo estaban definidas, cómo podíamos traba
 
 Recordamos algunas operaciones como *filter*, *map*, *flatMap* y *fold*, qué tipo tenían, cómo se usaban y cuál es la intuición de las abstracciones que encapsulan. El objetivo es entender que estas operaciones pueden ser pensadas de forma independiente a los detalles de implementación de la lista; para eso tratamos de olvidarnos de las listas y pensar las operaciones en terminos de "cajas":
 
-- filter: dada una caja[A] y una función A => Bool, abre la caja, toma de su contenido los elementos que pasan la función criterio y los pone en una nueva caja[A].
+- filter: dada una caja[A] y una función A => Bool, abre la caja, el contenido que pasa la función criterio lo pone en una nueva caja[A].
 
 - map: dada una caja[A] y una función A => B, abre la caja, transforma el contenido usando la función y retorna el resultado en una nueva caja[B].
 
