@@ -1,4 +1,4 @@
-# Clase 3 TADP 2C2016
+# Clase 3 TADP
 
 ## METAPROGRAMACION
 Es el proceso o la práctica por la cual escribimos programas que generan, manipulan o utilizan otros programas.
