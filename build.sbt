@@ -14,5 +14,3 @@ resolvers ++= Seq(
 libraryDependencies ++= List(
         "org.scalatest" %% "scalatest" % "2.2.4" % "test"
         )
-        
-EclipseKeys.withSource := true
