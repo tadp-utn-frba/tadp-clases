@@ -4,6 +4,7 @@ import scala.collection.mutable.Set
 
 object GranjaApp2 extends App {
   var f: Vaca => Vaca = null
+//  var f: Function[Vaca, Vaca] = null
 
   def g(vaca: Vaca): Vaca = ??? // Recibe una Vaca y devuelve una Vaca
   def h(vaca: Vaca): Animal = ??? // Devuelve un Animal
