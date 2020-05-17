@@ -219,7 +219,7 @@ class Function1[-P,+R]{ // Clase de las funciones de un parámetro.
 También se puede decir que un parámetro sea covariante o contravariante a partir de cierto punto de la jerarquía de tipos.
 
 ~~~scala
-class Foo[+T <: Vaca, -R >: Animal]{
+class Foo[+T <: Vaca, -R >: Animal] {
     // T es COVARIANTE para los subtipos de Vaca.
     // Puedo pasarle una Vaca o una Vaca loca, pero no un Animal.
     // R es CONTRAVARIANTE para los supertipos de Animal.
@@ -227,6 +227,42 @@ class Foo[+T <: Vaca, -R >: Animal]{
 …
 }
 ~~~
+
+### Ejemplo de contravarianza
+Creemos una clase abstracta Printer que define un método print que imprime por la consola un objeto del tipo T: 
+```scala
+abstract class Printer[-T] {
+  def print(t: T): Unit
+}
+
+// Sabe imprimir animales
+class AnimalPrinter extends Printer[Animal] {
+    override def print(t: Animal): Unit = {
+      println(s"Este animal pesa: ${t.peso}")
+    }
+}
+
+// Sabe imprimir vacas locas
+class VacaLocaPrinter extends Printer[VacaLoca] {
+    override def print(t: VacaLoca): Unit = {
+      println(s"Una vaca loca se ríe así: ${t.reite}")
+    }
+}
+```
+
+Veamos ejemplos de uso
+
+```scala
+var printer: Printer[VacaLoca] = new VacaLocaPrinter
+printer.print(new VacaLoca) // imprime: "Una vaca loca se ríe así: Muajajajjaajja"
+```
+
+Y como Printer es contravariante con respecto a su parámetro de tipo T, podemos guardar un objeto de tipo Printer[Animal] en una variable de tipo Printer[VacaLoca]
+```scala
+printer = new AnimalPrinter
+printer.print(new VacaLoca) // imprime: "Este animal pesa: 100"
+```
+Esto es correcto porque print de AnimalPrinter espera un parámetro de tipo Animal (puede imprimir cualquier animal), y la variable printer solo acepta VacaLoca, que entiende todos los mensajes de Animal.
 
 -------------------
 
@@ -269,3 +305,38 @@ lechero.ordeñar(corralito)           // Esto también! Yupi!
 Ojo! Que la lista sea inmutable no significa que el corral tenga que serlo. De hecho, alcanzaría con cambiar el val por un var.
 
 Elegir en donde tener efecto colateral y en donde no es una decisión de diseño REEEE importante.
+
+### Covarianza
+Aprovechando las nuevas herramientas, podemos definir que los corrales de vacas sean subclases de los corrales de animales, usando covarianza:
+```scala
+class Corral[+T <: Animal](val animales: List[T])
+
+// Ahora podemos hacer esto:
+val corralDeVacas: Corral[Vaca] = new Corral(new Vaca, new Vaca, new VacaLoca)
+var corralDeAnimales: Corral[Animal] = corralDeVacas // Ahora es válido
+```
+
+La covarianza no viene gratis, una de las grandes limitantes es que no podemos definir un método que reciba T, porque T es covariante y el parámetro de una función es una posición contravariante:
+```scala
+class Corral[+T <: Animal](val animales: List[T]) {
+  def contiene(t: T): Boolean = ??? // covariant type T occurs in contravariant position in type T of value t
+}
+```
+
+Lo que podemos hacer para mitigar esto es usar lower bounds:
+
+```scala
+class Corral[+T <: Animal](val animales: List[T]) {
+  // [T1 >: T] significa "T1 tiene que ser una superclase de T"
+  def contiene[T1 >: T](t: T1): Boolean = ??? // covariant type T occurs in contravariant position in type T of value t
+}
+```
+
+Esto nos permite evitar en tiempo de compilación que se pueda llamar con cualquier objeto (que es imposible que sea contenido por el corral):
+
+```scala
+corralDeVacas.contiene[Int](123) // type arguments [Int] do not conform to class Corral's type parameter bounds [+T <: granja.Animal]
+
+// La desventaja es que también se puede
+corralDeVacas.contiene[AnyRef]("Vaca") // Funciona porque AnyRef es una superclase de Vaca
+```

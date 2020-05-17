@@ -2,7 +2,7 @@ package granja
 
 import scala.collection.mutable.Set
 
-class Corral(val animales: Set[Animal])
+class Corral[T <: Animal](val animales: Set[Animal])
 
 class Pastor {
   def pastorear(animales: Set[Animal]) = animales.foreach (_.come)

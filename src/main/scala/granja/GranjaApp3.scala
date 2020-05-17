@@ -2,7 +2,7 @@ package granja
 
 object GranjaApp3 extends App {
 
-  abstract class Printer[T] {
+  abstract class Printer[-T] {
     def print(t: T): Unit
   }
 
@@ -17,9 +17,10 @@ object GranjaApp3 extends App {
     }
   }
 
-  val printer: Printer[VacaLoca] = new VacaLocaPrinter
-//  val printer: Printer[VacaLoca] = new AnimalPrinter
+  var printer: Printer[VacaLoca] = new VacaLocaPrinter
+  printer.print(new VacaLoca)
 
+  printer = new AnimalPrinter
   printer.print(new VacaLoca)
 
 }
