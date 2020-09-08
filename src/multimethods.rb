@@ -54,6 +54,7 @@ class PartialBlock
     tipo_recibido = par[0] #Por ejemplo, Integer, Numeric, Object, String
     if tipo_definido.is_a? Array
       tipo_definido.all? do |mensaje|
+        ## TODO: mostrar alternativas con instance_methods.include?
         tipo_recibido.method_defined? mensaje
       end
     else

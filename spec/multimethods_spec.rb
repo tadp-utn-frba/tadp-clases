@@ -158,8 +158,5 @@ describe "partial_def" do
         F.new.formatear("Pesado", Perro.new(32))
     ).to eq("Pesado 32")
   end
-
-
-
 end
 
