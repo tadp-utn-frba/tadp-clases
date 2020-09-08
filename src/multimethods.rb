@@ -75,7 +75,7 @@ class Multimethod
 
   def call(this, *args)
     partial_block = definiciones.values
-        .filter { |it| it.matches? *args }
+        .select { |it| it.matches? *args }
         .min_by { |it| it.distance_to *args}
 
     return this.method_missing(*args) if partial_block.nil?
