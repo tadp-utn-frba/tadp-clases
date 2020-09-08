@@ -1,6 +1,17 @@
 require "rspec"
 require_relative "../src/multimethods"
 
+describe "construcción de partial block" do
+  it("deberia poder crearse con una lista de longitud acorde al bloque") do
+    expect { PartialBlock.new([String]) do |s| "mucho no importa" end }.not_to raise_error
+  end
+  it("no deberia poder crearse con una lista de longitud menor a la aridad del bloque") do
+    expect { PartialBlock.new([String]) do |s1, s2| "mucho no importa" end }.to raise_error("El bloque no coincide con los tipos")
+  end
+  it("no deberia poder crearse con una lista de longitud mayor a la aridad del bloque") do
+    expect { PartialBlock.new([String, String]) do |s1| "mucho no importa" end }.to raise_error("El bloque no coincide con los tipos")
+  end
+end
 
 describe "matches" do
   it("deberia matchear el mismo tipo") do
@@ -51,7 +62,7 @@ describe "call" do
     expect{helloBlock.call(1)}.to raise_error("El bloque no coincide con los argumentos")
   end
 end
-
+=begin
 describe "partial_def" do
   class A
     partial_def :concat, [String, String] do |s1,s2|
@@ -160,3 +171,4 @@ describe "partial_def" do
   end
 end
 
+=end
