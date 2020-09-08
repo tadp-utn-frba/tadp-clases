@@ -85,11 +85,11 @@ describe 'Multimethods' do
 
   it 'deberia permitir agregar multimethods una vez que la clase ya fue creada' do
     class B
-      partial_def :+, [String] { |n| n + 'B' }
+      partial_def :+, [String] do |n| n + 'B' end
     end
 
     class B
-      partial_def :+, [Float] { |n| 42 }
+      partial_def :+, [Float] do |n| 42 end
     end
 
     expect(B.new + 'asd').to eq 'asdB'
