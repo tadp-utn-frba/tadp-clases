@@ -92,78 +92,110 @@ describe "Partial Blocks" do
   end
 end
 
-=begin
-describe "partial_def" do
-  class A
-    partial_def :concat, [String, String] do |s1,s2|
-      s1 + s2
+describe "Multi Methods" do
+  describe "partial_def" do
+    class A
+      partial_def :concat, [String, String] do |s1,s2|
+        s1 + s2
+      end
+
+      partial_def :concat, [String, Integer] do |s1,n|
+        s1 * n
+      end
+
+      partial_def :concat, [Array] do |a|
+        a.join
+      end
     end
 
-    partial_def :concat, [String, Integer] do |s1,n|
-      s1 * n
+    module B
+      partial_def :concat, [String, Integer] do |s1,n|
+        s1 * n
+      end
+
+      partial_def :concat, [Object, Object] do |o1, o2|
+        "Objetos concatenados"
+      end
     end
 
-    partial_def :concat, [Array] do |a|
-      a.join
+    it("se puede usar un multimethod con las distintas firmas soportadas") do
+      expect(A.new.concat('hello', ' world')).to eq('hello world')
+      expect(A.new.concat('hello', 3)).to eq('hellohellohello')
+      expect(A.new.concat(['hello', ' world', '!'])).to eq('hello world!')
     end
-  end
-
-  it("deberia funcionar concat") do
-    expect(A.new.concat('hello', ' world')).to eq('hello world')
-    expect(A.new.concat('hello', 3)).to eq('hellohellohello')
-    expect(A.new.concat(['hello', ' world', '!'])).to eq('hello world!')
-
-      #A.new.concat('hello', 'world', '!') # Lanza una excepción!
-  end
-
-  class C
-    partial_def :blah, [String, String] do |s1,s2|
-      s1 + s2
-    end
-  end
-
-  it 'debería saber si responde a un mensaje' do
-    expect(C.new.respond_to? :blah).to be(true)
-  end
-
-  it 'debería saber si responde a un mensaje con tipos' do
-    expect(C.new.respond_to? :blah, false, [String, String]).to be(true)
-  end
-
-  it 'debería saber si no responde a un mensaje con tipos' do
-    expect(C.new.respond_to? :blah, false, [Integer, Integer]).to be(false)
-  end
-
-  class Soldado
-# ... implementación de soldado
-  end
-
-  class Tanque
-    def ataca_con_canion(objetivo)
-      "canion"
+    it("si se usa un multimethod con una firma no soportada, explota") do
+      expect {A.new.concat('hello', 'world', '!')}.to raise_error
     end
 
-    def ataca_con_ametralladora(objetivo)
-      "ametralladora"
+    it("se pueden conocer qué multimethods define una clase o módulo")do
+      expect(A.multimethods()).to eq([:concat])
+      expect(B.multimethods()).to eq([:concat])
     end
-
-    partial_def :ataca_a, [Tanque] do |objetivo|
-      self.ataca_con_canion(objetivo)
+    it("se puede obtener un multimethod definido")do
+      multimethod = A.multimethod(:concat)
+      expect(multimethod).not_to eq(nil) #TODO: qué esperamos?
     end
+    it("se tiene en cuenta la distancia si mas de una firma matchea") do
+      una_clase = Class.new
+      una_clase.include(B)
 
-    partial_def :ataca_a, [Soldado] do |objetivo|
-      self.ataca_con_ametralladora(objetivo)
+      expect(una_clase.new.concat("Hello", 2)).to eq("HelloHello")
+      expect(una_clase.new.concat(Object.new, 2)).to eq("Objetos concatenados")
     end
   end
+  describe "respond_to?" do
+    class C
+      partial_def :blah, [String, String] do |s1,s2|
+        s1 + s2
+      end
+    end
 
-  it "deberia funcionar con self" do
-    tanque = Tanque.new
-    soldado = Soldado.new
+    it 'debería saber si responde a un mensaje' do
+      expect(C.new.respond_to? :blah).to be(true)
+    end
 
-    expect(tanque.ataca_a(soldado)).to eq("ametralladora")
-    expect(tanque.ataca_a(tanque)).to eq("canion")
+    it 'debería saber si responde a un mensaje con tipos' do
+      expect(C.new.respond_to? :blah, false, [String, String]).to be(true)
+    end
+
+    it 'debería saber si no responde a un mensaje con tipos' do
+      expect(C.new.respond_to? :blah, false, [Integer, Integer]).to be(false)
+    end
   end
+  describe "definiciones con self" do
+    class Soldado
+  # ... implementación de soldado
+    end
 
+    class Tanque
+      def ataca_con_canion(objetivo)
+        "canion"
+      end
+
+      def ataca_con_ametralladora(objetivo)
+        "ametralladora"
+      end
+
+      partial_def :ataca_a, [Tanque] do |objetivo|
+        self.ataca_con_canion(objetivo)
+      end
+
+      partial_def :ataca_a, [Soldado] do |objetivo|
+        self.ataca_con_ametralladora(objetivo)
+      end
+    end
+
+    it "deberia funcionar con self" do
+      tanque = Tanque.new
+      soldado = Soldado.new
+
+      expect(tanque.ataca_a(soldado)).to eq("ametralladora")
+      expect(tanque.ataca_a(tanque)).to eq("canion")
+    end
+  end
+end
+
+describe "Duck Typing" do
   class F
     partial_def :formatear, [String, [:nombre, :direccion]] do |titulo, coso|
       titulo + " | " + coso.nombre + ": " + coso.direccion
@@ -200,5 +232,3 @@ describe "partial_def" do
     ).to eq("Pesado 32")
   end
 end
-
-=end
