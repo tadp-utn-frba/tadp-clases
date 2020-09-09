@@ -7,10 +7,10 @@ describe "Partial Blocks" do
       expect { PartialBlock.new([String]) do |s| "mucho no importa" end }.not_to raise_error
     end
     it("no deberia poder crearse con una lista de longitud menor a la aridad del bloque") do
-      expect { PartialBlock.new([String]) do |s1, s2| "mucho no importa" end }.to raise_error("El bloque no coincide con los tipos")
+      expect { PartialBlock.new([String]) do |s1, s2| "mucho no importa" end }.to raise_error("El bloque debería tener la misma aridad que la lista de tipos")
     end
     it("no deberia poder crearse con una lista de longitud mayor a la aridad del bloque") do
-      expect { PartialBlock.new([String, String]) do |s1| "mucho no importa" end }.to raise_error("El bloque no coincide con los tipos")
+      expect { PartialBlock.new([String, String]) do |s1| "mucho no importa" end }.to raise_error("El bloque debería tener la misma aridad que la lista de tipos")
     end
   end
 
