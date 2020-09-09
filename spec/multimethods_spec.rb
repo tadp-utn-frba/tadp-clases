@@ -31,6 +31,18 @@ describe "Partial Blocks" do
       expect(un_bloque.matches?("unString")).to be(true)
     end
 
+    it("deberia aceptar modulos como tipos para la firma") do
+      un_modulo = Module.new
+      una_clase = Class.new
+      una_clase.include(un_modulo)
+
+      un_bloque = PartialBlock.new([un_modulo]) do |s|
+        "mucho no importa"
+      end
+
+      expect(un_bloque.matches?(una_clase.new)).to be(true)
+    end
+
     it("deberia no matchear si no hay relación") do
       un_bloque = PartialBlock.new([String]) do |s|
         "mucho no importa"
