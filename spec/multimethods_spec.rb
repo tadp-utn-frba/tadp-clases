@@ -1,74 +1,85 @@
 require "rspec"
 require_relative "../src/multimethods"
 
-describe "construcción de partial block" do
-  it("deberia poder crearse con una lista de longitud acorde al bloque") do
-    expect { PartialBlock.new([String]) do |s| "mucho no importa" end }.not_to raise_error
+describe "Partial Blocks" do
+  describe "construcción de partial block" do
+    it("deberia poder crearse con una lista de longitud acorde al bloque") do
+      expect { PartialBlock.new([String]) do |s| "mucho no importa" end }.not_to raise_error
+    end
+    it("no deberia poder crearse con una lista de longitud menor a la aridad del bloque") do
+      expect { PartialBlock.new([String]) do |s1, s2| "mucho no importa" end }.to raise_error("El bloque no coincide con los tipos")
+    end
+    it("no deberia poder crearse con una lista de longitud mayor a la aridad del bloque") do
+      expect { PartialBlock.new([String, String]) do |s1| "mucho no importa" end }.to raise_error("El bloque no coincide con los tipos")
+    end
   end
-  it("no deberia poder crearse con una lista de longitud menor a la aridad del bloque") do
-    expect { PartialBlock.new([String]) do |s1, s2| "mucho no importa" end }.to raise_error("El bloque no coincide con los tipos")
-  end
-  it("no deberia poder crearse con una lista de longitud mayor a la aridad del bloque") do
-    expect { PartialBlock.new([String, String]) do |s1| "mucho no importa" end }.to raise_error("El bloque no coincide con los tipos")
-  end
-end
 
-describe "matches" do
-  it("deberia matchear el mismo tipo") do
-      un_bloque = PartialBlock.new([String]) do |s|
+  describe "matches" do
+    it("deberia matchear el mismo tipo") do
+        un_bloque = PartialBlock.new([String]) do |s|
+          "mucho no importa"
+        end
+
+        expect(un_bloque.matches?("unString")).to be(true)
+    end
+
+    it("deberia matchear super tipo") do
+      un_bloque = PartialBlock.new([Object]) do |s|
         "mucho no importa"
       end
 
       expect(un_bloque.matches?("unString")).to be(true)
-  end
-
-  it("deberia matchear super tipo") do
-    un_bloque = PartialBlock.new([Object]) do |s|
-      "mucho no importa"
     end
 
-    expect(un_bloque.matches?("unString")).to be(true)
-  end
+    it("deberia no matchear si no hay relación") do
+      un_bloque = PartialBlock.new([String]) do |s|
+        "mucho no importa"
+      end
 
-  it("deberia no matchear si no hay relación") do
-    un_bloque = PartialBlock.new([String]) do |s|
-      "mucho no importa"
+      expect(un_bloque.matches?(3)).to be(false)
+    end
+    it("deberia no matchear si no coincide la cantidad de argumentos") do
+      un_bloque = PartialBlock.new([String]) do |s|
+        "mucho no importa"
+      end
+
+      expect(un_bloque.matches?("hola", "mundo")).to be(false)
     end
 
-    expect(un_bloque.matches?(3)).to be(false)
+    it("deberia matchear con multiples parámetros") do
+      un_bloque = PartialBlock.new([String, String]) do |s1, s2|
+        "mucho no importa"
+      end
+
+      expect(un_bloque.matches?("s1", "s2")).to be(true)
+      expect(un_bloque.matches?("s1", 1)).to be(false)
+      expect(un_bloque.matches?(1, 3)).to be(false)
+    end
   end
-  it("deberia no matchear si no coincide la cantidad de argumentos") do
-    un_bloque = PartialBlock.new([String]) do |s|
-      "mucho no importa"
+
+  describe "call" do
+    helloBlock = PartialBlock.new([String]) do |who|
+      "Hello #{who}"
     end
 
-    expect(un_bloque.matches?("hola", "mundo")).to be(false)
-  end
-
-  it("deberia matchear con multiples parámetros") do
-    un_bloque = PartialBlock.new([String, String]) do |s1, s2|
-      "mucho no importa"
+    it("deberia ejecutar con el parámetro que le paso") do
+      expect(helloBlock.call("Juan")).to eq("Hello Juan")
     end
 
-    expect(un_bloque.matches?("s1", "s2")).to be(true)
-    expect(un_bloque.matches?("s1", 1)).to be(false)
-    expect(un_bloque.matches?(1, 3)).to be(false)
+    it("deberia arrojar error cuando le paso un tipo que no corresponde") do
+      expect{helloBlock.call(1)}.to raise_error("El bloque no coincide con los argumentos")
+    end
+
+    it("deberia ejecutarse con instancias de subtipos") do
+      pairBlock = PartialBlock.new([Object, Object]) do |left, right|
+        [left, right]
+      end
+
+      expect(pairBlock.call("hello", 1)).to eq(["hello",1])
+    end
   end
 end
 
-describe "call" do
-  helloBlock = PartialBlock.new([String]) do |who|
-    "Hello #{who}"
-  end
-
-  it("deberia ejecutar con el parámetro que le paso") do
-    expect(helloBlock.call("Juan")).to eq("Hello Juan")
-  end
-
-  it("deberia arrojar error cuando le paso un tipo que no corresponde") do
-    expect{helloBlock.call(1)}.to raise_error("El bloque no coincide con los argumentos")
-  end
-end
 =begin
 describe "partial_def" do
   class A
