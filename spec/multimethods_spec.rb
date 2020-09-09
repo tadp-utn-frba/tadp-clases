@@ -37,6 +37,13 @@ describe "matches" do
 
     expect(un_bloque.matches?(3)).to be(false)
   end
+  it("deberia no matchear si no coincide la cantidad de argumentos") do
+    un_bloque = PartialBlock.new([String]) do |s|
+      "mucho no importa"
+    end
+
+    expect(un_bloque.matches?("hola", "mundo")).to be(false)
+  end
 
   it("deberia matchear con multiples parámetros") do
     un_bloque = PartialBlock.new([String, String]) do |s1, s2|
