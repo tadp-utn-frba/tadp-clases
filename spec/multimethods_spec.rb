@@ -109,12 +109,11 @@ describe "Multi Methods" do
     end
 
     module B
-      partial_def :concat, [String, Integer] do |s1,n|
-        s1 * n
-      end
-
       partial_def :concat, [Object, Object] do |o1, o2|
         "Objetos concatenados"
+      end
+      partial_def :concat, [String, Integer] do |s1,n|
+        s1 * n
       end
     end
 
@@ -127,8 +126,10 @@ describe "Multi Methods" do
       expect {A.new.concat('hello', 'world', '!')}.to raise_error
     end
 
-    it("se pueden conocer qué multimethods define una clase o módulo")do
+    it("se pueden conocer qué multimethods define una clase")do
       expect(A.multimethods()).to eq([:concat])
+    end
+    it("se pueden conocer qué multimethods define un módulo")do
       expect(B.multimethods()).to eq([:concat])
     end
     it("se puede obtener un multimethod definido")do
@@ -136,6 +137,7 @@ describe "Multi Methods" do
       expect(multimethod).not_to eq(nil) #TODO: qué esperamos?
     end
     it("se tiene en cuenta la distancia si mas de una firma matchea") do
+      # FIXME: con un find, sale primero el correcto y da verde el test
       una_clase = Class.new
       una_clase.include(B)
 
