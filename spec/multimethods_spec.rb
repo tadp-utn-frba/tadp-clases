@@ -129,7 +129,7 @@ describe "Multi Methods" do
       expect(una_clase.new.concat(1, 2)).to eq("Objetos concatenados")
     end
     it("si se usa un multimethod con una firma no soportada, explota") do
-      expect {A.new.concat('hello', 'world', '!')}.to raise_error("El bloque no coincide con los argumentos")
+      expect {A.new.concat('hello', 'world', '!')}.to raise_error("Ninguna definición aplica para los argumentos")
     end
 
     it("se pueden conocer qué multimethods define una clase")do
@@ -230,7 +230,7 @@ describe "Duck Typing" do
   end
   it "deberia fallar si ninguna firma aplica usando ducktyping" do
     expect {F.new.formatear("EXPLOTO", "Hola")}
-        .to raise_error("El bloque no coincide con los argumentos")
+        .to raise_error("Ninguna definición aplica para los argumentos")
   end
 
   it "deberia soportar ducktyping" do
