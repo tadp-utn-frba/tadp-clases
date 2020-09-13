@@ -92,6 +92,8 @@ describe "Partial Blocks" do
   end
 end
 
+=begin
+
 describe "Multi Methods" do
   describe "partial_def" do
     class A
@@ -243,3 +245,5 @@ describe "Duck Typing" do
     ).to eq("Pesado 32")
   end
 end
+
+=end
