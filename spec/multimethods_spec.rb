@@ -122,8 +122,14 @@ describe "Multi Methods" do
       expect(A.new.concat('hello', 3)).to eq('hellohellohello')
       expect(A.new.concat(['hello', ' world', '!'])).to eq('hello world!')
     end
+    it("se puede usar un multimethod definido en un modulo") do
+      una_clase = Class.new
+      una_clase.include(B)
+
+      expect(una_clase.new.concat(1, 2)).to eq("Objetos concatenados")
+    end
     it("si se usa un multimethod con una firma no soportada, explota") do
-      expect {A.new.concat('hello', 'world', '!')}.to raise_error
+      expect {A.new.concat('hello', 'world', '!')}.to raise_error("El bloque no coincide con los argumentos")
     end
 
     it("se pueden conocer qué multimethods define una clase")do
@@ -137,7 +143,6 @@ describe "Multi Methods" do
       expect(multimethod).not_to eq(nil) #TODO: qué esperamos?
     end
     it("se tiene en cuenta la distancia si mas de una firma matchea") do
-      # FIXME: con un find, sale primero el correcto y da verde el test
       una_clase = Class.new
       una_clase.include(B)
 
@@ -222,6 +227,10 @@ describe "Duck Typing" do
       @edad = edad
       @peso = peso
     end
+  end
+  it "deberia fallar si ninguna firma aplica usando ducktyping" do
+    expect {F.new.formatear("EXPLOTO", "Hola")}
+        .to raise_error("El bloque no coincide con los argumentos")
   end
 
   it "deberia soportar ducktyping" do
