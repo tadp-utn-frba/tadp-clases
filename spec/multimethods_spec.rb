@@ -4,13 +4,16 @@ require_relative "../src/multimethods"
 describe "Partial Blocks" do
   describe "construcción de partial block" do
     it("deberia poder crearse con una lista de longitud acorde al bloque") do
-      expect { PartialBlock.new([String]) do |s| "mucho no importa" end }.not_to raise_error
+      expect { PartialBlock.new([String]) do |s| "mucho no importa" end }
+          .not_to raise_error
     end
     it("no deberia poder crearse con una lista de longitud menor a la aridad del bloque") do
-      expect { PartialBlock.new([String]) do |s1, s2| "mucho no importa" end }.to raise_error("El bloque debería tener la misma aridad que la lista de tipos")
+      expect { PartialBlock.new([String]) do |s1, s2| "mucho no importa" end }
+          .to raise_error("El bloque debería tener la misma aridad que la lista de tipos")
     end
     it("no deberia poder crearse con una lista de longitud mayor a la aridad del bloque") do
-      expect { PartialBlock.new([String, String]) do |s1| "mucho no importa" end }.to raise_error("El bloque debería tener la misma aridad que la lista de tipos")
+      expect { PartialBlock.new([String, String]) do |s1| "mucho no importa" end }
+          .to raise_error("El bloque debería tener la misma aridad que la lista de tipos")
     end
   end
 
@@ -79,7 +82,8 @@ describe "Partial Blocks" do
     end
 
     it("deberia arrojar error cuando le paso un tipo que no corresponde") do
-      expect{helloBlock.call(1)}.to raise_error("El bloque no coincide con los argumentos")
+      expect{helloBlock.call(1)}
+          .to raise_error("El bloque no coincide con los argumentos")
     end
 
     it("deberia ejecutarse con instancias de subtipos") do
@@ -91,8 +95,8 @@ describe "Partial Blocks" do
     end
   end
 end
-
 =begin
+
 
 describe "Multi Methods" do
   describe "partial_def" do
@@ -131,7 +135,8 @@ describe "Multi Methods" do
       expect(una_clase.new.concat(1, 2)).to eq("Objetos concatenados")
     end
     it("si se usa un multimethod con una firma no soportada, explota") do
-      expect {A.new.concat('hello', 'world', '!')}.to raise_error("Ninguna definición aplica para los argumentos")
+      expect {A.new.concat('hello', 'world', '!')}
+          .to raise_error("Ninguna definición aplica para los argumentos")
     end
 
     it("se pueden conocer qué multimethods define una clase")do
