@@ -95,7 +95,6 @@ describe "Partial Blocks" do
     end
   end
 end
-=begin
 
 
 describe "Multi Methods" do
@@ -251,4 +250,3 @@ describe "Duck Typing" do
   end
 end
 
-=end
