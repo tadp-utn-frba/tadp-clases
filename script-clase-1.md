@@ -134,7 +134,7 @@ end
 
 * Otra característica esencial de los Mixins es el concepto de *linearization.*
 
-Sobre esto no hablamos mucho, para profundizar más conviene leer en: http://www.bracha.org/oopsla90.pdf
+Sobre esto no hablamos mucho, para profundizar más conviene leer en [el paper de traits de Bracha](https://bracha.org/oopsla90.pdf)
 
 ### ¿Conviene poner todo el código en los Mixins?
 
@@ -148,7 +148,7 @@ Código de la clase:
 
 Leer el paper donde se presenta la idea de Mixins:
 
-[http://www.bracha.org/oopsla90.pdf](http://www.bracha.org/oopsla90.pdf)
+[https://bracha.org/oopsla90.pdf](https://bracha.org/oopsla90.pdf)
 
 Leer la idea de Traits:
 
