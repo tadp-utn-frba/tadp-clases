@@ -134,7 +134,7 @@ end
 
 * Otra característica esencial de los Mixins es el concepto de *linearization.*
 
-Sobre esto no hablamos mucho, para profundizar más conviene leer en: 
+Sobre esto no hablamos mucho, para profundizar más conviene leer en: http://www.bracha.org/oopsla90.pdf
 
 ### ¿Conviene poner todo el código en los Mixins?
 
