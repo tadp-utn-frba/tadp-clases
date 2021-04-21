@@ -732,7 +732,7 @@ en base al contexto.
 - [http://docs.scala-lang.org/tutorials/tour/case-classes.html](http://docs.scala-lang.org/tutorials/tour/case-classes.html)
 - [http://docs.scala-lang.org/overviews/core/string-interpolation.html](http://docs.scala-lang.org/overviews/core/string-interpolation.html)
 - [http://docs.scala-lang.org/overviews/core/implicit-classes.html](http://docs.scala-lang.org/overviews/core/implicit-classes.html)
-- [http://docs.scala-lang.org/tutorials/tour/implicit-conversions](http://docs.scala-lang.org/tutorials/tour/implicit-conversions)
+- [https://docs.scala-lang.org/tour/implicit-conversions.html](https://docs.scala-lang.org/tour/implicit-conversions.html)
 - [http://docs.scala-lang.org/tutorials/tour/implicit-parameters.html](http://docs.scala-lang.org/tutorials/tour/implicit-parameters.html)
 - [http://docs.scala-lang.org/tutorials/FAQ/finding-implicits.html](http://docs.scala-lang.org/tutorials/FAQ/finding-implicits.html)
 - [http://docs.scala-lang.org/overviews/macros/overview.html](http://docs.scala-lang.org/overviews/macros/overview.html)
