@@ -5,7 +5,7 @@
 Ver un poquito de diseño en funcional. La idea es partir de soluciones imperfectas, o lejanas del grado de abstracción y declaratividad que uno querría tener en un diseño funcionaloso (con mucho pattern matching, muchas estructuras muy expuestas) y empezar en cambio a introducir funciones como objetos y objetos como funciones para ir hacia algo que aplique algo más de orden superior, que use funciones para abstraer la lógica.
 
 ## TP a utilizar:
-En principio, la intención es usar el TP de [Pokemon](https://docs.google.com/document/d/1gXSN8iBayDOxZ1zPM4xWRX72hG6nnHIt0SCoU6lu1WE/edit?usp=sharing)
+En principio, la intención es usar el TP de Pokemon.
 
 Se utilizó esta versión [reducida](https://docs.google.com/document/d/1aewVvR4YcU3-1fXZDKEGEGgH5i2ar-mTpugKn2uGMhg/edit#)
 
