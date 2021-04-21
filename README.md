@@ -693,11 +693,11 @@ moduleMirror.instance // returns C
 [1]: https://docs.oracle.com/javase/tutorial/reflect/
 [2]: http://docs.scala-lang.org/overviews/reflection/overview.html
 [3]: https://en.wikipedia.org/wiki/Mirror_(programming)
-[4]: http://www.scala-lang.org/files/archive/nightly/docs/library/index.html#scala.reflect.api.Universe
-[5]: http://www.scala-lang.org/files/archive/nightly/docs/library/index.html#scala.reflect.api.Mirrors
-[6]: http://www.scala-lang.org/files/archive/nightly/docs/library/index.html#scala.reflect.api.Symbols
-[7]: http://www.scala-lang.org/files/archive/nightly/docs/library/index.html#scala.reflect.api.Types
-[8]: http://www.scala-lang.org/files/archive/nightly/docs/library/index.html#scala.reflect.api.TypeTags
+[4]: https://www.scala-lang.org/api/2.12.6/scala-reflect/scala/reflect/api/Universe.html
+[5]: https://www.scala-lang.org/api/2.12.6/scala-reflect/scala/reflect/api/Mirrors.html
+[6]: https://www.scala-lang.org/api/2.12.6/scala-reflect/scala/reflect/api/Symbols.html
+[7]: https://www.scala-lang.org/api/2.12.6/scala-reflect/scala/reflect/api/Types.html
+[8]: https://www.scala-lang.org/api/2.12.6/scala-reflect/scala/reflect/api/TypeTags.html
 [9]: https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html
 [10]: https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-5.html
 [11]:  https://www.artima.com/insidejvm/ed2/lifetype.html
