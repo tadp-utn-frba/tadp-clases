@@ -321,11 +321,11 @@ a   # 7
 
 ## **Anexo**
 
-**MIXINS**
+### **MIXINS**
 
 Si lo que queremos es incluir comportamiento de n modules, pero no nos importa utilizar un método que comparten (en este caso descansar), podemos incluir a los modules de cualquier forma, y no va a influir en lo que hagamos después. Por el contrario, si lo que queremos es utilizar algun método que aparece en más de un module, tenemos que resolver los conflictos que se presenten.
 
-**MIXINS: Resolución de conflictos**
+### **MIXINS: Resolución de conflictos**
 
 
 En este ejemplo, vemos que un Atacante no descansa de la misma forma que un Defensor, por lo cual podemos tomar varios caminos
@@ -359,7 +359,7 @@ soy atacante
 soy defensor
 ~~~
 
-**Lazy Initialization**
+### **Lazy Initialization**
 
 Podemos usar ```||=``` para inicializar una variable, pero hay que tomar algunas consideraciones con eso. Hay que tener en cuenta que Ruby tiene algunos valores que considera que son false o que son true. Por ejemplo, a nil lo considera false, y otros valores como numeros, letras, etc, los considera true.
 Supongamos que quiero inicializar```@a```:
@@ -409,7 +409,7 @@ end
 => false
 ~~~
 
-## **Sobre bloques como objetos**
+### **Sobre bloques como objetos**
 
 Ademas de todo lo visto de bloques, puede ser muy útil guardar un bloque como un objeto (un proc) y ya vimos que lo único que hay que hacer es agregar la palabra proc antes del mismo. Esto permite que podamos guardarlo en una variable y que le podamos hacer:
 
