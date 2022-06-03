@@ -2,7 +2,7 @@ name := "Microprocesador Objetos-Funcional III"
 
 description := "3. Ejercicio de Microprocesador reemplazando la recursividad por una reducción"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.12"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

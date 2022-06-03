@@ -2,7 +2,7 @@ name := "Microprocesador Objetos Puro"
 
 description := "Ejercicio de Microprocesador en paradigmas de objetos solamente"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.12"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

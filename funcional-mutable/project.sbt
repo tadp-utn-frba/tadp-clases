@@ -2,7 +2,7 @@ name := "Microprocesador Objetos-Funcional I"
 
 description := "2. Ejercicio de Microprocesador reemplazando el visitor por pattern matching"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.12"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
