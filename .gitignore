@@ -15,3 +15,9 @@ project/plugins/project/
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
+
+# VSCode specific
+.bloop
+.bsp
+.metals
+.vscode

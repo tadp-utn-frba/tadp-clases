@@ -1,73 +1,68 @@
-package org.uqbar.tadep.macros
+package org.uqbar.tadep.macros.caseClasses
 
-object E01_CaseClasses {
-	class Alumno
-	type Curso = List[Alumno]
+class Alumno(val nota: Int)
+type Curso = List[Alumno]
 
-	//═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-	// Con Magia
-	//═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+//═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+// Con Magia
+//═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-	object ConMagia {
+package conMagia:
+  // Properties de sólo lectura
+  // Copy
+  // Conversión a String lindo
+  // Comparación / hashing
+  // Constructor sin new, parcialmente aplicable
+  // Unapply
+  // Etc...
+  case class Materia(nombre: String, ciclo: Int)(criterioDeAprobación: Alumno => Boolean):
+    def aprobados(curso: Curso) = curso filter criterioDeAprobación
 
-		// Properties de sólo lectura
-		// Copy
-		// Conversión a String lindo
-		// Comparación / hashing
-		// Constructor sin new, parcialmente aplicable
-		// Unapply
-		// Etc...
-		case class Materia(nombre: String, ciclo: Int)(criterioDeAprobación: Alumno => Boolean) {
-			def aprobados(curso: Curso) = curso filter criterioDeAprobación
-		}
-	}
+//═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+// Sin Magia
+//═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-	//═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-	// Sin Magia
-	//═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+package sinMagia:
 
-	object SinMagia {
+  class Materia:
+    // Properties de sólo lectura
+    private var _nombre: String = _
+    def nombre: String = _nombre
 
-		class Materia {
-			// Properties de sólo lectura
-			private var _nombre: String = _
-			def nombre = _nombre
-			private var _ciclo: Int = _
-			def ciclo = _ciclo
-			private var _criterioDeAprobación: Alumno => Boolean = _
-			private def criterioDeAprobación = _criterioDeAprobación
+    private var _ciclo: Int = _
+    def ciclo: Int = _ciclo
 
-			private def this(nombre: String, ciclo: Int, criterioDeAprovación: Alumno => Boolean) {
-				this()
-				_nombre = nombre
-				_ciclo = ciclo
-				_criterioDeAprobación = criterioDeAprobación
-			}
+    private var _criterioDeAprobación: Alumno => Boolean = _
+    private def criterioDeAprobación: Alumno => Boolean = _criterioDeAprobación
 
-			// Copy
-			def copy(nombre: String = this.nombre, ciclo: Int = this.ciclo) = new Materia(nombre,ciclo,criterioDeAprobación)
+		// Constructor
+    private def this(nombre: String, ciclo: Int, criterioDeAprovación: Alumno => Boolean) =
+      this()
+      _nombre = nombre
+      _ciclo = ciclo
+      _criterioDeAprobación = criterioDeAprobación
+
+    // Copy
+    def copy(nombre: String = this.nombre, ciclo: Int = this.ciclo) = new Materia(nombre, ciclo, criterioDeAprobación)
+
+    // Conversión a String lindo
+    override def toString = s"${this.getClass.getSimpleName}($nombre, $ciclo)"
+
+    // Comparación / hashing
+    override def equals(other: Any) = other match
+      case m: Materia => m.nombre == nombre && m.ciclo == ciclo
+      case _          => false
 			
-			// Conversión a String lindo
-			override def toString = s"Materia($nombre, $ciclo)"
+    override def hashCode = ???
 
-			// Comparación / hashing
-			override def equals(other: Any) = other match {
-				case m: Materia => m.nombre == nombre && m.ciclo == ciclo
-				case _ => false
-			}
-			override def hashCode = ???
+    def aprobados(curso: Curso) = curso filter criterioDeAprobación
 
-			def aprobados(curso: Curso) = curso filter criterioDeAprobación
-		}
+  // Companion Object
+  object Materia:
+    // Constructor sin new, parcialmente aplicable
+    def apply(nombre: String, ciclo: Int) =
+      (criterioDeAprobación: Alumno => Boolean) =>
+        new Materia(nombre, ciclo, criterioDeAprobación)
 
-		object Materia {
-			// Constructor sin new, parcialmente aplicable
-			def apply(nombre: String, ciclo: Int) = { criterioDeAprobación: (Alumno => Boolean) =>
-				new Materia(nombre, ciclo, criterioDeAprobación)
-			}
-
-			// Unapply
-			def unapply(materia: Materia): Option[(String, Int)] = ???
-		}
-	}
-}
+    // Unapply
+    def unapply(materia: Materia): Option[(String, Int)] = Some((materia.nombre, materia.ciclo))
