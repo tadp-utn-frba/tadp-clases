@@ -180,5 +180,33 @@ describe "Multimethods" do
     expect(un_objeto_con_dos_multimethods.concat("a", 3)).to eq("aaa")
     expect(un_objeto_con_dos_multimethods.saludar("juan carlos", 3)).to eq("Hola juan carlos!!!")
   end
+
+  describe "usando self" do
+    let(:class_c) do
+      Class.new do
+        attr_accessor :energia
+
+        def initialize
+          @energia = 0
+        end
+
+        partial_def :volar, [Integer] do |kms|
+          self.energia -= kms
+        end
+
+        partial_def :volar, [] do
+          self.volar(10)
+        end
+      end
+    end
+
+    it "los multimethods pueden referenciar a self" do
+      pepita = class_c.new
+
+      pepita.volar(10)
+
+      expect(pepita.energia).to eq(-10)
+    end
+  end
 end
 

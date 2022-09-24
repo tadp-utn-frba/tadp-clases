@@ -41,6 +41,10 @@ class PartialBlock
     validate_parametros(*parametros)
     @bloque.call(*parametros)
   end
+
+  def eval_in(instancia, *parametros)
+    instancia.instance_exec(*parametros, &@bloque)
+  end
 end
 
 class Module
@@ -59,7 +63,7 @@ class Module
     mi_multimethod.add_definition(tipos, &bloque)
 
     define_method(nombre) do |*parametros|
-      self.class.multimethod(nombre).call(*parametros)
+      self.class.multimethod(nombre).call(self, *parametros)
     end
   end
 
@@ -85,8 +89,8 @@ class MultiMethod
   end
 
 
-  def call(*parametros)
-    partial_block_for(*parametros).call(*parametros)
+  def call(instancia, *parametros)
+    partial_block_for(*parametros).eval_in(instancia, *parametros)
   end
 
   def partial_block_for(*parametros)
