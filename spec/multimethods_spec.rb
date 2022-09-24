@@ -94,6 +94,18 @@ describe "Multimethods" do
     end
   end
 
+  let(:class_b) do
+    Class.new do
+      partial_def :concat, [Object, Object] do |o1, o2|
+        "Objetos concatenados"
+      end
+
+      partial_def :concat, [String, Integer] do |s1,n|
+        s1 * n
+      end
+    end
+  end
+
   it ".." do
     un_a = class_a.new
     expect(un_a.concat('hello', ' world'))
@@ -104,4 +116,42 @@ describe "Multimethods" do
     expect { un_a.concat('hello', 'world', '!') }
       .to raise_error(ArgumentError)
   end
+
+  it "un multimethod ejecuta la definicion mas especifica que tenga" do
+    un_b = class_b.new
+
+    expect(un_b.concat("Hello", 2)).to eq("HelloHello")
+    expect(un_b.concat(Object.new, 3)).to eq("Objetos concatenados")
+  end
+
+  it "un objeto deberia poder responder un mensaje que tiene definido como multimethod" do
+    un_b = class_b.new
+
+    expect(un_b.respond_to?(:concat)).to be true
+  end
+
+  it "un objeto deberia poder responder un mensaje que tiene definido como multimethod si los parametros que le paso son correctos" do
+    un_b = class_b.new
+
+    expect(un_b.respond_to?(:concat, false, [String,String])).to be true
+  end
+
+  it "..." do
+    un_b = class_b.new
+
+    expect(un_b.respond_to?(:concat, false, [Integer,class_b])).to be true
+  end
+
+  it "si le paso tipos y lo entendia pero no por multimethods, da false el respond_to?" do
+    un_b = class_b.new
+
+    expect(un_b.respond_to?(:to_s, false, [String])).to be false
+  end
+
+  it "si los tipos no coinciden, da false el respond_to?" do
+    un_b = class_b.new
+
+    expect(un_b.respond_to?(:concat, false, [String, String, String])).to be false
+  end
 end
+
