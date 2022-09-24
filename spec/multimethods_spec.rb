@@ -75,9 +75,33 @@ describe "Partial Blocks" do
     expect(headBlock.call({ a: 1,
                             b: "hundiste mi acarozado" })).to eq([:a, 1])
   end
+end
 
-  # 5
-  # helloBlock.matches?("a") #true
-  # helloBlock.matches?(1) #false
-  # helloBlock.matches?("a", "b") #false
+describe "Multimethods" do
+  let(:class_a) do
+    Class.new do
+      partial_def :concat, [String, String] do |s1,s2|
+        s1 + s2
+      end
+
+      partial_def :concat, [String, Integer] do |s1,n|
+        s1 * n
+      end
+
+      partial_def :concat, [Array] do |a|
+        a.join
+      end
+    end
+  end
+
+  it ".." do
+    un_a = class_a.new
+    expect(un_a.concat('hello', ' world'))
+        .to eq("hello world")
+
+    expect(un_a.concat('hello', 3)).to eq("hellohellohello")
+    expect(un_a.concat(['hello', ' world', '!'])).to eq("hello world!")
+    expect { un_a.concat('hello', 'world', '!') }
+      .to raise_error(ArgumentError)
+  end
 end
