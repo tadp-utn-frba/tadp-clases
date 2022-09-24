@@ -44,20 +44,36 @@ class PartialBlock
 end
 
 class Module
-  attr_reader :multimethod
+  def multimethod(nombre, if_none = proc { raise NameError })
+    @multimethods ||= []
+    @multimethods.find(if_none) do |multimethod|
+      multimethod.nombre == nombre
+    end
+  end
 
   def partial_def(nombre, tipos, &bloque)
-    @multimethod ||= MultiMethod.new(nombre)
+    mi_multimethod = multimethod(nombre, proc do
+      crear_nuevo_multimethod(nombre, tipos, &bloque)
+    end)
 
-    @multimethod.add_definition(tipos, &bloque)
+    mi_multimethod.add_definition(tipos, &bloque)
 
     define_method(nombre) do |*parametros|
-      self.class.multimethod.call(*parametros)
+      self.class.multimethod(nombre).call(*parametros)
     end
+  end
+
+  private
+
+  def crear_nuevo_multimethod(nombre, tipos, &bloque)
+    nuevo_multimethod = MultiMethod.new(nombre)
+    @multimethods.push(nuevo_multimethod)
+    nuevo_multimethod
   end
 end
 
 class MultiMethod
+  attr_reader :nombre
   def initialize(nombre)
     @partial_blocks = []
     @nombre = nombre
@@ -95,7 +111,9 @@ class Object
     if tipos == nil
       super(name, include_all)
     else
-      self.class.multimethod.matches?(tipos)
+      multimethod = self.class.multimethod(name,
+                                           proc { return false })
+      multimethod.matches?(tipos)
     end
   end
 end

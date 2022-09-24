@@ -145,13 +145,40 @@ describe "Multimethods" do
   it "si le paso tipos y lo entendia pero no por multimethods, da false el respond_to?" do
     un_b = class_b.new
 
-    expect(un_b.respond_to?(:to_s, false, [String])).to be false
+    expect(un_b.respond_to?(:to_s, false, [String, String])).to be false
   end
 
   it "si los tipos no coinciden, da false el respond_to?" do
     un_b = class_b.new
 
     expect(un_b.respond_to?(:concat, false, [String, String, String])).to be false
+  end
+
+  let(:class_con_dos_multimethods) do
+    Class.new do
+      partial_def :concat, [Object, Object] do |o1, o2|
+        "Objetos concatenados"
+      end
+
+      partial_def :concat, [String, Integer] do |s1,n|
+        s1 * n
+      end
+
+      partial_def :saludar, [String] do |x|
+        "Hola #{x}"
+      end
+
+      partial_def :saludar, [String, Integer] do |x, n|
+        "Hola #{x}" + "!" * n
+      end
+    end
+  end
+
+  it "deberiamos poder tener mas de un multimethod" do
+    un_objeto_con_dos_multimethods = class_con_dos_multimethods.new
+
+    expect(un_objeto_con_dos_multimethods.concat("a", 3)).to eq("aaa")
+    expect(un_objeto_con_dos_multimethods.saludar("juan carlos", 3)).to eq("Hola juan carlos!!!")
   end
 end
 
