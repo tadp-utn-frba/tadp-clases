@@ -71,7 +71,7 @@ describe "Partial Blocks" do
       enumerable.to_a[0]
     end
 
-    expect(headBlock.call([1,2,3])).to eq(1)
+    expect(headBlock.call([1, 2, 3])).to eq(1)
     expect(headBlock.call({ a: 1,
                             b: "hundiste mi acarozado" })).to eq([:a, 1])
   end
@@ -80,11 +80,11 @@ end
 describe "Multimethods" do
   let(:class_a) do
     Class.new do
-      partial_def :concat, [String, String] do |s1,s2|
+      partial_def :concat, [String, String] do |s1, s2|
         s1 + s2
       end
 
-      partial_def :concat, [String, Integer] do |s1,n|
+      partial_def :concat, [String, Integer] do |s1, n|
         s1 * n
       end
 
@@ -100,7 +100,7 @@ describe "Multimethods" do
         "Objetos concatenados"
       end
 
-      partial_def :concat, [String, Integer] do |s1,n|
+      partial_def :concat, [String, Integer] do |s1, n|
         s1 * n
       end
     end
@@ -109,7 +109,7 @@ describe "Multimethods" do
   it ".." do
     un_a = class_a.new
     expect(un_a.concat('hello', ' world'))
-        .to eq("hello world")
+      .to eq("hello world")
 
     expect(un_a.concat('hello', 3)).to eq("hellohellohello")
     expect(un_a.concat(['hello', ' world', '!'])).to eq("hello world!")
@@ -133,13 +133,13 @@ describe "Multimethods" do
   it "un objeto deberia poder responder un mensaje que tiene definido como multimethod si los parametros que le paso son correctos" do
     un_b = class_b.new
 
-    expect(un_b.respond_to?(:concat, false, [String,String])).to be true
+    expect(un_b.respond_to?(:concat, false, [String, String])).to be true
   end
 
   it "..." do
     un_b = class_b.new
 
-    expect(un_b.respond_to?(:concat, false, [Integer,class_b])).to be true
+    expect(un_b.respond_to?(:concat, false, [Integer, class_b])).to be true
   end
 
   it "si le paso tipos y lo entendia pero no por multimethods, da false el respond_to?" do
@@ -160,7 +160,7 @@ describe "Multimethods" do
         "Objetos concatenados"
       end
 
-      partial_def :concat, [String, Integer] do |s1,n|
+      partial_def :concat, [String, Integer] do |s1, n|
         s1 * n
       end
 
@@ -208,5 +208,51 @@ describe "Multimethods" do
       expect(pepita.energia).to eq(-10)
     end
   end
+
+  it "tp individual" do
+    klass_d = Class.new do
+      partial_def :formatear, [String, [:nombre, :direccion]] do |titulo, coso|
+        titulo + " | " + coso.nombre + ": " + coso.direccion
+      end
+      partial_def :formatear, [String, [:peso]] do |titulo, pesable|
+        titulo + " " + pesable.peso.to_s
+      end
+    end
+
+    klass_lugar = Class.new do
+      attr_accessor :nombre, :direccion, :fotos
+
+      def initialize(nombre, direccion)
+        @nombre = nombre
+        @direccion = direccion
+      end
+    end
+
+    klass_perro = Class.new do
+      attr_accessor :nombre, :edad, :peso
+
+      def initialize(peso)
+        @peso = peso
+      end
+    end
+
+    expect(
+      klass_d.new.formatear("VISITE", klass_lugar.new("Obelisco", "Corrientes y 9 de Julio"))
+    #devuelve
+    ).to eq("VISITE | Obelisco: Corrientes y 9 de Julio")
+
+    expect(
+      klass_d.new.formatear("Pesado", klass_perro.new(32))
+    ).to eq("Pesado 32")
+
+    expect(klass_d.new.respond_to?(:formatear, false, [String, [:peso]]))
+
+    expect {
+      klass_d.new.formatear("Pesado", 5)
+    }.to raise_error(ArgumentError)
+
+  end
 end
+
+
 

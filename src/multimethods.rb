@@ -11,7 +11,11 @@ class PartialBlock
     parametros
       .zip(@tipos, (1..parametros.length))
       .sum do |parametro, tipo, indice|
-        indice * distance_for(parametro, tipo)
+        if tipo.is_a?(Array)
+          0.5
+        else
+          indice * distance_for(parametro, tipo)
+        end
       end
   end
 
@@ -22,14 +26,24 @@ class PartialBlock
   def matches?(*parametros)
     parametros.length == @tipos.length and
       parametros.zip(@tipos).all? do |parametro, tipo|
-        parametro.is_a? tipo
+        if(tipo.is_a?(Array))
+          tipo.all? do |mensaje|
+            parametro.respond_to?(mensaje)
+          end
+        else
+          parametro.is_a? tipo
+        end
       end
   end
 
   def matches_types?(*tipos_esperados)
     tipos_esperados.length == @tipos.length and
       tipos_esperados.zip(@tipos).all? do |tipo_esperado, tipo|
-        tipo_esperado <= tipo
+        if(tipo.is_a?(Array))
+          tipo_esperado == tipo
+        else
+          tipo_esperado <= tipo
+        end
       end
   end
 
