@@ -1,62 +1,104 @@
 package ar.edu.utn.frba.tadp.pokemon
+
 import scala.math.pow
 
-case class Pokemon(statsBase: Stats, especie: Especie, energia: Int, xp: Int = 0) {
-  lazy val nivel: Int = Stream.from(1).find(nivel => especie.xpNecesariaNivel(nivel) > xp).get - 1
+sealed trait Tipo {
+  def unapply(pokemon: Pokemon): Option[(Boolean, Boolean)] = {
+    if (pokemon.especie.tipoPrincipal == this) {
+      Some((true, false))
+    } else if (pokemon.especie.tipoSecundario.contains(this)) {
+      Some((false, true))
+    } else {
+      None
+    }
 
-  lazy val statsActuales: Stats = especie.statsActuales(statsBase, nivel)
-
-  lazy val fuerza: Int = statsActuales.fuerza
-  lazy val velocidad: Int = statsActuales.velocidad
-  lazy val energiaMaxima: Int = statsActuales.energiaMaxima
-
-  def intentarEvolucionar(): Pokemon = especie.intentarEvolucionar(this)
-
-  def esDeTipo(tipo: Tipo): Boolean = especie.esDeTipo(tipo)
-
-  def esDeTipoPrincipal(tipo: Tipo): Boolean = especie.esDeTipo(tipo)
-
-  def ganarVelocidad(cantidad: Int): Pokemon = copy(statsBase = statsBase.ganarVelocidad(cantidad))
-
-  def ganarXp(cantidad: Int): Pokemon = copy(xp = xp + cantidad)
-
-  def perderEnergia(cantidad: Int): Pokemon = copy(energia = energia - cantidad)
-
-  def energiaAlMaximo(): Pokemon = copy(energia = statsBase.energiaMaxima)
+    // if (pokemon.esDeTipo(this)) Some((true, false)) else None
+  }
 }
 
-case class Stats(fuerza: Int, velocidad: Int, energiaMaxima: Int) {
-  def *(m: Int): Stats = copy(fuerza * m, velocidad * m, energiaMaxima * m)
+case object Fuego extends Tipo
 
-  def *(m: Stats): Stats = copy(fuerza * m.fuerza, velocidad * m.velocidad, energiaMaxima * m.energiaMaxima)
+case object Agua extends Tipo
 
-  def ganarVelocidad(cantidad: Int): Stats = copy(velocidad = velocidad + cantidad)
+case object Fantasma extends Tipo
+
+case object Pelea extends Tipo
+
+case class Especie(
+  tipoPrincipal: Tipo,
+  tipoSecundario: Option[Tipo],
+  resistenciaEvolutiva: Int,
+  incremento: Stats) {
+  def xpParaNivel(nivel: Int): Int = {
+    if (nivel == 1)
+      0
+    else 2 * xpParaNivel(nivel - 1) + resistenciaEvolutiva
+  }
 }
 
-case class Especie(tipoPrincipal: Tipo,
-                   tipoSecundario: Option[Tipo],
-                   resistenciaEvolutiva: Int,
-                   multiplicadores: Stats,
-                   evolucion: List[Evolucion]) {
-  def intentarEvolucionar(pokemon: Pokemon): Pokemon = evolucion.flatMap(_.evolucionar(pokemon)).headOption.getOrElse(pokemon)
+case class Stats(
+  energiaMax: Int,
+  fuerza: Int,
+  velocidad: Int
+)
 
-  def statsActuales(statsBase: Stats, nivel: Int): Stats = statsBase * multiplicadores * nivel
+case class Pokemon(
+  xp: Int,
+  energia: Int,
+  stats: Stats,
+  especie: Especie
+) {
+  require(stats.fuerza >= 1 && stats.fuerza <= 100)
+  require(stats.velocidad >= 1 && stats.velocidad <= 100)
+  require(energia >= 0 && energia <= stats.energiaMax)
 
-  def esDeTipoPrincipal(tipo: Tipo): Boolean = tipoPrincipal == tipo
+  lazy val nivel: Int =
+    Stream.from(1).find(nivel => especie.xpParaNivel(nivel) < xp).getOrElse(1)
 
-  def esDeTipo(tipo: Tipo): Boolean = esDeTipoPrincipal(tipo) || tipoSecundario.contains(tipo)
-
-  def xpNecesariaNivel(nivel: Int): Int = (pow(2, nivel).toInt - 1) * resistenciaEvolutiva
+  def esDeTipo(tipo: => Tipo): Boolean =
+    especie.tipoPrincipal == tipo || especie.tipoSecundario.contains(tipo)
+  
 }
 
-case class Evolucion(especie: Especie, condicion: Pokemon => Boolean) {
-  def evolucionar(pokemon: Pokemon): Option[Pokemon] =
-    if(condicion(pokemon)) Some(pokemon.copy(especie = especie)) else None
+
+object actividad {
+  trait Actividad extends (Pokemon => Pokemon)
+
+  case object Descansar extends Actividad {
+    override def apply(pokemon: Pokemon): Pokemon =
+      pokemon.copy(energia = pokemon.stats.energiaMax)
+  }
+
+  case class LevantarPesas(kilos: Int) extends Actividad {
+    override def apply(pokemon: Pokemon): Pokemon = {
+      // tipo fantasma => no puede levantar
+      // > 10kg por fuerza => no gana xp y pierde energía
+      // _ => 1xp por cada kilo
+
+      // tipo pelea => doble de puntos
+      pokemon match {
+        case Fantasma(a, b) => pokemon
+        case p if kilos / pokemon.stats.fuerza > 10 =>
+          p.copy(energia = p.energia - 10)
+        case Pelea(a, b) => pokemon.copy(xp = pokemon.xp + kilos * 2)
+        case _ => pokemon.copy(xp = pokemon.xp + kilos)
+      }
+    }
+  }
+
+  case class Nadar(minutos: Int) extends Actividad {
+    override def apply(pokemon: Pokemon): Pokemon = ???
+  }
+
+  //  def descansar(pokemon: Pokemon): Pokemon = ???
+  //  def levantarPesas(pokemon: Pokemon): Pokemon = ???
+  //  def nadar(minutos: Int)(pokemon: Pokemon): Pokemon = ???
+
+  //  val rutina: List[Actividad] = List(
+  //    descansar, // def descansar
+  //    _.descansar, // método descansar en Pokemon
+  //    _.levantarPesas, // método levantarPesas en Pokemon
+  //    Descansar, // object Descansar que tiene apply
+  //    nadar(10)(_),
+  //  )
 }
-
-trait Tipo
-
-case object TipoAgua extends Tipo
-case object TipoFuego extends Tipo
-case object TipoFantasma extends Tipo
-case object TipoPelea extends Tipo
