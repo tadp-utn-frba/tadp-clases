@@ -1,6 +1,7 @@
 package ar.edu.utn.frba.tadp.pokemon
 
 import scala.math.pow
+import scala.util.Try
 
 sealed trait Tipo {
   def unapply(pokemon: Pokemon): Option[(Boolean, Boolean)] = {
@@ -17,12 +18,16 @@ sealed trait Tipo {
 }
 
 case object Fuego extends Tipo
-
 case object Agua extends Tipo
-
 case object Fantasma extends Tipo
-
 case object Pelea extends Tipo
+
+sealed trait Estado
+case object Normal extends Estado
+case class Dormido(actividadesRealizadas: Int) extends Estado
+case object Paralizado extends Estado
+case object KO extends Estado
+
 
 case class Especie(
   tipoPrincipal: Tipo,
@@ -46,59 +51,111 @@ case class Pokemon(
   xp: Int,
   energia: Int,
   stats: Stats,
-  especie: Especie
+  especie: Especie,
+  estado: Estado
 ) {
   require(stats.fuerza >= 1 && stats.fuerza <= 100)
   require(stats.velocidad >= 1 && stats.velocidad <= 100)
   require(energia >= 0 && energia <= stats.energiaMax)
 
   lazy val nivel: Int =
-    Stream.from(1).find(nivel => especie.xpParaNivel(nivel) < xp).getOrElse(1)
+    Stream.from(1).find(nivel => especie.xpParaNivel(nivel) > xp).getOrElse(1)
 
   def esDeTipo(tipo: => Tipo): Boolean =
     especie.tipoPrincipal == tipo || especie.tipoSecundario.contains(tipo)
   
 }
 
-
 object actividad {
-  trait Actividad extends (Pokemon => Pokemon)
+  type Tarea = Pokemon => Try[Pokemon]
+  object Actividad {
+    def apply(tarea: Tarea) = new Actividad {
+      override def realizar(pokemon: Pokemon): Try[Pokemon] = tarea(pokemon)
+    }
+  }
+  trait Actividad extends (Tarea) {
+    protected def realizar(pokemon: Pokemon): Try[Pokemon]
 
-  case object Descansar extends Actividad {
-    override def apply(pokemon: Pokemon): Pokemon =
-      pokemon.copy(energia = pokemon.stats.energiaMax)
+    def apply(pokemonOriginal: Pokemon): Try[Pokemon] = {
+      lazy val pokemonAlterado: Try[Pokemon] = realizar(pokemonOriginal)
+      pokemonOriginal.estado match {
+        case KO => Try {
+          throw new RuntimeException("El pokemon esta KO")
+        }
+        case Paralizado => Try {
+          pokemonOriginal
+        }
+        case Dormido(3) => pokemonAlterado.map(p => p.copy(estado = Normal))
+        case Dormido(n) => Try {
+          pokemonOriginal.copy(estado = Dormido(n + 1))
+        }
+        case Normal => pokemonAlterado
+      }
+    }
+
+    case object Descansar extends Actividad {
+      def realizar(pokemonOriginal: Pokemon): Try[Pokemon] = {
+        lazy val pokemonDescansado = pokemonOriginal
+          .copy(energia = pokemonOriginal.stats.energiaMax)
+        Try {
+          pokemonOriginal.estado match {
+            case Normal => {
+              if (pokemonOriginal.energia < (pokemonOriginal.stats.energiaMax / 2))
+                pokemonDescansado.copy(estado = Dormido(1))
+              else
+                pokemonDescansado
+            }
+          }
+        }
+      }
+    }
+
+    case class LevantarPesas(kilos: Int) extends Actividad {
+      def realizar(pokemon: Pokemon): Try[Pokemon] = Try {
+        // tipo fantasma => no puede levantar
+        // > 10kg por fuerza => no gana xp y pierde energía
+        // _ => 1xp por cada kilo
+
+        // tipo pelea => doble de puntos
+        pokemon match {
+          case p if p.estado == Paralizado => p.copy(estado = KO)
+          case Fantasma(a, b) => pokemon
+          case p if kilos / pokemon.stats.fuerza > 10 =>
+            p.copy(energia = p.energia - 10, estado = Paralizado)
+          case Pelea(a, b) => pokemon.copy(xp = pokemon.xp + kilos * 2)
+          case _ => pokemon.copy(xp = pokemon.xp + kilos)
+        }
+      }
+    }
+
+    def nadar(minutos: Int) = Actividad( pokemon  => ???)
+//    case class Nadar(minutos: Int) extends Actividad {
+//      def realizar(pokemon: Pokemon): Try[Pokemon] = ???
+//
+//      override def apply(pokemon: Pokemon): Try[Pokemon] = ???
+//    }
   }
 
-  case class LevantarPesas(kilos: Int) extends Actividad {
-    override def apply(pokemon: Pokemon): Pokemon = {
-      // tipo fantasma => no puede levantar
-      // > 10kg por fuerza => no gana xp y pierde energía
-      // _ => 1xp por cada kilo
-
-      // tipo pelea => doble de puntos
-      pokemon match {
-        case Fantasma(a, b) => pokemon
-        case p if kilos / pokemon.stats.fuerza > 10 =>
-          p.copy(energia = p.energia - 10)
-        case Pelea(a, b) => pokemon.copy(xp = pokemon.xp + kilos * 2)
-        case _ => pokemon.copy(xp = pokemon.xp + kilos)
+  class Rutina(val nombre: String, actividades: List[Actividad]) {
+    def realizar(pokemonOriginal: Pokemon): Try[Pokemon] = {
+      actividades.foldLeft(Try { pokemonOriginal }) { (pokemon, actividad) =>
+        pokemon.flatMap(actividad)
       }
     }
   }
 
-  case class Nadar(minutos: Int) extends Actividad {
-    override def apply(pokemon: Pokemon): Pokemon = ???
+  type Criterio = (Pokemon, Pokemon) => Pokemon
+  def analizadorRutinas(pokemonOriginal: Pokemon,
+                        rutinas: List[Rutina],
+                        criterio: Criterio): Try[String] = {
+    rutinas.reduce { (rutina_1, rutina_2) => {
+      val tryP1 = rutina_1.realizar(pokemonOriginal)
+      val tryP2 = rutina_2.realizar(pokemonOriginal)
+      for {
+        p1 <- tryP1
+        p2 <- tryP2
+      } yield (if (p1 == criterio(p1, p2)) rutina_1.nombre else rutina_2.nombre)
+    }
+    }
   }
-
-  //  def descansar(pokemon: Pokemon): Pokemon = ???
-  //  def levantarPesas(pokemon: Pokemon): Pokemon = ???
-  //  def nadar(minutos: Int)(pokemon: Pokemon): Pokemon = ???
-
-  //  val rutina: List[Actividad] = List(
-  //    descansar, // def descansar
-  //    _.descansar, // método descansar en Pokemon
-  //    _.levantarPesas, // método levantarPesas en Pokemon
-  //    Descansar, // object Descansar que tiene apply
-  //    nadar(10)(_),
-  //  )
 }
