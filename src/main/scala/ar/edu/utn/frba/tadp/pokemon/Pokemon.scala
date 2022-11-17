@@ -45,7 +45,9 @@ case class Stats(
   energiaMax: Int,
   fuerza: Int,
   velocidad: Int
-)
+) {
+  def ganarVelocidad(velocidadGanada: Int) = copy(velocidad =  velocidad + velocidadGanada)
+}
 
 case class Pokemon(
   xp: Int,
@@ -63,7 +65,12 @@ case class Pokemon(
 
   def esDeTipo(tipo: => Tipo): Boolean =
     especie.tipoPrincipal == tipo || especie.tipoSecundario.contains(tipo)
-  
+
+  def ganarXp(xpGanada: Int) = copy(xp = xp + xpGanada)
+
+  def perderEnergia(energiaPerdida: Int) = copy(energia = energia - energiaPerdida)
+
+  def ganarVelocidad(velocidadGanada: Int) = copy(stats = stats.copy(velocidad =  stats.velocidad + velocidadGanada))
 }
 
 object actividad {
@@ -128,12 +135,17 @@ object actividad {
       }
     }
 
-    def nadar(minutos: Int) = Actividad( pokemon  => ???)
-//    case class Nadar(minutos: Int) extends Actividad {
-//      def realizar(pokemon: Pokemon): Try[Pokemon] = ???
-//
-//      override def apply(pokemon: Pokemon): Try[Pokemon] = ???
-//    }
+    case class Nadar(minutos: Int) extends Actividad {
+      def realizar(pokemon: Pokemon): Try[Pokemon] = Try {
+        pokemon match {
+          case Fuego(_, _) => pokemon.copy(estado = KO)
+          case Agua(a, b) => efectoBase(pokemon).ganarVelocidad(10 * minutos / 60)
+          case _ => efectoBase(pokemon)
+        }
+      }
+
+      private def efectoBase(pokemon: Pokemon): Pokemon = pokemon.perderEnergia(minutos).ganarXp(20 * minutos)
+    }
   }
 
   class Rutina(val nombre: String, actividades: List[Actividad]) {
