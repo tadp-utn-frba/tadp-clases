@@ -4,7 +4,7 @@
 
 - Página de la materia: [http://tadp-utn-frba.github.io/](http://tadp-utn-frba.github.io/)
 
-- Es muy importante que se anoten a la lista de emails de la cursada: [https://groups.google.com/forum/#!forum/tadp-cursada](https://groups.google.com/forum/#!forum/tadp-cursada)
+- Es muy importante que se metan en el servidor de Discord, como dice en la sección de [temas administrativas](https://tadp-utn-frba.github.io/administrativos/).
 
 - Va a haber 2 TPs (uno de metaprogramación y el otro de híbrido objetos-funcional), cada uno con una entrega grupal y una individual. Les vamos a pedir una hoja por grupo con legajo, nombre, apellido y email.
 
