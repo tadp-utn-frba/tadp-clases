@@ -43,7 +43,7 @@ En definitiva, estos lenguajes nos importan porque no son más de lo mismo, sino
 
 Vamos a empezar planteando algunas variantes interesantes a los sistemas de tipos de los lenguajes que usamos durante la cursada. El tipado de *Scala* es de los más seguros, flexibles y, por lo tanto, complejos de los lenguajes orientados a objetos. *Kotlin* toma muchas de sus ideas y define un tipado algo más rígido y menos preciso pero mucho más simple, al mismo tiempo que agrega bastante boilerplate a su sintáxis para protejerse de (lo que algunos consideran) problemas comunes. Por otro lado, *TypeScript* abiertamente acepta su tipado como **unsound** y no ofrece una solución para las situaciones más complejas que otros lenguajes tratan de resolver pagando el costo de una mayor complejidad. Del sitio de *TypeScript*:
 
-> TypeScript’s type system allows certain operations that can’t be known at compile-time to be safe. [...] The places where TypeScript allows unsound behavior were carefully considered, and throughout this document we’ll explain where these happen and the motivating scenarios behind them.
+> TypeScript's type system allows certain operations that can't be known at compile-time to be safe. [...] The places where TypeScript allows unsound behavior were carefully considered, and throughout this document we'll explain where these happen and the motivating scenarios behind them.
 
 Basicamente el lenguaje aspira a que su tipado sea una mejor alternativa que el no-tipado de *EcmaScript* y está más preocupado por ser accesible que seguro. Ironicamente, esta laxedad en los chequeos permite luego tipar algunas construcciones complejas que en otros lenguajes más estrictos no serían posibles y tendrían que hacerse usando reflection u otros mecanismos inseguros.
 
@@ -141,7 +141,7 @@ Los típos parámetricos (o, como algunos lenguajes los llaman, **Generics**) co
 
 Me gusta el detalle de que llama a los wildcards *"tricky"*, y no *"difíciles"*, porque abre la puerta a una discusión interesante. **Varianza**, como tantos otros conceptos con un contenido teórico fuerte, es un tema bastante complejo. Para usarlo bien, es necesario aprender los fundamentos y leer a los autores que estudiaron el tema. En ocasiones los lenguajes industriales optan por no seguir el camino que marca la academia (a veces porque creen tener una propuesta mejor, a veces porque no les interesa tanto un tema y prefieren ahorrar complejidad e invertirla en otra cosa y a veces porque abiertamente reniegan de la teoría). En estos casos, los mismos problemas pueden resolverse a los ponchazos, con construcciones simplificadas y especializadas para un uso particular, lo cual, a la larga, puede terminar en una pila de herramientas heterogéneas que se solapan o no terminan de cubrir todos los casos de uso. Lo gracioso es que estas herramientas simplificadas muchas veces terminan teniendo tantos casos especiales que resulta más complicado aprenderlos todos que leer la teoría que tratan de evitar.
 
-En fin... *Kotlin*, que no quería los parches de *Java* ni quiso pagar la complejidad de *Scala* apostó por un mecanismo de tipado similar pero más sencillo, que [tomó prestado de .NET](https://docs.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance#DefiningVariantTypeParameters).
+En fin... *Kotlin*, que no quería los parches de *Java* ni quiso pagar la complejidad de *Scala* apostó por un mecanismo de tipado similar pero más sencillo, que [tomó prestado de .NET](https://learn.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance).
 
 Este enfoque permite definir *Covarianza* y *Contravarianza* similar al `-T` y `+T` de *Scala*, pero usando las palabras clave `in` y `out`, respectivamente.
 
@@ -187,7 +187,7 @@ class Caja<T>(var contenido: T) {
 fun main(args: Array<String>) {
     val a: Caja<Any> = Caja(7)
     val b: Caja<Int> = Caja(5)
-    
+
     a.copiar1(b) // Falla porque a y b tienen distinto tipo
     a.copiar2(b) // Pero si forzamos el parámetro covariante funciona!
 }
@@ -420,12 +420,12 @@ Otra gran decisión fue reemplazar la idea de **constructor** por la de **parame
 // Los parámetros por defecto cubren la mayor parte de los casos de sobrecarga.
 class X(val a: Int, var b: String = "") {
     var c: String
-    
+
     // Cualquier efecto que no sea inicializar un campo va en el bloque init (en lugar de estar desperdigado en el cuerpo de la clase).
     init {
          c = if (b == "foo") "bar" else "baz"
     }
-    
+
     // En caso de necesitar otra firma, puedo hacer esto (o usar un object como en Scala).
     constructor(d: Boolean) : this(0, "")
 }
@@ -436,7 +436,7 @@ fun main(args: Array<String>) {
 }
 ```
 
-También incorpora el concepto de **Companion Object** para lidiar con el aspecto estático de las abstracciones, aunque va un paso más lejos y hace que tenga que declararse dentro de la clase misma: 
+También incorpora el concepto de **Companion Object** para lidiar con el aspecto estático de las abstracciones, aunque va un paso más lejos y hace que tenga que declararse dentro de la clase misma:
 
 ```kotlin
 class X {
@@ -547,7 +547,7 @@ let M1 = (next) => class extends next {
   m() { return super.m() * 2 }
 }
 
-let M2 = (next) => class extends next {  
+let M2 = (next) => class extends next {
     m() { return super.m() + 10 }
 }
 
@@ -585,9 +585,9 @@ Uno de estos planteos pasa por integrar la inmutabilidad al **ciclo de vida de l
 ```kotlin
 class Persona(edad: Int) {
     val esAdulto: Boolean
-    
+
     init {
-      require(edad in 0..100){ "mala edad" }        
+      require(edad in 0..100){ "mala edad" }
       esAdulto = edad > 18
     }
 }
@@ -634,7 +634,7 @@ class Docente
 class Curso {
     // Las referencias (vars o vals) deben ser inicializadas siempre...
     var docente: Docente
-    
+
     // ...salvo los var marcados como lateinit, que pueden inicializarse después.
     lateinit var jtp: Docente
 }
@@ -668,7 +668,7 @@ class Curso {
 }
 
 // Como readonly es sólo un modificador de tipo no necesito cambiar código
-// puedo usar un curso cualquiera y sólo lo "veo" distinto. 
+// puedo usar un curso cualquiera y sólo lo "veo" distinto.
 let curso: Curso
 let cursoRO: Readonly<Curso> = curso
 let cursoDRO: DeepReadonly<Curso> = curso
@@ -768,7 +768,7 @@ const aprobo = ({ nota }: Alumno) => nota > 6
 
 // Podemos deconstruir multiples niveles (e incluso inferir el tipo estructural).
 const necesitaUnApodo = ({ nombre: { length } }) => length > 10
-    
+
 // Podemos copiar un objeto "untandolo" en otra definición.
 // Noten que el campo alumnos es pisado... Este es nuestro copy.
 const desdoblar = (curso: Curso) => ({...curso, alumnos: []})
@@ -796,7 +796,7 @@ type Lens<T, U> = { [K in keyof U]: Lens<T, U[K]> } & { (t: T, u: U): T, (t: T):
 // Más adelante explicamos esta implementación. Por ahora no importa...
 function lens<T,U>(path:string[]): Lens<T, U> {
     const f = ((t: T, u: U) => t) as Lens<T, U>
-    
+
     return new Proxy(f, {
         get<K extends keyof U>(_, k: K) { return lens<T, U[K]>([k, ...path]) },
         apply(_, self, args): T {
@@ -816,7 +816,7 @@ function lens<T,U>(path:string[]): Lens<T, U> {
     })
 }
 
-function $<T>() { return lens<T, T>([]) } 
+function $<T>() { return lens<T, T>([]) }
 
 
 const $curso = $<Curso>()
@@ -843,7 +843,7 @@ val siguiente: (Int)->Int = { x -> x + 1 }
 //...esto hace que la sintaxis tenga que manejar casos especiales
 //para evitar parentesis redundantes.
 (1..10).map{x -> x + 1}
-    
+
 //Una lambda que espera un único parámetro puede referirlo con la palabra clave "it".
 val doble: (Int)->Int = { it * it }
 }
@@ -857,7 +857,7 @@ const siguiente = n => n + 1
 // La deconstrucción de parámetros funciona igual que en otras funciones.
 const nota = ({nota}) => nota
 
-// Esta sintáxis hace fácil currificar una función para aplicarla parcialmente. 
+// Esta sintáxis hace fácil currificar una función para aplicarla parcialmente.
 const sumar = x => y => x + y
 const sumatoria = ns => ns.map(sumar(1))
 
@@ -878,10 +878,10 @@ class Alumno(val nota:Int) {
 fun main(args: Array<String>) {
 	val jose = Alumno(7)
 	val tito = Alumno(2)
-    
+
     val aprobo = Alumno::aprobo
     val aproboJose = jose::aprobo
-    
+
     aproboJose() // true
     aprobo(tito) // false
     Alumno::nota.get(jose) // 7
@@ -923,15 +923,15 @@ object g {
 
 fun main(args: Array<String>) {
     var aplicable: (Int) -> Int
-    
+
     aplicable = ::f
     aplicable = g    // Esto no funciona... g no es una función como en Scala.
-    
+
     // Pero puedo hacerlo así.
     aplicable = object : (Int) -> Int {
     	override operator fun invoke(n: Int): Int = n + 1
 	}
-    
+
     aplicable(5)
 }
 ```
@@ -966,9 +966,9 @@ def haceRuido(animal: Animal): String = {
         // return animal.aullar() // Esto no funciona
         return animal.asInstanceOf[Lobo].aullar()
     }
-    
+
     if(animal.isInstanceOf[Vaca]) {
-    	return animal.asInstanceOf[Vaca].muji()    
+    	return animal.asInstanceOf[Vaca].muji()
     }
 
     throw new Error("No hace ruido")
@@ -995,13 +995,13 @@ fun haceRuido(animal: Animal): String {
         // El bloque del if entiende que animal referencia algo de tipo Lobo.
         return animal.aullar()
     }
-    
+
     // No sólo funciona con el if...
     animal is Vaca && return animal.muji()
-    
+
     // Ninguno de esos mensajes puede enviarse fuera del if
     //animal.muji()
-    
+
     throw Error("No hace ruido")
 }
 ```
@@ -1042,7 +1042,7 @@ function haceRuido(animal: Lobo | Vaca) {
 }
 ```
 
-Y eso no es todo; varios casos de uso comunes ya vienen soportados incluyendo lo que *TypeScript* llama **[Discriminated Unions](http://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions)**:
+Y eso no es todo; varios casos de uso comunes ya vienen soportados incluyendo lo que *TypeScript* llama **[Discriminated Union](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#discriminating-unions)**:
 
 ```typescript
 class Lobo {
@@ -1155,7 +1155,7 @@ Hasta acá todo muy lindo, pero no serviría de mucho si el `null` fuera la mism
     // El uso más habitual del map en un Option es enviarle un mensaje al contenido.
     // La sintaxis ?. sirve básicamente para esto.
    	curso?.docente
-    
+
     // Este tipo de acceso puede encadenarse sin problemas.
     // Dado que no estamos envolviendo los valores en otras estructuras, T? === T??.
     // Esto quiere decir que ?. puede usarse como equivalente de map Y flatMap.
@@ -1164,10 +1164,10 @@ Hasta acá todo muy lindo, pero no serviría de mucho si el `null` fuera la mism
     // Si quiero hacer algo más que mandar un mensaje al posible null puedo usar ?.let.
     // let es un mensaje que entienden todos los nullables, equivalente a map y flatMap.
     val esIncreible: Boolean? = curso?.let{ it.docente.nombre == "Marcelo" }
-    
+
     // El ?: (operador elvis) funciona como un getOrElse.
     val esIncreiblePosta: Boolean = esIncreible ?: false
-    
+
     // En el peor de los casos, los nullables también son considerados en el Smart-Cast.
     if(curso == null) throw Error("es null")
     // Si llega acá sabe que no puede ser null.
@@ -1214,7 +1214,7 @@ class MiClase {
   esteNo: boolean
 }
 
-function Groso<T>(target: T, key: keyof T) { 
+function Groso<T>(target: T, key: keyof T) {
     if(!target['camposGrosos']) target['camposGrosos'] = []
     target['camposGrosos'].push(key)
 }
@@ -1254,7 +1254,7 @@ loritoInteligente.decimeChau() // retorna Chau! Esto no es un method_missing!
 ```
 
 Este enfoque permite capturar cualquier envío de mensaje, ya que no afecta el *method lookup* de todos los objetos, solo de los pocos proxiados (?).
-**Nota:** Ya podemos volver a ver [el código de *Lenses*](###Transformación-de-datos-inmutables).
+**Nota:** Ya podemos volver a ver [el código de *Lenses*](#transformación-de-datos-inmutables).
 
 Del otro lado del espectro, en lo referente a extensiones de interfaces, *Kotlin* mantiene posiciones extrañas. Por un lado se presenta muy restrictivo, debido a [la desafortunada decisión de hacer todas las abstracciones *final* por defecto](https://discuss.kotlinlang.org/t/classes-final-by-default/166/4) que impide, entre otras cosas, extender clases que no hayan sido explicitamente marcadas como `open`; mientras que, por el otro, define unas herramientas a las que llama **Extensions**, muy similares a las **Implicit Classes** de *Scala*, que permiten extender (pero no sobreescribir) cualquier clase, abierta o no, con *métodos* y *properties*.
 
@@ -1304,12 +1304,12 @@ fun main(args: Array<String>) {
 	val pepe = Persona(Informal)
     // Persona responde a la interfaz de Saludador delegando en su estratégia.
     pepe.saludar() // "Qui hace', pa?"
-    
+
     // Ojo! El bindeo no es completamente dinámico!
     // Cambiar el atributo no cambia la delegación.
     pepe.estrategia = Formal
     pepe.saludar()  // "Qui hace', pa?"
-    
+
     // Sin embargo, eso no es un problema si trabajamos de forma inmutable.
     val lordPepe = pepe.copy(Formal)
     lordPepe.saludar() // "Tenga usted un gran día, mi buen señor."
@@ -1341,4 +1341,4 @@ fun main(args: Array<String>) {
 }
 ```
 
-Esto tiene muchos usos prácticos, varios de los cuales ya vienen predefinidos (Ej.: [inicialización diferida](https://kotlinlang.org/docs/reference/delegated-properties.html#lazy), [propiedades observables](https://kotlinlang.org/docs/reference/delegated-properties.html#observable), [estado compartido](https://kotlinlang.org/docs/reference/delegated-properties.html#storing-properties-in-a-map)).
+Esto tiene muchos usos prácticos, varios de los cuales ya vienen predefinidos (Ej.: [inicialización diferida](https://kotlinlang.org/docs/delegated-properties.html#lazy-properties), [propiedades observables](https://kotlinlang.org/docs/delegated-properties.html#observable-properties), [estado compartido](https://kotlinlang.org/docs/delegated-properties.html#storing-properties-in-a-map)).
