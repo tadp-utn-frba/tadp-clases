@@ -43,13 +43,23 @@ package object Operations1 {
   def run(program: Program, initialMicro: Micro): Result = {
     program.foldLeft(Result(initialMicro)) { (previousResult, instruction) =>
       instruction match {
-        case Add                 => previousResult.map(micro => micro.copy(a = micro.a + micro.b))
-        case Mul                 => previousResult.map(micro => micro.copy(a = micro.a * micro.b))
-        case Swap                => previousResult.map(micro => micro.copy(a = micro.b, b = micro.a))
-        case Load(address)       => previousResult.map(micro => micro.copy(a = micro.mem(address)))
-        case Store(address)      => previousResult.map(micro => micro.copy(mem = micro.mem.updated(address, micro.a)))
-        case If(subInstructions) => previousResult.flatMap(micro => if (micro.a == 0) run(subInstructions, micro) else previousResult)
-        case Halt                => previousResult.flatMap(micro => Halted(micro))
+        case Add =>
+          previousResult.map(micro => micro.copy(a = micro.a + micro.b))
+        case Mul =>
+          previousResult.map(micro => micro.copy(a = micro.a * micro.b))
+        case Swap =>
+          previousResult.map(micro => micro.copy(a = micro.b, b = micro.a))
+        case Load(address) =>
+          previousResult.map(micro => micro.copy(a = micro.mem(address)))
+        case Store(address) =>
+          previousResult.map(micro => micro.copy(mem = micro.mem.updated(address, micro.a)))
+        case If(subInstructions) =>
+          previousResult.flatMap(micro =>
+            if (micro.a == 0) run(subInstructions, micro)
+            else previousResult
+          )
+        case Halt =>
+          previousResult.flatMap(micro => Halted(micro))
       }
     }
   }

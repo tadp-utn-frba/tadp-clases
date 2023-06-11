@@ -43,11 +43,25 @@ package object Operations2 {
   def run(program: Program, initialMicro: Micro): Result = {
     program.foldLeft(Result(initialMicro)) { (previousResult, instruction) =>
       instruction match {
-        case Add            => for (micro <- previousResult) yield micro.copy(a = micro.a + micro.b)
-        case Mul            => for (micro <- previousResult) yield micro.copy(a = micro.a * micro.b)
-        case Swap           => for (micro <- previousResult) yield micro.copy(a = micro.b, b = micro.a)
-        case Load(address)  => for (micro <- previousResult) yield micro.copy(a = micro.mem(address))
-        case Store(address) => for (micro <- previousResult) yield micro.copy(mem = micro.mem.updated(address, micro.a))
+        case Add =>
+          for (micro <- previousResult)
+          yield micro.copy(a = micro.a + micro.b)
+
+        case Mul =>
+          for (micro <- previousResult)
+          yield micro.copy(a = micro.a * micro.b)
+
+        case Swap =>
+          for (micro <- previousResult)
+          yield micro.copy(a = micro.b, b = micro.a)
+
+        case Load(address) =>
+          for (micro <- previousResult)
+          yield micro.copy(a = micro.mem(address))
+
+        case Store(address) =>
+          for (micro <- previousResult)
+          yield micro.copy(mem = micro.mem.updated(address, micro.a))
 
         case If(subInstructions) =>
           for {
@@ -55,10 +69,11 @@ package object Operations2 {
             nextMicro <- run(subInstructions, micro)
           } yield if (micro.a == 0) nextMicro else micro
 
-        case Halt => for {
-          micro <- previousResult
-          haltedMicro <- Halted(micro)
-        } yield haltedMicro
+        case Halt =>
+          for {
+            micro <- previousResult
+            haltedMicro <- Halted(micro)
+          } yield haltedMicro
       }
     }
   }

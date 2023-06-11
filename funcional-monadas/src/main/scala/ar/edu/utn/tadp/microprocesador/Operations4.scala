@@ -2,7 +2,7 @@ package ar.edu.utn.tadp.microprocesador
 
 import scala.util.Try
 
-package object Operations3 {
+package object Operations4 {
 
   type Program = List[Instruction]
   class ExecutionHaltException(val micro: Micro) extends RuntimeException
@@ -15,28 +15,36 @@ package object Operations3 {
     program.foldLeft(Try(initialMicro)) { (previousResult, instruction) =>
       instruction match {
         case Add =>
-          previousResult.map(micro => micro.copy(a = micro.a + micro.b))
+          for (micro <- previousResult)
+          yield micro.copy(a = micro.a + micro.b)
 
         case Mul =>
-          previousResult.map(micro => micro.copy(a = micro.a * micro.b))
+          for (micro <- previousResult)
+          yield micro.copy(a = micro.a * micro.b)
 
         case Swap =>
-          previousResult.map(micro => micro.copy(a = micro.b, b = micro.a))
+          for (micro <- previousResult)
+          yield micro.copy(a = micro.b, b = micro.a)
 
         case Load(address) =>
-          previousResult.map(micro => micro.copy(a = micro.mem(address)))
+          for (micro <- previousResult)
+          yield micro.copy(a = micro.mem(address))
 
         case Store(address) =>
-          previousResult.map(micro => micro.copy(mem = micro.mem.updated(address, micro.a)))
+          for (micro <- previousResult)
+          yield micro.copy(mem = micro.mem.updated(address, micro.a))
 
         case If(subInstructions) =>
-          previousResult.flatMap(micro =>
-            if (micro.a == 0) run(subInstructions, micro)
-            else previousResult
-          )
+          for {
+            micro <- previousResult
+            nextMicro <- run(subInstructions, micro)
+          } yield if (micro.a == 0) nextMicro else micro
 
         case Halt =>
-          previousResult.flatMap(micro => Try(throw new ExecutionHaltException(micro)))
+          for {
+            micro <- previousResult
+            haltedMicro <- Try(throw new ExecutionHaltException(micro))
+          } yield haltedMicro
       }
     }
   }
