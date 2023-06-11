@@ -2,20 +2,9 @@ name := "Microprocesador Objetos-Funcional III"
 
 description := "3. Ejercicio de Microprocesador reemplazando la recursividad por una reducción"
 
-scalaVersion := "2.11.12"
+scalaVersion := "2.13.10"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-lazy val cacao = FDProject(
-	"org.scalatest" %% "scalatest" % "2.2.1" % "test",
-	"com.novocode" % "junit-interface" % "0.11" % "test"
+libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest" % "3.2.15" % "test",
+  "org.scalactic" %% "scalactic" % "3.2.15"
 )
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-unmanagedSourceDirectories in Compile := Seq((scalaSource in Compile).value)
-
-unmanagedSourceDirectories in Test := Seq((scalaSource in Test).value)
-
-scalacOptions += "-feature"

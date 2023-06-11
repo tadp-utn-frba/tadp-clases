@@ -12,3 +12,9 @@ target
 .tmpBin
 *.sc
 */.cache-main
+.idea
+.metals
+metals.sbt
+.bloop
+.vscode
+
