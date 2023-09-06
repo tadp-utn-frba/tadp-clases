@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../src/age'
+require_relative '../src/age-clase2'
 
 describe 'age of empires tests' do
   #Los guerreros tienen estos parámetros por default: potencial_ofensivo=20, energia=100, potencial_defensivo=10
