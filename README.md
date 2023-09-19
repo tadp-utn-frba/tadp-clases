@@ -482,7 +482,7 @@ Vayamos ahora al otro extremo del espectro: ¿Qué ideas locas e inovadoras sobr
 
 Clases.
 
-![what year is it???](http://e.lvme.me/ohzrd5t.jpg)
+...
 
 Eso. Desde su versión *6*, *EcmaScript* incorpora una reificación del concepto de **Clases con Herencia Simple** y, obviamente, *TypeScript* traslada esto a su propio modelo.
 
