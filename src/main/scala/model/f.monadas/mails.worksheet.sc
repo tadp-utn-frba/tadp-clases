@@ -1,4 +1,4 @@
-import model.f.monadas.*
+import model.f.monadas._
 
 def mailAlCurso(curso: Curso): Unit = {
   val mensaje = curso.titular

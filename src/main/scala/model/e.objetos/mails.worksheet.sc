@@ -1,4 +1,4 @@
-import model.e.objetos.*
+import model.e.objetos._
 
 def mailAlCurso(curso: Curso): Unit = {
   val talVezUnDocente = curso.titular

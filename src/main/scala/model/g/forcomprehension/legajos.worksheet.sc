@@ -1,4 +1,4 @@
-import model.e.objetos.*
+import model.e.objetos._
 
 for {
   materia <- todasLasMaterias if materia.electiva

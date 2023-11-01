@@ -1,4 +1,4 @@
-import model.f.monadas.*
+import model.f.monadas._
 
 import scala.util.Try
 
