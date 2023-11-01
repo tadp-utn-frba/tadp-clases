@@ -1,6 +1,6 @@
 package helpers.b
 
-import listas.b.tad.{head, isEmpty, tail}
+import listas.b.snoc.{head, isEmpty, tail}
 import model.abcd.funcional.{Materia, Curso, Alumno}
 
 package object tad {

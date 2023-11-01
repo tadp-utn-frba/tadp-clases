@@ -1,6 +1,7 @@
 package listas.c
 
-import listas.b.tad.{head, init, isEmpty, last, tail}
+import listas.b.cons.{head, isEmpty, tail}
+import listas.b.snoc.{init, last}
 
 package object reduccion {
   def foldLeft[A, B](semilla: A)(reduccion: (A, B) => A)(lista: List[B]): A =
