@@ -15,3 +15,19 @@ puts nombre
 # Podemos decir entonces que el proc tiene acceso a las variables donde fue definido pero el proc define su propio contexto
 
 # Pero que pasa con los metodos?
+def m1
+  puts nombre
+end
+m1
+# A diferencia de procs, los defs o clases no pueden acceder a variables de afuera de su contexto
+# Para poder acceder a la variable de afuera de su contexto, se puede hacer como un bloque
+
+define_method(:m2) do
+  puts nombre # Lo hago con un bloque
+end
+m2
+
+# Idem con clases
+C1 = Class.new do
+  puts nombre
+end
