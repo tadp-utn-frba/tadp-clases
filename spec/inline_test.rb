@@ -1,26 +1,23 @@
-test_suite do
-  test do
-    pepe = objeto do
-      def nombre
-        "Pepe"
-      end
+require_relative '../src/segundaParte/inline/5_inline'
 
-      def saludar
-        "Hola #{nombre}"
-      end
-    end
-    assert(pepe.saludar == "Hola Pepe")
+pepe = objeto do
+  def nombre
+    "Pepe"
   end
 
-  test do
-    Persona = clase do
-      attr_reader :nombre
-
-      def initialize(nombre)
-        @nombre = nombre
-      end
-    end
-    pepe = Persona.new("Pepe")
-    assert(pepe.nombre == "Pepe")
+  def saludar
+    "Hola #{nombre}"
   end
 end
+
+puts pepe.saludar == "Hola Pepe"
+
+Persona = clase do
+  attr_reader :nombre
+
+  def initialize(nombre)
+    @nombre = nombre
+  end
+end
+pepe = Persona.new("Pepe")
+puts pepe.nombre == "Pepe"
