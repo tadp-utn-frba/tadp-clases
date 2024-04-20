@@ -1,4 +1,4 @@
-require_relative '../src/segundaParte/inline/5_inline'
+require_relative '../src/resolucion/segundaParte/inline/5_inline'
 
 pepe = objeto do
   def nombre
