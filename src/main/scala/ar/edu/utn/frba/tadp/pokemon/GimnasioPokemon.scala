@@ -32,11 +32,26 @@ object GimnasioPokemon {
       } else pokemonNuevo
     }
 
-    val nivel: Int = ???
+    def ganaVelocidad(velocidadGanada: Int): Pokemon = this.copy(velocidad= (velocidad+velocidadGanada).min(100))
 
-    def aumentarStats: Pokemon = {
-      ???
+    lazy val nivel = {
+      //experiencia para llegar al nivel actual
+      //nivel actual
+      def nivelR(experienciaParaNivel: Int,
+                 nivel: Int): Int = {
+        val experienciaParaProximoNivel =
+          2 * experienciaParaNivel + especie.resistenciaEvolutiva
+        if (experienciaParaProximoNivel > xp) {
+          nivel
+        } else {
+          nivelR(experienciaParaProximoNivel, nivel + 1)
+        }
+      }
+      //Llamada recursiva de obtener el nivel a partir de la experiencia actual.
+      nivelR(0, 1)
     }
+
+    def aumentarStats: Pokemon = ???
 
     def descansar: Pokemon = this.recuperarEnergia(energiaMaxima)
   }
@@ -45,14 +60,14 @@ object GimnasioPokemon {
   val descansar: Actividad = _.map(pokemon => pokemon.descansar)
   case class LevantarPesas(kilos: Int) {
       def apply(tryPokemon: Try[Pokemon]): Try[Pokemon] = {
-//Cuando un Pokémon levanta pesas,
-// gana 1 punto de experiencia por cada kilo levantado.
-// Si un Pokémon levanta más de 10 kilos
-// por cada punto de Fuerza, no gana nada de Experiencia y
-// pierde 10 de energía.
-// Los Pokémon de Tipo Pelea ganan el doble de puntos.
-// Los Pokémon de Tipo Fantasma NO PUEDEN levantar pesas (es decir, son incapaces de realizar la
-// actividad, sin importar el peso a levantar ni ningún otro factor).
+      //Cuando un Pokémon levanta pesas,
+      // gana 1 punto de experiencia por cada kilo levantado.
+      // Si un Pokémon levanta más de 10 kilos
+      // por cada punto de Fuerza, no gana nada de Experiencia y
+      // pierde 10 de energía.
+      // Los Pokémon de Tipo Pelea ganan el doble de puntos.
+      // Los Pokémon de Tipo Fantasma NO PUEDEN levantar pesas (es decir, son incapaces de realizar la
+      // actividad, sin importar el peso a levantar ni ningún otro factor).
         tryPokemon.map( pokemon =>
         pokemon match {
           case Fantasma(_,_) => throw new RuntimeException("Un pokemon fantasma no puede levantar peso.")
@@ -63,6 +78,18 @@ object GimnasioPokemon {
         )
       }
   }
+  case class Nadar(minutos: Int) extends Actividad {
+    def apply(pokemon:Pokemon) = {
+      val pokemonEntrenado = pokemon
+        .ganaExperiencia(200 * minutos)
+        .pierdeEnergia(minutos)
+
+      pokemonEntrenado match {
+        case Agua(_,_) => pokemonEntrenado.ganaVelocidad(minutos / 60)
+        case _ => pokemonEntrenado
+      }
+    }
+  }
 
   val levantarPesasObj10 = LevantarPesas(10)
   def levantarPesas(kilos: Int)(pokemon: Pokemon): Pokemon = ???
@@ -70,7 +97,8 @@ object GimnasioPokemon {
 
   case class Especie(tipoPrincipal: Tipo,
                      tipoSecundario: Option[Tipo],
-                     multiplicador: OperadorDeStats) {
+                     resistenciaEvolutiva: Int,
+                     multiplicador: Stats) {
 
       def esTipo(tipo: Tipo) = {
         esTipoPrimario(tipo) || esTipoSecundario(tipo)
@@ -80,10 +108,14 @@ object GimnasioPokemon {
       def esTipoSecundario(tipo: Tipo) = tipoSecundario.contains(tipo)
   }
 
-  case class OperadorDeStats(energiaMaxima: Int,
+  case class Stats(energiaMaxima: Int,
                              fuerza: Int,
                              velocidad: Int) {
 
+    //TODO: definir si estos stats son solo para los multiplicadores o tambien para los modificadores del pokemon.
+    // Como validamos a un pokemon si usamos stats???
+    def +(otroStats: Stats): Stats = ???
+    def *(otroStats: Stats): Stats = ???
   }
 
   trait Tipo {
