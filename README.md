@@ -1324,10 +1324,10 @@ De forma similar, es posible delegar la implementación de una *property* en otr
 import kotlin.reflect.KProperty
 
 class MiClase() {
-    val propiedadPeresoza : String by Peresozo { "foo" }
+    val propiedadPerezosa : String by Perezoso { "foo" }
 }
 
-class Peresozo<T>(val getter:(()->T)) {
+class Perezoso<T>(val getter:(()->T)) {
     var valor: T? = null
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
@@ -1337,7 +1337,7 @@ class Peresozo<T>(val getter:(()->T)) {
 }
 
 fun main(args: Array<String>) {
-    MiClase().propiedadPeresoza // Retorna "foo"
+    MiClase().propiedadPerezosa // Retorna "foo"
 }
 ```
 
