@@ -9,13 +9,13 @@ class Micro {
   private var _mem: Array[Int] = new Array(MEM_SIZE)
   
   def a = _a
-  def a_=(value: Int) {
+  def a_=(value: Int): Unit = {
     require(value < REGISTER_SIZE && value > -REGISTER_SIZE)
     _a = value
   }
   
   def b = _b
-  def b_=(value: Int) {
+  def b_=(value: Int): Unit = {
     require(value < REGISTER_SIZE && value > -REGISTER_SIZE)
     _b = value
   }

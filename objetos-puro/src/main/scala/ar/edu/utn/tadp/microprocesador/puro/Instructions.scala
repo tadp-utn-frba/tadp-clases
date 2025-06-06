@@ -8,14 +8,14 @@ import ar.edu.utn.tadp.microprocesador.ExecutionHaltException
 // ---------------------------------------------------------------------------------------------------------------------------------
 
 class Program(private var instructions: Seq[Instruction]) {
-  def runOn(micro: Micro) {
+  def runOn(micro: Micro): Unit = {
     for (instruction <- instructions)
       instruction.beExecutedBy(micro)
   }
 
   def print = instructions.map(_.print).mkString(", ")
 
-  def simplify {
+  def simplify: Unit = {
     var simplified = 0
     while (simplified < instructions.size - 1) {
       val simplifiedPair: Seq[Instruction] = instructions(simplified).simplifiedBefore(instructions(simplified + 1))
@@ -32,7 +32,7 @@ class Program(private var instructions: Seq[Instruction]) {
 // ---------------------------------------------------------------------------------------------------------------------------------
 
 trait Instruction {
-  def beExecutedBy(micro: Micro)
+  def beExecutedBy(micro: Micro): Unit
 
   def print: String
 
@@ -43,7 +43,7 @@ trait Instruction {
 }
 
 object Add extends Instruction {
-  def beExecutedBy(micro: Micro) {
+  def beExecutedBy(micro: Micro): Unit = {
     micro.a = micro.a + micro.b
   }
 
@@ -51,7 +51,7 @@ object Add extends Instruction {
 }
 
 object Mul extends Instruction {
-  def beExecutedBy(micro: Micro) {
+  def beExecutedBy(micro: Micro): Unit = {
     micro.a = micro.a * micro.b
   }
 
@@ -59,7 +59,7 @@ object Mul extends Instruction {
 }
 
 object Swap extends Instruction {
-  def beExecutedBy(micro: Micro) {
+  def beExecutedBy(micro: Micro): Unit = {
     val temp = micro.a
     micro.a = micro.b
     micro.b = temp
@@ -72,7 +72,7 @@ object Swap extends Instruction {
 }
 
 class Load(val address: Int) extends Instruction {
-  def beExecutedBy(micro: Micro) {
+  def beExecutedBy(micro: Micro): Unit = {
     micro.a = micro.mem(address)
   }
 
@@ -83,7 +83,7 @@ class Load(val address: Int) extends Instruction {
 }
 
 class Store(val address: Int) extends Instruction {
-  def beExecutedBy(micro: Micro) {
+  def beExecutedBy(micro: Micro): Unit = {
     micro.mem(address) = micro.a
   }
 
@@ -94,7 +94,7 @@ class Store(val address: Int) extends Instruction {
 }
 
 class If(subInstructions: Program) extends Instruction {
-  def beExecutedBy(micro: Micro) {
+  def beExecutedBy(micro: Micro): Unit = {
     if (micro.a == 0) subInstructions.runOn(micro)
   }
 
@@ -107,7 +107,7 @@ class If(subInstructions: Program) extends Instruction {
 }
 
 object Halt extends Instruction {
-  def beExecutedBy(micro: Micro) {
+  def beExecutedBy(micro: Micro): Unit = {
     throw new ExecutionHaltException
   }
 

@@ -9,14 +9,14 @@ trait InstructionVisitor {
   def visitProgram(program: Program) = program.accept(this)
   def visitInstruction(instruction: Instruction) = instruction.accept(this)
 
-  def visitAdd(instruction: Add.type)
-  def visitMul(instruction: Mul.type)
-  def visitSwap(instruction: Swap.type)
-  def visitLoad(instruction: Load)
-  def visitStore(instruction: Store)
-  def visitIf(instruction: If)
-  def endVisitIf(instruction: If)
-  def visitHalt(instruction: Halt.type)
+  def visitAdd(instruction: Add.type): Unit
+  def visitMul(instruction: Mul.type): Unit
+  def visitSwap(instruction: Swap.type): Unit
+  def visitLoad(instruction: Load): Unit
+  def visitStore(instruction: Store): Unit
+  def visitIf(instruction: If): Unit
+  def endVisitIf(instruction: If): Unit
+  def visitHalt(instruction: Halt.type): Unit
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------------
@@ -28,37 +28,37 @@ class RunVisitor(micro: Micro) extends InstructionVisitor {
   
   override def visitInstruction(instruction: Instruction) = if(!ignoreInstructions) super.visitInstruction(instruction)
   
-  def visitAdd(instruction: Add.type) {
+  def visitAdd(instruction: Add.type): Unit = {
     micro.a = micro.a + micro.b
   }
 
-  def visitMul(instruction: Mul.type) {
+  def visitMul(instruction: Mul.type): Unit = {
     micro.a = micro.a * micro.b
   }
 
-  def visitSwap(instruction: Swap.type) {
+  def visitSwap(instruction: Swap.type): Unit = {
     val temp = micro.a
     micro.a = micro.b
     micro.b = temp
   }
 
-  def visitLoad(instruction: Load) {
+  def visitLoad(instruction: Load): Unit = {
     micro.a = micro.mem(instruction.address)
   }
 
-  def visitStore(instruction: Store) {
+  def visitStore(instruction: Store): Unit = {
     micro.mem(instruction.address) = micro.a
   }
 
-  def visitIf(instruction: If) {
+  def visitIf(instruction: If): Unit = {
     if (micro.a != 0) ignoreInstructions = true
   }
   
-  def endVisitIf(instruction: If) {
+  def endVisitIf(instruction: If): Unit = {
     ignoreInstructions = false
   }
 
-  def visitHalt(instruction: Halt.type) {
+  def visitHalt(instruction: Halt.type): Unit = {
     throw new ExecutionHaltException
   }
 }
@@ -104,36 +104,36 @@ class SimplifyVisitor() extends InstructionVisitor {
   private var lastWroteMemAddress = 0
   private var visitedHalt = false
   
-  def visitAdd(instruction: Add.type) {
-	  simplified.top += instruction
+  def visitAdd(instruction: Add.type): Unit = {
+    simplified.top += instruction
 
-	  justVisitedSwap = false
+    justVisitedSwap = false
     justLoadedA = false
     justWroteMem = false
   }
 
-  def visitMul(instruction: Mul.type) {
-	  simplified.top += instruction
+  def visitMul(instruction: Mul.type): Unit = {
+    simplified.top += instruction
 
-	  justVisitedSwap = false
+    justVisitedSwap = false
     justLoadedA = false
     justWroteMem = false
   }
 
-  def visitSwap(instruction: Swap.type) {
+  def visitSwap(instruction: Swap.type): Unit = {
     if(justVisitedSwap){
       simplified.top.dropRight(1)
       justVisitedSwap = false
     } else {
       simplified.top += instruction
-    	justVisitedSwap = true
+      justVisitedSwap = true
     }
 
     justLoadedA = false
     justWroteMem = false
   }
 
-  def visitLoad(instruction: Load) {
+  def visitLoad(instruction: Load): Unit = {
     if(justLoadedA) simplified.top.dropRight(1)
     
     simplified.top += instruction
@@ -143,7 +143,7 @@ class SimplifyVisitor() extends InstructionVisitor {
     justLoadedA = true
   }
 
-  def visitStore(instruction: Store) {
+  def visitStore(instruction: Store): Unit = {
     if(justWroteMem && lastWroteMemAddress == instruction.address) simplified.top.dropRight(1)
     
     simplified.top += instruction
@@ -154,7 +154,7 @@ class SimplifyVisitor() extends InstructionVisitor {
     justLoadedA = false
   }
 
-  def visitIf(instruction: If) {
+  def visitIf(instruction: If): Unit = {
     simplified.push(ListBuffer[Instruction]())
     
     justVisitedSwap = false
@@ -162,7 +162,7 @@ class SimplifyVisitor() extends InstructionVisitor {
     justLoadedA = false
   }
   
-  def endVisitIf(instruction: If) {
+  def endVisitIf(instruction: If): Unit = {
     val subInstructions = simplified.pop()
     if(subInstructions.nonEmpty) simplified.top += new If(new Program(subInstructions))
     
@@ -171,7 +171,7 @@ class SimplifyVisitor() extends InstructionVisitor {
     justLoadedA = false
   }
 
-  def visitHalt(instruction: Halt.type) {
+  def visitHalt(instruction: Halt.type): Unit = {
     simplified.top += instruction
     
     visitedHalt = true

@@ -6,10 +6,10 @@ import ar.edu.utn.tadp.microprocesador.Micro
 // PROGRAM
 // ---------------------------------------------------------------------------------------------------------------------------------
 
-class Program(private var instructions: Seq[Instruction]) {
+class Program(private var instructions: collection.Seq[Instruction]) {
   def instructionCount = instructions.size
   
-  def accept(visitor: InstructionVisitor) {
+  def accept(visitor: InstructionVisitor): Unit = {
     for (instruction <- instructions)
       instruction.accept(visitor)
   }
@@ -20,7 +20,7 @@ class Program(private var instructions: Seq[Instruction]) {
 // ---------------------------------------------------------------------------------------------------------------------------------
 
 trait Instruction {
-  def accept(visitor: InstructionVisitor)
+  def accept(visitor: InstructionVisitor): Unit
 }
 
 object Add extends Instruction {
@@ -44,7 +44,7 @@ class Store(val address: Int) extends Instruction {
 }
 
 class If(subInstructions: Program) extends Instruction {
-  def accept(visitor: InstructionVisitor) {
+  def accept(visitor: InstructionVisitor): Unit = {
     visitor.visitIf(this)
     subInstructions.accept(visitor)
     visitor.endVisitIf(this)
