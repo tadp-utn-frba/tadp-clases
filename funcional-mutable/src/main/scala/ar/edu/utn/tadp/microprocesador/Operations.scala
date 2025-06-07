@@ -9,7 +9,7 @@ package object Operations {
   // RUN
   // ---------------------------------------------------------------------------------------------------------------------------------
 
-  def run(program: Program, micro: Micro) {
+  def run(program: Program, micro: Micro): Unit = {
     for (instruction <- program)
       instruction match {
         case Add => micro.a = micro.a + micro.b
