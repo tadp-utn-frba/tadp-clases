@@ -1,337 +1,323 @@
-# Clase 6: Ejercicio Integrador N° 2
+# Ejercicio de diseño de metaprogramación: Prototype
 
-En esta clase veremos otro ejercicio integrador con el mismo fin que la clase pasada. Para ello realizaremos el ejercicio de Multimethods. 
+## Introducción
 
-## Que es multimethod?
+En Ruby existen, por defecto, dos formas de definir y compartir comportamiento entre los distintos objetos
+de nuestro sistema: Clases y Mixins (modules). Pero debido a sus características dinámicas y a su metamodelo
+maleable, es posible alterar las formas de recibir comportamiento e incluso agregar nuevas.
+El objetivo de este trabajo práctico es, entonces, implementar y analizar una nueva forma de definir y compartir
+comportamiento en Ruby, puntualmente a través deprototipos.
 
-Es un sistema que permite que una serie de métodos sean polimórficos en al menos uno o más de sus argumentos. Esta idea se puede ver en CLOS (Common Lisp Object System) y algunos lenguajes como Dylan. CLOS extiende a Common Lisp para agregar un sistema de objectos [http://c2.com/cgi/wiki?TheArtOfTheMetaObjectProtocol](http://c2.com/cgi/wiki?TheArtOfTheMetaObjectProtocol) extendiendo el lenguaje y para dar soporte a objetos. 
+## Prototipos programáticos
 
-## Una explicación simple de Multimethods
-
-En Ruby como en Python, ambos tienen sistemas de single dispatch, en el que la firma es esencialmente el nombre del método, sin importar en temas como la aridad, por lo que dos métodos como 
-
-~~~ruby
-def saraza(a)
-….
-end
-~~~
-
-y 
-
-~~~ruby
-def saraza(a, b, c)
-….
-end
-~~~
-
-no serán dos métodos sino que dependiendo de cómo estén declarados en el caso de Ruby, la segunda declaración pisa a la primera, en el caso de Python, en general sucede lo mismo en un intérprete o directamente nos lanzará un error en el código. Más allá de eso, nosotros queremos que saraza(a) y saraza(a, b) puedan coexistir y el método a ejecutar dependa de cuáles sean los parámetros recibidos. Por lo que deberemos chequear esto en tiempo de ejecución y dirigir el flujo al método con la firma adecuada. Esto se relaciona un poco con el concepto de polimorfismo del receptor, por ej. si tenemos algo como:
-
-~~~ruby
-a.saraza(unParam)
-~~~
-
-a ejecutará un método u otro dependiendo de la clase a la que pertenece, queremos abrir la puerta a que también se decida en base al tipo de unParam. Vamos a hablar más sobre firmas de métodos y la búsqueda de la definición para un mensaje a partir de la misma en la segunda parte de la materia, cuando trabajemos con un lenguaje con tipado estático. De momento quédense con la idea de que lo que queremos implementar va a resolver qué definición usar en tiempo de ejecución, a partir del tipo de todos los objetos involucrados en el envío del mensaje, no sólo el receptor.
+Para esta primera parte, se busca introducir la nueva forma de definir comportamiento. La intención es poder hacer algo como lo que sigue:
 
 
-## En donde entra la metaprogramación?
+```ruby
+guerrero = PrototypedObject.new
 
-En este caso extenderemos a Ruby agregándole multimethods, de esta manera estamos un poco más del lado de intercession que es la capacidad de extender el lenguaje en el que estamos para agregarle más features interesantes (o locos?). Además como otros ejercicios usaremos reflection y self modification para llegar a resolver este problema.
+guerrero.set_property(:energia, 100)
+expect(guerrero.get_property(:energia)).to eq(100)
 
-Sobre el ejercicio
+# Pero esto tambien deberia funcionar:
+expect(guerrero.energia).to eq(100)
 
-El enunciado del ejercicio esta [acá](https://www.google.com/url?q=http://drive.google.com/open?id%3D1_yCtJQdQbhaeWny5ByMJKNJKpCmEdTELoTEoCZG4_4Q&sa=D&ust=1471097603702000&usg=AFQjCNHbRgVqvmyQL0fi9u3_cIJPY15dXQ)
+guerrero.set_property(:potencial_defensivo, 10)
+guerrero.set_property(:potencial_ofensivo, 30)
 
-El código al que llegamos al final de la clase esta en este [repo](https://github.com/tadp-utn-frba/tadp-clases/tree/ruby-multimethods)
+guerrero.set_method(:atacar_a,
+    proc { |otro_guerrero|
+        if(otro_guerrero.potencial_defensivo < self.potencial_ofensivo)
+          otro_guerrero.recibe_danio(self.potencial_ofensivo - otro_guerrero.potencial_defensivo)
+        end
+})
 
-En el primer punto implementamos algo del estilo
+guerrero.set_method(:recibe_danio, proc {...})
 
-~~~ruby
-helloBlock = PartialBlock.new([String]) do |who|
-  "Hello #{who}"
-end
+otro_guerrero = guerrero.clone #clone es un metodo que ya viene definido en Ruby
 
-helloBlock.matches("a") #true
-helloBlock.matches(1) #false
-helloBlock.matches("a", "b") #false
-~~~
+guerrero.atacar_a otro_guerrero
 
-Acá lo que hicimos fue algo bastante simple que es crear la abstracción del PartialBlock que contenga los tipos de los parámetros esperados y el bloque que se espera poder ejecutar, y después le definimos el método matches devolviendo true o false dependiendo de si los tipos esperados coinciden con los de los argumentos que le pasamos al método. Este método debía definirse con varargs para poder recibir múltiples argumentos como se indicaba en el ejemplo de uso.
+expect(otro_guerrero.energia).to eq(80)
+```
 
-~~~ruby
-class PartialBlock
-  attr_accessor :block, :types
+Hasta aquí el único agregado es la posibilidad de definir métodos y propiedades en cualquier objeto prototipado,
+sin necesidad que ese comportamiento provenga de una clase en particular.
 
-  def initialize types, &block
-    self.types = types
-    self.block = block
-  end
+Lo interesante viene ahora:
 
-  def matches(*values)
-    unless values.length == types.length
-      return false
-    end
+```ruby
+espadachin = PrototypedObject.new
 
-    return true
-  end
+espadachin.set_prototype(guerrero)
 
-end
-~~~
+espadachin.set_property(:habilidad, 0.5)
+espadachin.set_property(:potencial_espada, 30)
+espadachin.energia = 100
 
-Además para poder evaluarlos como se pide a continuación usando call le agregamos:
+espadachin.set_method(:potencial_ofensivo, proc {
+  @potencial_ofensivo + self.potencial_espada * self.habilidad
+})
 
-~~~ruby
-class PartialBlock
+espadachin.atacar_a(otro_guerrero)
+expect(otro_guerrero.energia).to eq(75)
+```
 
-  def call(*args)
-    raise ArgumentError unless self.matches(*args)
-    self.block.call(*args)
-  end
+Más interesante todavía es la relación que se crea entre el espadachin y su prototipo:
 
-end
-~~~
+```ruby
+guerrero.set_method(:sanar, proc {  self.energia = self.energia + 10 })
 
-2. El segundo punto es el de poder crear multimethods de la mano de partial_def, que debemos poder utilizarlo en el contexto de una clase, de modo que luego las instancias de esa clase puedan responder al mensaje correspondiente. 
+espadachin.sanar
+expect(espadachin.energia).to eq(110)
+```
 
-~~~ruby
-class A
-  partial_def :concat, [String, String] do |s1,s2|
-    s1 + s2
-  end
+Es decir, cualquier cambio en el prototipo impacta también en los objetos derivados deél. Cabe aclarar que el
+prototipo provee métodos y no estado.
 
-  partial_def :concat, [String, Integer] do |s1,n|
-    s1 * n
-  end
+Distinto sucede con la clonación: Los cambios no se impactan en el objeto que es clon:
 
-  partial_def :concat, [Array] do |a|
-    a.join
-  end
-end
+```ruby
+expect {otro_guerrero.sanar}.to raise_error(NoMethodError)
+```
 
-A.new.concat('hello', ' world') # devuelve 'helloworld'
-A.new.concat('hello', 3) # devuelve 'hellohellohello'
-A.new.concat(['hello', ' world', '!']) # devuelve 'hello world!'
-A.new.concat('hello', 'world', '!') # Lanza una excepción!
-~~~
+Además, con la clonación se copia el estado del objeto, cosa que no debe suceder con los prototipos.
 
-Ahora debemos definir el comportamiento del partial_def, abriendo una clase del metamodelo, pero cual? Podría pensarse de hacerlo sobre Object, al hacerlo sobre esta clase funcionaría para cualquier clase, pero a su vez le estaría dando este comportamiento también a cualquier objeto, lo cual no tendría sentido, sólo lo querríamos para las clases. Una opción válida sería Class aunque si queremos usar partial_def en un módulo no podremos, por lo que la otra opción es hacerlo sobre Module y permitirle tanto a clases como a módulos el de poder utilizar partial_def.
+Tampoco son afectados los métodos que fueron redefinidos por el objeto derivado:
 
-Otra cosa que tuvimos que decidir fue cómo íbamos a representar a los multimethods y cómo almacenar la información de cada definición que se haga usando partial_def. Una primer idea fue tener un atributo que guardara un diccionario donde el selector del mensaje a definir fuera la clave y se le asociara una lista con los partial blocks. Otra alternativa, por la que decidimos ir, era reificar la idea de Multimethod, de esa forma el atributo que terminamos llamando @actual_multimethods tendría directamente una lista de instancias de Multimethod (una por cada selector) de modo que se pudiera delegar también a estos objetos en vez de mantener toda la lógica en Module.
+```ruby
+guerrero.set_method(:potencial_ofensivo, proc {  1000  })
 
-Para poder mandarle el mensaje definido usando partial_def a las instancias de la clase también surgieron ideas distintas. Una de ellas era definir un método en la clase/módulo que recibió partial_def que se llame igual que el símbolo recibido por parámetro de modo que triggeree la búsqueda de la implementación correspondiente en base a los parámetros que reciba, la otra era redefinir method_missing de modo que obtenga el multimethod con el símbolo correspondiente al mensaje no entendido y luego triggeree esa misma búsqueda en base a los parámetros recibidos.
+expect(espadachin.potencial_ofensivo).to eq(45)
+```
 
-Fuimos por la primer alternativa porque no hay una verdadera necesidad de caer en el method_missing, después de todo ya sabemos de antemano cuál es el mensaje que tiene que poder entender, y en general vamos a optar por no usar method_missing en esos casos ya que es más complejo (tenemos que asegurarnos de mantener consistente la interfaz de reflection también, cosa que si definimos el método usando define_method se da solo).
+Finalmente, también nos interesa hacer que el comportamiento “prototipable” sea algo que yo pueda usar en
+cualquier lado. Por ejemplo:
 
-Además definimos la lógica necesaria para poder responder a los mensajes multimethod y multimethods:
-
-~~~ruby
-A.multimethods() #[:concat]
-A.multimethod(:concat) #Representación del multimethod
-~~~
-
-... cuya implementación, al modelar al multimethod como un objeto, es trivial. Finalmente llegamos al siguiente código:
-
-~~~ruby
-class Module
-
-  def partial_def(sym, types, &block)
-    partial_block = PartialBlock.new(types, &block)
-    multimethod = get_multimethod(sym)
-    multimethod.definitions << partial_block
-    self.send(:define_method, sym) do |*args|
-      multimethod.call(*args)
-    end
-  end
-
-  def actual_multimethods
-    @actual_multimethods ||= []
-  end
-
-  def multimethod(sym)
-    self.actual_multimethods.find { |mm| mm.selector.eql?(sym) }
-  end
-
-  def multimethods
-    self.actual_multimethods.map { |mm| mm.selector }
-  end
-
-  private
-
-  def has_multimethod?(multimethod)
-    self.actual_multimethods.include?(multimethod)
-  end
-
-  def get_multimethod(sym)
-    multimethod = self.multimethod(sym) || MultiMethod.new(sym)
-    actual_multimethods << multimethod unless has_multimethod?(multimethod)
-    multimethod
-  end
-
-end
-
-class MultiMethod
-
-  attr_accessor :selector, :definitions
-
-  def initialize(sym)
-    self.selector = sym
-    self.definitions = []
-  end
-
-  def call(*args)
-    definition = self.definitions
-                     .select { |definition| definition.matches(*args) }
-                     .min_by { |definition| definition.distance_to(*args) }
-    definition ? definition.call(*args) : raise(NoMethodError)
-  end
-
-end
-
-class PartialBlock
-  def distance_to(*args)
-    args.zip(types).each_with_index do |tuple, index|
-      case tuple[1]
-        when Array then
-          1 #because classroom-related reasons
-        else
-          tuple[0].class.ancestors.index(tuple[1]) * index
-      end
-    end
-  end
-end
-~~~
-
-Cabe destacar que esa solución de partial_def fue posible gracias a que el bloque conoce el contexto en el cual fue creado, por eso no es necesario buscar el multimethod en la lista.
-
-A su vez, se pide extender la interfaz de reflection con métodos que indiquen si un objeto responde a un determinado mensaje con cierta firma:
-
-~~~ruby
-A.new.respond_to?(:concat) # true, define el método como multimethod
-A.new.respond_to?(:to_s) # true, define el método normalmente
-A.new.respond_to?(:concat, false, [String,String]) # true, los tipos coinciden
-A.new.respond_to?(:concat, false, [Integer,A]) # true, matchea con [Object, Object]
-A.new.respond_to?(:to_s, false, [String]) # false, no es un multimethod
-A.new.respond_to?(:concat, false, [String,String,String]) # false, los tipos no coinciden
-~~~
-
-Entonces también debemos redefinir el respond_to?. Hay que tener siempre cuidado con este tipo de extensiones ya que debemos estar atentos de no modificar el comportamiento para aquellos métodos que no fueron definidos por medio de un partial_def. Las opciones propuestas fueron:
-Definir respond_to? usando partial_def, de modo que que la definición original de respond_to? (la cual deberíamos asegurarnos de no perder mediante un alias o pidiendo el unbound method y guardándolo en una variable para poder invocarlo más adelante) se use si matchea con los tipos [Symbol] o [Symbol, Object], y una tercer definición para [Symbol, Object, Array] que haga lo que nosotros queremos.
-Redefinir respond_to? como un método normal con un if, de modo que si nos pasan el tercer parámetro, se use la definición para multimethods y sino la original.
-
-Tratamos de ir por la primera porque era más divertida, pero lamentablemente no funcionó por un loop infinito (respond_to? se usa en el core del method lookup, no fue por un error de la solución en sí, simplemente justo con en respond_to? no se puede, se las dejamos comentada de todos modos). Luego fuimos por la otra alternativa:
- 
-~~~ruby
+```ruby
 class Object
-
-  def respond_to?(sym, include_private = false, signature = nil)
-    signature.nil? ? super(sym, include_private) : self.class.actual_multimethods
-               .any? { |mm| mm.matches?(sym, signature) }
-  end
-
-=begin
-  partial_def :respond_to?, [Symbol] do |sym|
-    self.old_respond_to?(sym)
-  end
-  partial_def :respond_to?, [Symbol, Object] do |sym, bool|
-    self.old_respond_to?(sym, bool)
-  end
-  partial_def :respond_to?, [Symbol, Object, Array] do |sym, bool, types|
-    false unless self.class.multimethods.include?(sym)
-    multimethod = self.class.multimethod(sym)
-    multimethod.matches_signature?(types)
-  end
-=end
-
+  include Prototyped
 end
-~~~
+```
 
-Para saber si existe alguna definición para el multimethod cuya firma matchee con la lista de tipos recibida refactorizamos un poco PartialBlock para evitar la repetición de lógica.
+## 4.2. Constructores
 
-~~~ruby
-class Multimethod
+Las clases proveen, además de comportamiento, un mecanismo para construir los objetos de manera tal que
+cada uno pueda tener inicializado su estado para funcionar según corresponda.
 
-  def matches?(sym, types)
-    self.selector.eql?(sym) && self.definitions
-                             .any? { |definition|definition.matches_signature?(types)}
-  end
-  
+En principio, queremos un objeto o función que nos permita construir un objeto en base a un prototipo,
+inicializando su estado con parámetros:
+
+```ruby
+Guerrero = PrototypedConstructor.new(guerrero, proc {
+    |guerrero_nuevo, una_energia, un_potencial_ofensivo, un_potencial_defensivo|
+    
+    guerrero_nuevo.energia = una_energia
+    guerrero_nuevo.potencial_ofensivo = un_potencial_ofensivo
+    guerrero_nuevo.potencial_defensivo = un_potencial_defensivo
+})
+
+un_guerrero = Guerrero.new(100, 30, 10)
+expect(un_guerrero.energia).to eq(100)
+```
+
+El resultado del new sería un objeto con “guerrero” como prototipo y el estado inicializado como indica el proc
+que se pasa como parámetro.
+
+Pero esa forma de definir los constructores requiere mucho trabajo. Luego veremos cómo hacerla más linda
+y usable, pero por lo pronto lo que podemos hacer es definir un constructor sencillo por defecto. Tenemos la
+información de las propiedades del prototipo para trabajar. Por ejemplo:
+
+```ruby
+Guerrero = PrototypedConstructor.new(guerrero)
+
+un_guerrero = Guerrero.new(
+{energia: 100, potencial_ofensivo: 30, potencial_defensivo: 10}
+)
+expect(un_guerrero.potencial_ofensivo).to eq(30)
+```
+
+Por el hecho de que no está claramente definido el orden de los parámetros, usamos un mapa.
+
+Además, queremos definir un constructor que cree un prototipo y copie el estado actual del prototipo. Para
+ello, usamos lo siguiente:
+
+```ruby
+Guerrero = PrototypedConstructor.copy(guerrero)
+
+un_guerrero = Guerrero.new
+expect(un_guerrero.potencial_defensivo).to eq(10)
+```
+
+Finalmente, con lo que hicimos también podemos producir un constructor que altere los métodos que entiende
+el objeto, produciendo un nuevo tipo de objeto. Nos interesa que un constructor pueda extender de otro:
+
+```ruby
+#Guerrero es la primer variante de constructores, que recibe 3 parametros
+Espadachin = Guerrero.extended {
+  |espadachin, habilidad, potencial_espada|
+    espadachin.set_property(:habilidad, habilidad)
+    espadachin.set_property(:potencial_espada, potencial_espada)
+    
+    espadachin.set_method(:potencial_ofensivo, proc {
+      @potencial_ofensivo + self.potencial_espada * self.habilidad
+    })
+}
+
+espadachin = Espadachin.new(100, 30, 10, 0.5, 30)
+expect(espadachin.potencial_ofensivo).to eq(45)
+```
+
+La convención que se define (de momento) es que los parámetros del constructor se pasan y se consumen en
+orden. Los primeros 3 parámetros del constructor generado van para Guerrero, porque Guerrero recibe 3 parámetros
+en su constructor. Si fuera la segunda variante del constructor de guerrero, el constructor de Espadachín debería
+llamarse así:
+
+```ruby
+espadachin = Espadachin.new({energia: 100, potencial_ofensivo: 30, potencial_defensivo: 10},
+0.5, 30)
+```
+
+## 4.3. Azúcar sintáctico
+
+La implementación de prototipos que hicimos funciona, pero tiene problemas de expresividad, y realmente no
+es muy usable, muy cómoda para el programador. La intención ahora es entonces agregar una interfaz a nuestros
+objetos prototipados para que sean más fácilmente utilizables, aprovechando las características de Ruby.
+
+
+Comenzamos con los elementos de la primera parte:
+
+```ruby
+guerrero_proto = PrototypedObject.new
+guerrero_proto.energia = 100
+expect(guerrero_proto.energia).to eq(100)
+
+guerrero_proto.potencial_defensivo = 10
+guerrero_proto.potencial_ofensivo = 30
+
+guerrero_proto.atacar_a = proc { |otro_guerrero| ... });
+guerrero_proto.recibe_danio = proc {...}
+
+Guerrero = PrototypedConstructor.copy(guerrero_proto)
+
+un_guerrero = Guerrero.new
+Guerrero.new.atacar_a(un_guerrero)
+
+expect(un_guerrero.energia).to eq(80)
+```
+
+La idea es que, dinámicamente, uno puede “asignar” propiedades y métodos a los objetos prototipados.
+
+También es incómodo repetir el receptor del mensaje en todo momento. Podemos hacer algo mejor:
+
+
+```ruby
+guerrero_proto = PrototypedObject.new {
+    self.energia = 100
+    self.potencial_ofensivo = 30
+    self.potencial_defensivo = 10
+
+    self.atacar_a = proc { |otro_guerrero| ... }
+    self.recibe_danio = proc {...}
+}
+```
+
+Podemos aplicar ideas similares para los constructores:
+
+```ruby
+Guerrero = PrototypedConstructor.new(guerrero) do |una_energia, un_potencial_ofensivo,
+un_potencial_defensivo|
+    self.energia = una_energia
+    self.potencial_ofensivo = un_potencial_ofensivo
+    self.potencial_defensivo = un_potencial_defensivo
 end
+```
 
-class PartialBlock
-  def matches(*args)
-    arg_types = args.map { |arg| arg.class }
-    matches_signature?(arg_types)
-  end
+También, puede ser práctico definir y utilizar el prototipo en el mismo momento:
 
-  def matches_signature?(signature)
-    return false unless signature.size.eql?(self.types.size)
-    self.types.zip(signature).all? do |my_type, sign_type| sign_type <= my_type end
-  end
-end
-~~~
+```ruby
+Guerrero = PrototypedConstructor.create {
+    self.atacar_a = proc { |otro_guerrero| ... })
+    self.recibe_danio = proc {...}
+}.with {
+    |una_energia, un_potencial_ofensivo, un_potencial_defensivo|
+    self.energia = una_energia
+    self.potencial_ofensivo = un_potencial_ofensivo
+    self.potencial_defensivo = un_potencial_defensivo
+}
+```
 
-Algo que quedó en el tintero para poder ir al siguiente punto es la aclaración de que se pueda usar self dentro de la definición de un método declarado mediante partial_def. Con el código actual eso no funcionará como querríamos, si te animás, c
+Es necesario pasarle el procedimiento del constructor para inicializar las propiedades porque no tenemos información de las propiedades existentes. También se podría definir un método para crear un constructor por defecto
+más sencillo:
 
-3. Hay muchos más puntos en el enunciado de TP grupal original, pero por cuestiones de tiempo los dejamos afuera para resolver que pueda usarse duck typing (que fue el TP individual que se tomó), que es básicamente que pueda conocerse la usabilidad de un objeto de acuerdo a sus comportamientos en vez de su tipo estrictamente. Es decir que trato a dos objetos de distintas clases polimórficamente si entienden el mismo subconjunto de mensajes aún si son cosas totalmente diferentes como el siguiente ejemplo:
+```ruby
+Guerrero = PrototypedConstructor.create {
+    self.atacar_a = proc { |otro_guerrero| ... }
+    self.recibe_danio = proc {...}
+}.with_properties([:energia, :potencial_ofensivo, :potencial_defensivo])
+```
 
-~~~ruby
-class Duck:
-    def quack(self):
-        print("Quaaaaaack!")
-    def feathers(self):
-        print("The duck has white and gray feathers.")
+Si yo quisiera obtener el prototipo de un constructor de estos, debería poder pedírselo, y valen las mismas condiciones
+que para los prototipos con nombre:
 
-class Person:
-    def quack(self):
-        print("The person imitates a duck.")
-    def feathers(self):
-        print("The person takes a feather from the ground and shows it.")
-    def name(self):
-        print("John Smith")
+```ruby
+atila = Guerrero.new(100, 50, 30)
 
-def in_the_forest(duck):
-    duck.quack()
-    duck.feathers()
+expect(atila.potencial_ofensivo).to eq(50)
 
-def game():
-    donald = Duck()
-    john = Person()
-    in_the_forest(donald)
-    in_the_forest(john)
+proto_guerrero = Guerrero.prototype
+proto_guerrero.potencial_ofensivo = proc { 1000 }
 
-game()
-~~~
+expect(atila.potencial_ofensivo).to eq(1000)
+```
 
-Ahora volviendo al ejercicio, vamos a definir duck typing de la siguiente manera
 
-~~~ruby
-class B
-    partial_def :concat, [String, [:m, :n], Integer] do |o1, o2, o3|
-    'Objetos Concatenados'
-    end
-end
-~~~
+Finalmente, debería poder aprovechar esta nueva sintaxis también para la extensión de constructores:
 
-Si el argumento que debería ser un tipo es un array de símbolos, representando el nombre de los selectores que debería entender, entonces se debe aplicar duck typing. Para implementar este agregado entonces debemos extender el matches del partial block de la siguiente manera.
+```ruby
+Espadachin = Guerrero.extended {
+    |una_habilidad, un_potencial_espada|
+    self.habilidad = una_habilidad
+    self.potencial_espada = un_potencial_espada
+    
+    self.potencial_ofensivo = proc {
+      @potencial_ofensivo + self.potencial_espada * self.habilidad
+    }
+}
+```
 
-~~~ruby
-class PartialBlock
-  def matches_signature?(signature)
-    return false unless signature.size.eql?(self.types.size)
-    self.types.zip(signature).all? do |my_type, sign_type|
-      case my_type
-        when Array then
-          my_type.all? { |method| sign_type.instance_methods.include?(method) }
-        else
-          sign_type <= my_type
-      end
-    end
+## 4.4. Llamar al prototipo anterior y Múltiples prototipos
 
-  end
-end
-~~~
+Anteriormente, cuando definimos Espadachin nos encontramos con el inconveniente de que queríamos utilizar
+la implementación previa de potencialofensivo (que venía de guerrero), pero no teníamos forma de acceder a ella,
+porque estábamos pisando ese método.
 
-A esta altura debería volverse más evidente que el refactor que hicimos en el punto anterior para no repetir lógica era muy importante. Si no lo hacíamos antes, lo íbamos a tener que hacer ahora.
+Nos interesa entonces definir un mecanismo para poder llamar a la implementación siguiente de la cadena de
+prototipos:
 
-Algunas alternativas que no hubieran estado buenas para resolver este ejercicio:
-Definir todo en términos de duck typing obteniendo todos los mensajes que definen las clases correspondientes. Eso rompería la funcionalidad porque el tipo en base a los mensajes que entiene puede abarcar objetos que no están en la jerarquía que se pedía inicialmente.
-Resolver el if/switch con polimorfismo abriendo Array y Module. Esto es algo muy particular de nuestro framework, y ensuciar más la interfaz de Array y Module para evitar ese if no es una buena idea.
+```ruby
+Espadachin = Guerrero.extended {
+    |una_habilidad, un_potencial_espada|
+    self.habilidad = una_habilidad
+    self.potencial_espada = un_potencial_espada
+    
+    self.potencial_ofensivo = proc {
+      call_next + self.potencial_espada * self.habilidad
+    }
+}
+```
+
+Finalmente, nos interesa incorporar una idea similar a lo que hacemos con Mixins o con herencia múltiple y permitir
+múltiples prototipos en un mismo objeto:
+
+```ruby
+Guerrero.prototype.set_prototypes([proto_atacante, proto_defensor])
+```
+
+Cabe aclarar que protoatacante y protodefensor no deben verse afectados en su cadena de prototipado: No es
+válido que protodefensor pase a ser prototipo de protoatacante ni vice versa.
+
+Queda a criterio del grupo cómo se efectúa la resolución de conflictos en caso que existieran y cómo funciona el
+callnext al tener múltiples prototipos.
+
+
