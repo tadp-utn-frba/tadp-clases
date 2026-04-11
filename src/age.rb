@@ -1,3 +1,4 @@
+# mixin Atacante
 module Atacante
 
   attr_accessor :potencial_ofensivo
@@ -9,28 +10,61 @@ module Atacante
     end
   end
 
+  def reposar
+    self.potencial_ofensivo = self.potencial_ofensivo + 10
+  end
 end
 
+# mixin Defensor
 module Defensor
 
+  # crea getter y setters
   attr_accessor :potencial_defensivo, :energia
 
   def sufri_danio(danio)
-    self.energia= self.energia - danio
+    energia = energia - danio
   end
 
+  def reposar
+    energia = energia + 10
+  end
 end
 
 class Guerrero
   include Atacante
+  alias_method :descansar_atacante, :descansar
   include Defensor
+  alias_method :descansar_defensor, :descansar
 
+  # constructor
   def initialize(potencial_ofensivo=20, energia=100, potencial_defensivo=10)
     self.potencial_ofensivo = potencial_ofensivo
     self.energia = energia
     self.potencial_defensivo = potencial_defensivo
   end
 
+  def descansar(un_defensor)
+    descansar_atacante
+    descansar_defensor
+  end
+end
+
+class Kamikaze
+  # lo dejamos asi por ahora...
+  include Defensor
+  include Atacante
+
+  def initialize(energia=100, potencial_defensivo=10)
+    self.energia = energia
+    self.potencial_defensivo = potencial_defensivo
+    self.potencial_ofensivo = 250
+  end
+
+  # override al atacar de Atacante.
+  def atacar(un_defensor)
+    super(un_defensor)
+    self.energia = 0
+  end
 end
 
 class Espadachin < Guerrero
@@ -73,4 +107,6 @@ class Muralla
     self.energia = energia
   end
 
+  def reposar
+  end
 end
