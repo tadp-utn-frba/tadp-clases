@@ -145,10 +145,10 @@ end
 2+2  #=> 123
 ~~~
 
-Otra manera de abrir las clases y definir metodos es usando en la clase el `define_method` pero este es privado y como ya vimos podemos pasarlo por arriba invocando el send.
+Otra manera de abrir las clases y definir metodos es usando en la clase el `define_method`.
  
 ~~~ruby
-Guerrero.send(:define_method, :saluda) {
+Guerrero.define_method(:saluda) {
   'Hola'
 }
 Guerrero.new.saluda  #=> "Hola"
