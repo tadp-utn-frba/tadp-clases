@@ -99,7 +99,44 @@ metodo.bind(Hijo.new).call  #=> 'correr como padre'
 ~~~
 
 Como vemos los Unbound Methods se escapan al metodo lookup.
+
+##### Controles sobre unbound methods
+
+Si bien los Unbound methods se escapan al metodo lookup, cuando se hace el bind se hace previamente un chequeo de que la jerarquia a la que se bindea un unbound method debe ser del mismo tipo al de la clase que pertenecia o bien un tipo de la misma jerarquia, por ejemplo tomando lo que vimos ants tratemos de bindear un metodo a una clase que no es de la jerarquia de Padre/Hijo
+
+```ruby
+class A
+end 
+
+metodo = Padre.instance_method(:correr)
+
+metodo.bind(A.new).call # TypeError (bind argument must be an instance of Padre)
+```
+
+por lo que solo podremos bindear el UnboundMethod de correr perteneciente a la clase Padre a una instancia de Padre o de una subclase, por lo que se ajusta a lo que nos devuelve `kind_of?`
+
+```ruby
+Hijo.new.kind_of? Padre # verdadero
+Padre.new.kind_of? Padre # verdadero
+A.new.kind_of? Padre # falso
+```
+
+Es lo mismo que nos dide la documentacion en https://ruby-doc.org/core-2.6.1/UnboundMethod.html
+
+Incluso este control es algo que no podemos sobreescribir ya que es un control hecho en la implementacion de MRi de Ruby:
+
+https://github.com/ruby/ruby/blob/dd81af7b6a7539473b6d7a7e35637b4a7d986523/proc.c#L2403
+
+y que finalmente llama al metodo `convert_umethod_to_method_components`
+
+https://github.com/ruby/ruby/blob/dd81af7b6a7539473b6d7a7e35637b4a7d986523/proc.c#L2328
+
+Por lo que una instancia de UnboundMethod, al menos en MRi no podremos bindearlo en cualquier otro metodo, siempre hay algunas restricciones...
+
+Sigamos....
+
 Tambien podemos preguntarle cosas a los metodos.
+
 
 ~~~ruby
 metodo = atila.method(:atacar) #=> #<Method: Guerrero(Atacante)#atacar>
