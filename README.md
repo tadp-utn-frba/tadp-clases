@@ -4,7 +4,7 @@
 
 ~~~ruby
 class Persona
-  :attr_accessor :name
+  attr_accessor :name
   
   def initialize(name)
     self.name = name
