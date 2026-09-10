@@ -1,4 +1,4 @@
-require_relative 'age'
+require_relative '../src/age'
 require_relative '6_framework_tests'
 
 test_suite do

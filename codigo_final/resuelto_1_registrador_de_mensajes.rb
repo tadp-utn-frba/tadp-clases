@@ -1,4 +1,4 @@
-require_relative 'age'
+require_relative '../src/age'
 
 def hacer_combatir(guerrero)
   oponente = Guerrero.new(20, 100, 20)
