@@ -36,3 +36,8 @@ sass/.sass-cache
 
 .idea/
 tadp-clases.iml
+
+# Metals
+.bloop/
+.metals/
+metals.sbt
